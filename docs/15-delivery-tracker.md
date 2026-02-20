@@ -18,7 +18,7 @@ It is updated after every completed engineering task.
 
 | Phase | Target window | Progress | Status | Gate status |
 |---|---|---:|---|---|
-| Pre-kickoff (OSS standards) | Feb 23-Feb 27, 2026 | 95% | `IN_PROGRESS` | branch protection + required checks still manual |
+| Pre-kickoff (OSS standards) | Feb 23-Feb 27, 2026 | 100% | `DONE` | branch protection + required checks active |
 | Sprint 0 (scaffold) | Mar 2-Mar 6, 2026 | 100% | `DONE` | quality CI + architecture review completed |
 | Phase 1 (MVP foundation) | Mar 9-Apr 3, 2026 | 100% | `DONE` | tests and benchmarks passing; `0.1.0rc1` prepared |
 | Phase 2 (tool control) | Apr 6-May 1, 2026 | 15% | `PLANNED` | contract enforcement and adapter completion pending |
@@ -27,7 +27,7 @@ It is updated after every completed engineering task.
 | Phase 5 (dashboard + enterprise) | Jul 13-Sep 4, 2026 | 0% | `PLANNED` | not started |
 | Phase 6 (ecosystem) | Sep 2026+ | 0% | `PLANNED` | not started |
 
-Approximate overall completion (full program): **~34%**
+Approximate overall completion (full program): **~35%**
 
 ## Implemented so far (evidence)
 
@@ -88,6 +88,7 @@ Approximate overall completion (full program): **~34%**
 - `P1-10` Unit/integration/benchmark gates passing.
 - `P1-11` Quickstart and end-to-end example completed.
 - `P1-12` Release candidate prepared (`0.1.0rc1`).
+- `PK-7` Branch protection and required checks enabled on `main`.
 
 ## Release artifact note
 
@@ -104,7 +105,7 @@ Approximate overall completion (full program): **~34%**
 - [x] PK-4 Security disclosure and policy complete.
 - [x] PK-5 Compatibility/semver contract complete.
 - [x] PK-6 Supply-chain baseline workflows added.
-- [ ] PK-7 Branch protection and required checks enabled in GitHub settings.
+- [x] PK-7 Branch protection and required checks enabled in GitHub settings.
 
 ### Sprint 0 (repo/architecture baseline)
 
