@@ -1,0 +1,23 @@
+version: v1alpha1
+policies:
+  - name: block-secrets-everywhere
+    boundary: [input, action, output]
+    priority: 10
+    condition:
+      data_tags: [secret.credential, secret.token, secret]
+    action: block
+    reason: Secrets must never cross any boundary.
+
+  - name: redact-personal-data-in-output
+    boundary: output
+    priority: 20
+    condition:
+      data_tags: [personal, personal.pii, personal.phi, personal.financial]
+    action: redact
+    reason: Personal data must not appear in outbound responses.
+
+  - name: allow-input-by-default
+    boundary: input
+    priority: 1000
+    action: allow
+    reason: Allow when no restrictive policy matched.

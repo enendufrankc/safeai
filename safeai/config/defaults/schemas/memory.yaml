@@ -1,0 +1,19 @@
+version: v1alpha1
+memory:
+  name: default-session-memory
+  scope: session
+  max_entries: 100
+  default_retention: 24h
+  fields:
+    - name: user_preference
+      type: string
+      tag: internal
+      retention: 30d
+      encrypted: false
+      required: false
+    - name: ticket_id
+      type: string
+      tag: confidential
+      retention: 7d
+      encrypted: false
+      required: false

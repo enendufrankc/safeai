@@ -1,0 +1,60 @@
+name: Quality Gate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    name: Lint, type-check, tests, benchmarks
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12"]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Setup Python
+        uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38 # v6.0.0
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          python -m pip install ".[dev]"
+
+      - name: Compile check
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m compileall safeai tests
+
+      - name: Ruff lint
+        shell: bash
+        run: |
+          set -euo pipefail
+          ruff check safeai tests
+
+      - name: Mypy type check
+        shell: bash
+        run: |
+          set -euo pipefail
+          mypy safeai
+
+      - name: Unit and integration tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m unittest discover -s tests -v

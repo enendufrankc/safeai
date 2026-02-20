@@ -1,0 +1,10 @@
+version: v1alpha1
+paths:
+  policy_files:
+    - policies/default.yaml
+  contract_files:
+    - contracts/*.yaml
+  memory_schema_files:
+    - schemas/*.yaml
+audit:
+  file_path: logs/audit.log

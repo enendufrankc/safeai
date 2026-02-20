@@ -1,0 +1,81 @@
+name: Bug report
+description: Report a reproducible defect or unexpected behavior in SafeAI.
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting this. Please keep the report reproducible and evidence-based.
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: One or two sentences describing what is broken.
+      placeholder: Output guard allowed a secret-tagged token to pass through without redaction.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Provide the shortest deterministic path.
+      placeholder: |
+        1. Configure policy X
+        2. Run command Y with input Z
+        3. Observe behavior
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: What should happen if the bug does not exist.
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: What happened instead.
+    validations:
+      required: true
+  - type: dropdown
+    id: security_impact
+    attributes:
+      label: Security impact
+      description: Does this defect create a security or privacy risk?
+      options:
+        - "Unknown"
+        - "No"
+        - "Yes - low"
+        - "Yes - medium"
+        - "Yes - high"
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Runtime and integration context.
+      placeholder: |
+        OS:
+        Python version:
+        SafeAI version/commit:
+        Integration (SDK/CLI/proxy):
+        Relevant config (redacted):
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Logs, traces, or evidence
+      description: Add relevant redacted logs, trace snippets, and command output.
+      render: shell
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional context
+      description: Regression info, workarounds, or related links.
+
