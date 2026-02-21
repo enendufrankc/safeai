@@ -1,3 +1,57 @@
+/* ── Dark charcoal-brown theme ── */
+:root {
+  --md-primary-fg-color: #1a1a1a;
+  --md-primary-bg-color: #e0d6cc;
+  --md-accent-fg-color: #c8553d;
+}
+
+[data-md-color-scheme="slate"] {
+  --md-default-bg-color: #1e1c1a;
+  --md-default-fg-color: #d4cdc5;
+  --md-default-fg-color--light: #a89f95;
+  --md-default-fg-color--lighter: #7a7168;
+  --md-default-fg-color--lightest: #3d3733;
+  --md-primary-fg-color: #121110;
+  --md-primary-bg-color: #d4cdc5;
+  --md-accent-fg-color: #c8553d;
+  --md-typeset-a-color: #d4885a;
+  --md-code-bg-color: #151311;
+  --md-code-fg-color: #c9bfb3;
+  --md-footer-bg-color: #121110;
+  --md-footer-fg-color: #a89f95;
+  --md-typeset-color: #d4cdc5;
+}
+
+[data-md-color-scheme="slate"] .md-header {
+  background-color: #121110;
+}
+
+[data-md-color-scheme="slate"] .md-tabs {
+  background-color: #1a1816;
+}
+
+[data-md-color-scheme="slate"] .md-nav--primary .md-nav__item--active > .md-nav__link {
+  color: #d4885a;
+}
+
+[data-md-color-scheme="slate"] .md-typeset .md-button--primary {
+  background-color: #c8553d;
+  border-color: #c8553d;
+}
+
+[data-md-color-scheme="slate"] .md-typeset .md-button--primary:hover {
+  background-color: #a8442f;
+  border-color: #a8442f;
+}
+
+[data-md-color-scheme="slate"] .md-search__form {
+  background-color: #2a2623;
+}
+
+[data-md-color-scheme="slate"] .md-sidebar {
+  background-color: #1a1816;
+}
+
 /* Header logo sizing */
 .md-header__button.md-logo img {
   height: 10.5rem;
