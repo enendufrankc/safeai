@@ -1,4 +1,5 @@
 ---
+description: "SafeAI — the runtime security layer for AI agents. Block secrets, redact PII, enforce policies, and control tools across any AI provider."
 hide:
   - navigation
   - toc

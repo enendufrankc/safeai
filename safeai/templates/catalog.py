@@ -1,4 +1,4 @@
-"""Policy template catalog (built-in + plugin-provided packs)."""
+"""Policy template catalog (built-in + plugin-provided + community packs)."""
 
 from __future__ import annotations
 
@@ -8,13 +8,19 @@ from typing import Any
 import yaml  # type: ignore[import-untyped]
 
 from safeai.plugins.manager import PluginManager
+from safeai.templates.registry import CommunityRegistry
 
 
 class PolicyTemplateCatalog:
-    """Lookup and load policy templates from built-in and plugin sources."""
+    """Lookup and load policy templates from built-in, plugin, and community sources."""
 
-    def __init__(self, plugin_manager: PluginManager | None = None) -> None:
+    def __init__(
+        self,
+        plugin_manager: PluginManager | None = None,
+        community_registry: CommunityRegistry | None = None,
+    ) -> None:
         self._plugins = plugin_manager or PluginManager()
+        self._community = community_registry or CommunityRegistry()
         self._builtin_templates = _discover_builtin_templates()
         self._plugin_templates = self._plugins.policy_templates()
 
@@ -24,6 +30,8 @@ class PolicyTemplateCatalog:
             rows.append({"name": name, "source": "builtin", "path": str(self._builtin_templates[name])})
         for name in sorted(self._plugin_templates.keys()):
             rows.append({"name": name, "source": "plugin", "path": None})
+        for item in self._community.list_installed():
+            rows.append({"name": item.get("name", ""), "source": "community", "path": item.get("path")})
         return rows
 
     def load(self, name: str) -> dict[str, Any]:
@@ -35,11 +43,29 @@ class PolicyTemplateCatalog:
             return dict(plugin_doc)
         file_path = self._builtin_templates.get(token)
         if file_path is None:
+            # Check community installed templates
+            for item in self._community.list_installed():
+                if item.get("name", "").lower() == token:
+                    installed_path = Path(item["path"])
+                    loaded = yaml.safe_load(installed_path.read_text(encoding="utf-8")) or {}
+                    if not isinstance(loaded, dict):
+                        raise ValueError(f"Community template '{token}' is not a YAML object")
+                    return loaded
             raise KeyError(f"policy template '{token}' not found")
         loaded = yaml.safe_load(file_path.read_text(encoding="utf-8")) or {}
         if not isinstance(loaded, dict):
             raise ValueError(f"Policy template '{token}' at {file_path} is not a YAML object")
         return loaded
+
+    def search(self, **kwargs: Any) -> list[dict[str, Any]]:
+        """Search community templates."""
+        results = self._community.search(**kwargs)
+        return [tmpl.model_dump() for tmpl in results]
+
+    def install(self, name: str) -> str:
+        """Install a community template. Returns the installed path."""
+        path = self._community.install(name)
+        return str(path)
 
 
 def _discover_builtin_templates() -> dict[str, Path]:

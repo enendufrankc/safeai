@@ -39,6 +39,11 @@ class AuditLogger:
         self.file_path = Path(file_path).expanduser() if file_path else None
         if self.file_path:
             self.file_path.parent.mkdir(parents=True, exist_ok=True)
+        self._on_emit_callbacks: list[Any] = []
+
+    def register_on_emit(self, callback: Any) -> None:
+        """Register a callback invoked after every emit(). Callbacks receive the event dict."""
+        self._on_emit_callbacks.append(callback)
 
     def emit(self, event: AuditEvent) -> None:
         event_payload = asdict(event)
@@ -66,6 +71,12 @@ class AuditLogger:
                 fh.write(encoded + "\n")
         else:
             print(encoded)
+        event_dict = validated.model_dump(mode="json")
+        for callback in self._on_emit_callbacks:
+            try:
+                callback(event_dict)
+            except Exception:
+                pass
 
     def query(
         self,

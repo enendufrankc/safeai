@@ -68,6 +68,18 @@ class IntelligenceConfig(BaseModel):
     metadata_only: bool = True
 
 
+class AlertChannelConfig(BaseModel):
+    webhook_url: str | None = None
+    slack_webhook_url: str | None = None
+
+
+class AlertingConfig(BaseModel):
+    enabled: bool = False
+    default_channels: list[str] = Field(default_factory=lambda: ["file"])
+    cooldown_seconds: int = 60
+    channels: AlertChannelConfig = Field(default_factory=AlertChannelConfig)
+
+
 class SafeAIConfig(BaseModel):
     version: str = "v1alpha1"
     paths: PathsConfig = Field(default_factory=PathsConfig)
@@ -77,3 +89,4 @@ class SafeAIConfig(BaseModel):
     plugins: PluginConfig = Field(default_factory=PluginConfig)
     dashboard: DashboardConfig = Field(default_factory=DashboardConfig)
     intelligence: IntelligenceConfig = Field(default_factory=IntelligenceConfig)
+    alerting: AlertingConfig = Field(default_factory=AlertingConfig)

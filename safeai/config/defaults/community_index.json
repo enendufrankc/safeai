@@ -1,0 +1,53 @@
+{
+  "version": "v1",
+  "templates": [
+    {
+      "name": "healthcare-hipaa",
+      "description": "HIPAA-compliant policy template for healthcare AI applications",
+      "author": "safeai-team",
+      "category": "compliance",
+      "tags": ["hipaa", "healthcare", "phi", "pii"],
+      "compliance_standards": ["hipaa", "hitech"],
+      "framework_compat": ["langchain", "crewai", "autogen"],
+      "download_url": "",
+      "sha256": "",
+      "version": "1.0.0"
+    },
+    {
+      "name": "financial-pci",
+      "description": "PCI-DSS compliant policy template for financial AI applications",
+      "author": "safeai-team",
+      "category": "compliance",
+      "tags": ["pci", "financial", "credit-card", "pii"],
+      "compliance_standards": ["pci-dss", "sox"],
+      "framework_compat": ["langchain", "crewai"],
+      "download_url": "",
+      "sha256": "",
+      "version": "1.0.0"
+    },
+    {
+      "name": "coding-agent-strict",
+      "description": "Strict policy template for coding agents with dangerous command blocking",
+      "author": "safeai-team",
+      "category": "agent-security",
+      "tags": ["coding", "agent", "dangerous-commands", "shell"],
+      "compliance_standards": [],
+      "framework_compat": ["claude-code", "cursor", "copilot"],
+      "download_url": "",
+      "sha256": "",
+      "version": "1.0.0"
+    },
+    {
+      "name": "enterprise-default",
+      "description": "General-purpose enterprise policy with balanced security defaults",
+      "author": "safeai-team",
+      "category": "general",
+      "tags": ["enterprise", "secrets", "pii", "default"],
+      "compliance_standards": [],
+      "framework_compat": ["langchain", "crewai", "autogen", "claude-adk", "google-adk"],
+      "download_url": "",
+      "sha256": "",
+      "version": "1.0.0"
+    }
+  ]
+}

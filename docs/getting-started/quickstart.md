@@ -1,3 +1,7 @@
+---
+description: "Get started with SafeAI in two lines of code — scan inputs, guard outputs, and secure any AI agent pipeline."
+---
+
 # Quickstart
 
 SafeAI can be protecting your AI agent pipelines in two lines of code. This page walks through scanning inputs, guarding outputs, using the CLI, and wiring SafeAI into a real model call.

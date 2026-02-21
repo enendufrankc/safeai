@@ -27,6 +27,7 @@ def health(request: Request) -> dict[str, Any]:
         "status": "ok",
         "mode": runtime.mode,
         "version": _VERSION,
+        "agents": runtime.metrics.agent_summary(),
     }
 
 
