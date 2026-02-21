@@ -3,7 +3,7 @@
 SafeAI is an open-source, framework-agnostic runtime control layer for AI systems.
 It enforces security and privacy at input, action, and output boundaries.
 
-Current status: Sprint 0 and Phase 1 complete, with `0.1.0rc1` prepared.
+Current status: Sprint 0 through Phase 6 complete, with `0.6.0` release gate passed.
 
 Execution tracker: `docs/15-delivery-tracker.md`
 

@@ -1,4 +1,4 @@
-# SafeAI Quickstart (Phase 1)
+# SafeAI Quickstart (Phase 2)
 
 This quickstart covers install, initialization, boundary scans, audit query, memory writes, and one end-to-end SDK run.
 
@@ -19,6 +19,7 @@ Creates:
 - `policies/default.yaml`
 - `contracts/example.yaml`
 - `schemas/memory.yaml`
+- `agents/default.yaml`
 
 ## 3. Validate config and schemas
 
@@ -29,7 +30,9 @@ safeai validate --config safeai.yaml
 Expected output includes:
 - config path
 - policy count
+- contract count
 - memory schema count
+- agent identity count
 
 ## 4. Run boundary scans
 
@@ -58,6 +61,8 @@ Filtered query examples:
 ```bash
 safeai logs --boundary output --action redact --tail 10
 safeai logs --agent assistant-1 --last 1h --tail 50
+safeai logs --boundary action --phase request --data-tag personal --tail 20
+safeai logs --detail evt_abc123 --text-output
 ```
 
 Text output:
@@ -66,7 +71,26 @@ Text output:
 safeai logs --text-output --tail 5
 ```
 
-## 6. Run the end-to-end SDK example
+## 6. LangChain tool wrapper (optional)
+
+```python
+from safeai import SafeAI
+
+safeai = SafeAI.from_config("safeai.yaml")
+adapter = safeai.langchain_adapter()
+
+def send_email_tool(**kwargs):
+    return {"status": "sent", "message_id": "m-1", "recipient": "alice@example.com"}
+
+safe_send_email = adapter.wrap_tool(
+    "send_email",
+    send_email_tool,
+    agent_id="default-agent",
+    request_data_tags=["internal"],
+)
+```
+
+## 7. Run the end-to-end SDK example
 
 ```bash
 python3 examples/e2e_example.py
@@ -78,7 +102,7 @@ The example demonstrates:
 - memory write/read via schema-bound fields
 - audit query
 
-## 7. Next steps
+## 8. Next steps
 
 1. Edit `policies/default.yaml` to fit your data tags and tool names.
 2. Tighten `schemas/memory.yaml` to only approved memory fields.

@@ -23,38 +23,40 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
-      - name: Setup Python
-        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.0.0
+      - name: Setup uv
+        uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4debba9b28e50754d18e8c66 # v5.4.2
         with:
-          python-version: ${{ matrix.python-version }}
+          version: "latest"
+
+      - name: Setup Python
+        run: uv python install ${{ matrix.python-version }}
 
       - name: Install dependencies
         shell: bash
         run: |
           set -euo pipefail
-          python -m pip install --upgrade pip
-          python -m pip install ".[dev]"
+          uv sync --extra dev
 
       - name: Compile check
         shell: bash
         run: |
           set -euo pipefail
-          python -m compileall safeai tests
+          uv run python -m compileall safeai tests
 
       - name: Ruff lint
         shell: bash
         run: |
           set -euo pipefail
-          ruff check safeai tests
+          uv run ruff check safeai tests
 
       - name: Mypy type check
         shell: bash
         run: |
           set -euo pipefail
-          mypy safeai
+          uv run mypy safeai
 
       - name: Unit and integration tests
         shell: bash
         run: |
           set -euo pipefail
-          python -m unittest discover -s tests -v
+          uv run python -m unittest discover -s tests -v

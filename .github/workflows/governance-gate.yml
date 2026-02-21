@@ -40,6 +40,7 @@ jobs:
             schemas/v1alpha1/policy.schema.json
             schemas/v1alpha1/tool-contract.schema.json
             schemas/v1alpha1/memory.schema.json
+            schemas/v1alpha1/agent-identity.schema.json
           )
 
           missing=0
