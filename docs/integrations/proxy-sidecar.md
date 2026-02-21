@@ -384,8 +384,41 @@ docker run -p 8000:8000 safeai-sidecar
 
 ---
 
+---
+
+## Intelligence Endpoints
+
+When the intelligence layer is enabled, the proxy exposes additional advisory endpoints:
+
+| Endpoint | Method | Description |
+|---|---|---|
+| `/v1/intelligence/status` | `GET` | Check if intelligence is enabled and which backend/model is configured |
+| `/v1/intelligence/explain` | `POST` | Classify and explain a security incident by event ID |
+| `/v1/intelligence/recommend` | `POST` | Suggest policy improvements from audit aggregates |
+| `/v1/intelligence/compliance` | `POST` | Generate compliance policy sets for a given framework |
+
+```bash
+# Check intelligence status
+curl http://localhost:8000/v1/intelligence/status
+
+# Explain an incident
+curl -X POST http://localhost:8000/v1/intelligence/explain \
+  -H "Content-Type: application/json" \
+  -d '{"event_id": "evt_abc123"}'
+
+# Get policy recommendations
+curl -X POST http://localhost:8000/v1/intelligence/recommend \
+  -H "Content-Type: application/json" \
+  -d '{"since": "7d"}'
+```
+
+All intelligence endpoints return HTTP 503 when the intelligence layer is not configured.
+
+---
+
 ## Next Steps
 
 - [Coding Agents](coding-agents.md) -- hook-based integration for Claude Code and Cursor
 - [Plugins](plugins.md) -- extend SafeAI with custom detectors
 - [Audit Logging](../guides/audit-logging.md) -- query the decision log
+- [Intelligence Layer](../guides/intelligence.md) -- AI advisory agents

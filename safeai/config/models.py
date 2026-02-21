@@ -54,6 +54,20 @@ class MemoryRuntimeConfig(BaseModel):
     auto_purge_expired: bool = True
 
 
+class IntelligenceBackendConfig(BaseModel):
+    provider: str = "ollama"
+    model: str = "llama3.2"
+    base_url: str = "http://localhost:11434"
+    api_key_env: str | None = None
+
+
+class IntelligenceConfig(BaseModel):
+    enabled: bool = False
+    backend: IntelligenceBackendConfig = Field(default_factory=IntelligenceBackendConfig)
+    max_events_per_query: int = 500
+    metadata_only: bool = True
+
+
 class SafeAIConfig(BaseModel):
     version: str = "v1alpha1"
     paths: PathsConfig = Field(default_factory=PathsConfig)
@@ -62,3 +76,4 @@ class SafeAIConfig(BaseModel):
     memory_runtime: MemoryRuntimeConfig = Field(default_factory=MemoryRuntimeConfig)
     plugins: PluginConfig = Field(default_factory=PluginConfig)
     dashboard: DashboardConfig = Field(default_factory=DashboardConfig)
+    intelligence: IntelligenceConfig = Field(default_factory=IntelligenceConfig)

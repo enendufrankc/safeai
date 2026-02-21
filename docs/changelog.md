@@ -4,6 +4,31 @@ All notable changes to SafeAI are documented in this file. The format follows [K
 
 ---
 
+## 0.7.0 -- 2026-02-21
+
+### Added
+
+- Intelligence layer with 5 AI advisory agents: auto-config, policy recommender, incident explainer, compliance mapper, and integration generator (`safeai/intelligence/`).
+- BYOM (Bring Your Own Model) backend abstraction with `AIBackend` protocol, `AIBackendRegistry`, `OllamaBackend`, and `OpenAICompatibleBackend` (`safeai/intelligence/backend.py`).
+- `MetadataSanitizer` that strips raw values (secrets, PII, matched patterns) from audit events before they enter any AI prompt (`safeai/intelligence/sanitizer.py`).
+- `BaseAdvisor` ABC and `AdvisorResult` frozen dataclass for all intelligence agents (`safeai/intelligence/advisor.py`).
+- Codebase structure extraction via `ast.parse` for safe metadata-only project analysis (`safeai/intelligence/sanitizer.py`).
+- Prompt template packages for all 5 agents with built-in compliance requirement mappings (HIPAA, PCI-DSS, SOC2, GDPR) and framework integration templates (`safeai/intelligence/prompts/`).
+- CLI command group `safeai intelligence` with 5 subcommands: `auto-config`, `recommend`, `explain`, `compliance`, `integrate` (`safeai/cli/intelligence.py`).
+- SDK methods on `SafeAI` class: `register_ai_backend()`, `list_ai_backends()`, `intelligence_auto_config()`, `intelligence_recommend()`, `intelligence_explain()`, `intelligence_compliance()`, `intelligence_integrate()` (`safeai/api.py`).
+- Proxy intelligence endpoints: `GET /v1/intelligence/status`, `POST /v1/intelligence/explain`, `POST /v1/intelligence/recommend`, `POST /v1/intelligence/compliance` (`safeai/proxy/routes.py`).
+- Dashboard intelligence endpoint with RBAC: `POST /v1/dashboard/intelligence/explain` with `intelligence:explain` permission (`safeai/dashboard/routes.py`).
+- `IntelligenceConfig` and `IntelligenceBackendConfig` Pydantic models nested under `SafeAIConfig.intelligence` (`safeai/config/models.py`).
+- 8 new test files with 94 tests covering backends, sanitizer, all 5 agents, and CLI (`tests/test_intelligence_*.py`).
+
+### Changed
+
+- Package version moved to `0.7.0`.
+- CLI entrypoint now includes `intelligence` command group.
+- Intelligence layer is disabled by default (`intelligence.enabled: false`). All features require explicit opt-in.
+
+---
+
 ## 0.6.0 -- 2026-02-20
 
 ### Added

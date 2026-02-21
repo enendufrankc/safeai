@@ -194,6 +194,30 @@ def dashboard_upsert_alert_rule(payload: AlertRulePayload, request: Request) -> 
     )
 
 
+class IntelligenceExplainPayload(BaseModel):
+    event_id: str
+
+
+@router.post("/v1/dashboard/intelligence/explain")
+def dashboard_intelligence_explain(
+    payload: IntelligenceExplainPayload, request: Request
+) -> dict[str, Any]:
+    runtime = request.app.state.runtime
+    principal = runtime.dashboard.authorize_request(request.headers, permission="intelligence:explain")
+    try:
+        result = runtime.safeai.intelligence_explain(payload.event_id)
+    except Exception as exc:
+        return {"error": f"Intelligence layer not configured: {exc}"}
+    return {
+        "advisor": result.advisor_name,
+        "status": result.status,
+        "summary": result.summary,
+        "response": result.raw_response,
+        "model": result.model_used,
+        "metadata": result.metadata,
+    }
+
+
 @router.post("/v1/dashboard/alerts/evaluate")
 def dashboard_evaluate_alerts(payload: AlertEvaluatePayload, request: Request) -> dict[str, Any]:
     runtime = request.app.state.runtime

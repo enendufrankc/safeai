@@ -129,6 +129,7 @@ nav:
     - Structured Scanning: guides/structured-scanning.md
     - Agent Messaging: guides/agent-messaging.md
     - Dangerous Commands: guides/dangerous-commands.md
+    - Intelligence Layer: guides/intelligence.md
   - Integrations:
     - Overview: integrations/index.md
     - LangChain: integrations/langchain.md
@@ -154,6 +155,7 @@ nav:
     - Middleware: reference/middleware.md
     - Core Models: reference/models.md
     - Config Models: reference/config-models.md
+    - Intelligence: reference/intelligence.md
   - Notebooks: notebooks/index.md
   - Contributing:
     - Guide: contributing/guide.md
