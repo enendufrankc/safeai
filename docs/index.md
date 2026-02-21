@@ -21,7 +21,7 @@ Works with <strong>any</strong> AI provider — OpenAI, Gemini, Claude, LangChai
 <div class="badges" markdown>
 
 [![Build](https://img.shields.io/github/actions/workflow/status/enendufrankc/safeai/quality.yml?label=build&style=flat-square)](https://github.com/enendufrankc/safeai/actions/workflows/quality.yml)
-[![Release](https://img.shields.io/badge/release-v0.6.0-blue?style=flat-square)](https://github.com/enendufrankc/safeai/releases)
+[![Release](https://img.shields.io/badge/release-v0.7.0-blue?style=flat-square)](https://github.com/enendufrankc/safeai/releases)
 [![PyPI](https://img.shields.io/pypi/v/safeai?style=flat-square&label=pypi)](https://pypi.org/project/safeai/)
 [![License](https://img.shields.io/badge/license-Apache--2.0-green?style=flat-square)](https://github.com/enendufrankc/safeai/blob/main/LICENSE)
 [![Stars](https://img.shields.io/github/stars/enendufrankc/safeai?style=flat-square)](https://github.com/enendufrankc/safeai/stargazers)
@@ -124,6 +124,11 @@ Policy-gated agent-to-agent communication across trust boundaries.
 <div class="feature-card" markdown>
 ### :material-alert-octagon: Dangerous Commands
 Block `rm -rf /`, `DROP TABLE`, fork bombs, pipe-to-shell, and force pushes.
+</div>
+
+<div class="feature-card" markdown>
+### :material-brain: Intelligence Layer
+5 AI advisory agents for auto-config, policy recommendations, incident explanation, compliance mapping, and integration code generation. BYOM -- bring your own model.
 </div>
 
 </div>

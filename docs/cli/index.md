@@ -298,3 +298,85 @@ The MCP server exposes SafeAI's scanning, policy evaluation, and audit capabilit
 
 !!! note
     The MCP server uses stdio transport by default and is intended to be launched by an MCP client, not run standalone.
+
+---
+
+## `safeai intelligence`
+
+AI advisory commands for configuration generation, policy recommendations, incident explanation, compliance mapping, and integration code generation.
+
+```bash
+safeai intelligence <SUBCOMMAND> [FLAGS]
+```
+
+### Subcommands
+
+| Subcommand | Description |
+|------------|-------------|
+| `auto-config` | Generate SafeAI configuration from project structure |
+| `recommend` | Suggest policy improvements from audit data |
+| `explain` | Classify and explain a security incident |
+| `compliance` | Generate compliance policy sets |
+| `integrate` | Generate framework-specific integration code |
+
+### `auto-config`
+
+```bash
+safeai intelligence auto-config [--path .] [--framework langchain] [--output-dir .safeai-generated] [--apply] [--config safeai.yaml]
+```
+
+| Flag | Type | Default | Description |
+|------|------|---------|-------------|
+| `--path` | path | `.` | Project path to analyze |
+| `--framework` | string | auto-detect | Framework hint (e.g., langchain, crewai) |
+| `--output-dir` | path | `.safeai-generated` | Directory for generated files |
+| `--apply` | flag | off | Copy generated files to project root |
+| `--config` | path | `safeai.yaml` | Path to safeai.yaml |
+
+### `recommend`
+
+```bash
+safeai intelligence recommend [--since 7d] [--output-dir .safeai-generated] [--config safeai.yaml]
+```
+
+| Flag | Type | Default | Description |
+|------|------|---------|-------------|
+| `--since` | duration | `7d` | Time window for audit analysis |
+| `--output-dir` | path | `.safeai-generated` | Directory for generated files |
+| `--config` | path | `safeai.yaml` | Path to safeai.yaml |
+
+### `explain`
+
+```bash
+safeai intelligence explain <EVENT_ID> [--config safeai.yaml]
+```
+
+Takes a single event ID as argument and prints the classification and explanation.
+
+### `compliance`
+
+```bash
+safeai intelligence compliance --framework <FRAMEWORK> [--output-dir .safeai-generated] [--config safeai.yaml]
+```
+
+| Flag | Type | Required | Description |
+|------|------|----------|-------------|
+| `--framework` | `hipaa\|pci-dss\|soc2\|gdpr` | Yes | Compliance framework to map |
+| `--output-dir` | path | No | Directory for generated files |
+| `--config` | path | No | Path to safeai.yaml |
+
+### `integrate`
+
+```bash
+safeai intelligence integrate --target <FRAMEWORK> [--path .] [--output-dir .safeai-generated] [--config safeai.yaml]
+```
+
+| Flag | Type | Required | Description |
+|------|------|----------|-------------|
+| `--target` | string | Yes | Target framework (langchain, crewai, autogen, etc.) |
+| `--path` | path | No | Project path |
+| `--output-dir` | path | No | Directory for generated files |
+| `--config` | path | No | Path to safeai.yaml |
+
+!!! warning "Requires AI backend"
+    All intelligence commands require `intelligence.enabled: true` in `safeai.yaml` and a configured AI backend. See the [Intelligence Layer guide](../guides/intelligence.md) for setup instructions.

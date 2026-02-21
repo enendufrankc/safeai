@@ -80,6 +80,7 @@ class SafeAI:
         self.plugins = plugin_manager or PluginManager()
         self.templates = PolicyTemplateCatalog(plugin_manager=self.plugins)
         self.memory_auto_purge_expired = memory_auto_purge_expired
+        self._ai_backends: Any = None  # Lazy: AIBackendRegistry
         self._input = InputScanner(classifier=classifier, policy_engine=policy_engine, audit_logger=audit_logger)
         self._structured = StructuredScanner(
             classifier=classifier,
@@ -734,6 +735,81 @@ class SafeAI:
 
     def load_policy_template(self, name: str) -> dict[str, Any]:
         return self.templates.load(name)
+
+    # --- Intelligence layer (lazy imports) ---
+
+    def _ensure_ai_registry(self) -> Any:
+        if self._ai_backends is None:
+            from safeai.intelligence.backend import AIBackendRegistry
+
+            self._ai_backends = AIBackendRegistry()
+        return self._ai_backends
+
+    def register_ai_backend(self, name: str, backend: Any, *, default: bool = True) -> None:
+        registry = self._ensure_ai_registry()
+        registry.register(name, backend, default=default)
+
+    def list_ai_backends(self) -> list[str]:
+        return self._ensure_ai_registry().list_backends()
+
+    def intelligence_auto_config(
+        self, project_path: str = ".", framework_hint: str | None = None
+    ) -> Any:
+        from safeai.intelligence.auto_config import AutoConfigAdvisor
+        from safeai.intelligence.sanitizer import MetadataSanitizer
+
+        backend = self._ensure_ai_registry().get()
+        advisor = AutoConfigAdvisor(backend=backend, sanitizer=MetadataSanitizer())
+        return advisor.advise(project_path=project_path, framework_hint=framework_hint)
+
+    def intelligence_recommend(self, since: str = "7d") -> Any:
+        from safeai.intelligence.recommender import RecommenderAdvisor
+        from safeai.intelligence.sanitizer import MetadataSanitizer
+
+        backend = self._ensure_ai_registry().get()
+        sanitizer = MetadataSanitizer()
+        events = self.query_audit(last=since)
+        advisor = RecommenderAdvisor(backend=backend, sanitizer=sanitizer)
+        return advisor.advise(events=events)
+
+    def intelligence_explain(self, event_id: str) -> Any:
+        from safeai.intelligence.incident import IncidentAdvisor
+        from safeai.intelligence.sanitizer import MetadataSanitizer
+
+        backend = self._ensure_ai_registry().get()
+        sanitizer = MetadataSanitizer()
+        events = self.query_audit(event_id=event_id)
+        target = events[0] if events else None
+        if not target:
+            from safeai.intelligence.advisor import AdvisorResult
+
+            return AdvisorResult(
+                advisor_name="incident",
+                status="error",
+                summary=f"Event '{event_id}' not found.",
+            )
+        # Get surrounding context
+        context_events = self.query_audit(last="1h", limit=5)
+        advisor = IncidentAdvisor(backend=backend, sanitizer=sanitizer)
+        return advisor.advise(event=target, context_events=context_events)
+
+    def intelligence_compliance(
+        self, framework: str = "hipaa", config_path: str | None = None
+    ) -> Any:
+        from safeai.intelligence.compliance import ComplianceAdvisor
+        from safeai.intelligence.sanitizer import MetadataSanitizer
+
+        backend = self._ensure_ai_registry().get()
+        advisor = ComplianceAdvisor(backend=backend, sanitizer=MetadataSanitizer())
+        return advisor.advise(framework=framework, config_path=config_path)
+
+    def intelligence_integrate(self, target: str = "langchain", project_path: str = ".") -> Any:
+        from safeai.intelligence.integration import IntegrationAdvisor
+        from safeai.intelligence.sanitizer import MetadataSanitizer
+
+        backend = self._ensure_ai_registry().get()
+        advisor = IntegrationAdvisor(backend=backend, sanitizer=MetadataSanitizer())
+        return advisor.advise(target=target, project_path=project_path)
 
     def intercept_agent_message(
         self,

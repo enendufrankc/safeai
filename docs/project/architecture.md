@@ -97,6 +97,23 @@ safeai/
   mcp/                     # Model Context Protocol
     server.py              # MCP server implementation
 
+  intelligence/            # AI advisory layer (v0.7.0)
+    __init__.py            # Public exports
+    backend.py             # BYOM backend abstraction (Ollama, OpenAI-compatible)
+    sanitizer.py           # Metadata sanitizer (strips raw data from AI prompts)
+    advisor.py             # BaseAdvisor ABC, AdvisorResult dataclass
+    auto_config.py         # Agent 1: codebase → SafeAI config
+    recommender.py         # Agent 2: audit aggregates → policy recommendations
+    incident.py            # Agent 3: event → classification + explanation
+    compliance.py          # Agent 4: framework → compliance policy set
+    integration.py         # Agent 5: project → integration code
+    prompts/               # Prompt templates for each agent
+      auto_config.py
+      recommender.py
+      incident.py
+      compliance.py
+      integration.py
+
   schemas/                 # JSON schemas
     v1alpha1/              # Schema version
 ```
@@ -182,6 +199,17 @@ Issues scoped, time-limited tokens that grant access to specific secrets or oper
 
 ---
 
+### Intelligence Layer (`intelligence/`)
+
+Five AI advisory agents that help users configure and understand SafeAI. The intelligence layer is completely separate from the enforcement path:
+
+- **MetadataSanitizer** strips raw values (secrets, PII, matched patterns) before any data enters an AI prompt.
+- **AIBackendRegistry** manages named BYOM backends (Ollama, OpenAI-compatible). Users bring their own model.
+- **BaseAdvisor** is the abstract base for all 5 agents. Each returns an `AdvisorResult` with artifacts written to a staging directory.
+- AI generates configs → SafeAI enforces deterministically. AI never makes runtime decisions.
+
+---
+
 ## Design Decisions
 
 | Decision | Rationale |
@@ -192,3 +220,5 @@ Issues scoped, time-limited tokens that grant access to specific secrets or oper
 | **Deterministic enforcement** | Given the same input and policy, SafeAI always produces the same decision. No probabilistic or ML-based filtering in the enforcement path. |
 | **Audit everything** | Every boundary decision is logged with full context. This is non-negotiable for compliance and incident investigation. |
 | **Plugin system over monolith** | Custom detectors, adapters, and policy templates are loaded via entry points, keeping the core package small and extensible. |
+| **AI outside the enforcement loop** | The intelligence layer advises; it never enforces. Generated configs go to a staging directory for human review. This preserves deterministic enforcement guarantees. |
+| **Metadata-only by default** | AI agents work on audit aggregates, code structure, and tool definitions -- never raw content. This prevents accidental data exposure through the AI path. |

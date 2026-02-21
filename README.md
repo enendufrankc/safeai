@@ -6,7 +6,7 @@
 
 <p align="center">
   <a href="https://github.com/enendufrankc/safeai/actions/workflows/quality.yml"><img src="https://img.shields.io/github/actions/workflow/status/enendufrankc/safeai/quality.yml?label=build&style=flat-square" alt="Build"></a>
-  <a href="https://github.com/enendufrankc/safeai/releases"><img src="https://img.shields.io/badge/release-v0.6.0-blue?style=flat-square" alt="Release"></a>
+  <a href="https://github.com/enendufrankc/safeai/releases"><img src="https://img.shields.io/badge/release-v0.7.0-blue?style=flat-square" alt="Release"></a>
   <a href="https://pypi.org/project/safeai/"><img src="https://img.shields.io/pypi/v/safeai?style=flat-square&label=pypi" alt="PyPI"></a>
   <a href="https://opensource.org/licenses/Apache-2.0"><img src="https://img.shields.io/badge/license-Apache--2.0-green?style=flat-square" alt="License"></a>
   <a href="https://github.com/enendufrankc/safeai/stargazers"><img src="https://img.shields.io/github/stars/enendufrankc/safeai?style=flat-square" alt="Stars"></a>
@@ -56,7 +56,7 @@ That model keeps policy decisions close to execution, where incidents actually h
                               SafeAI Runtime
 ```
 
-Current status: Sprint 0 through Phase 6 complete, with `v0.6.0` release gate passed.
+Current status: Sprint 0 through Phase 7 complete, with `v0.7.0` release gate passed.
 
 ## Capability Overview
 
@@ -80,6 +80,7 @@ SafeAI is intentionally broad. This is the complete capability set currently imp
 | Integrations | LangChain, CrewAI, AutoGen, Claude ADK, Google ADK, coding-agent hooks, MCP server |
 | Extensibility | Plugin loader for detectors/adapters/templates, built-in policy template catalog (`finance`, `healthcare`, `support`) |
 | Operations UI | Web dashboard (`/dashboard`) for incidents, approvals, compliance summaries, tenant/RBAC controls, alerts |
+| Intelligence layer | 5 AI advisory agents: auto-config, policy recommender, incident explainer, compliance mapper, integration generator. BYOM (Bring Your Own Model), metadata-only, human-approved staging |
 
 ## Install
 
@@ -203,6 +204,10 @@ Core HTTP endpoints:
 - `GET /v1/policies/templates`
 - `GET /v1/policies/templates/{template_name}`
 - `POST /v1/proxy/forward`
+- `GET /v1/intelligence/status`
+- `POST /v1/intelligence/explain`
+- `POST /v1/intelligence/recommend`
+- `POST /v1/intelligence/compliance`
 - `GET /dashboard`
 
 ## CLI Commands
@@ -229,6 +234,12 @@ safeai setup generic --config safeai.yaml
 
 safeai hook --config safeai.yaml
 safeai mcp --config safeai.yaml
+
+safeai intelligence auto-config --path . --output-dir .safeai-generated
+safeai intelligence recommend --since 7d
+safeai intelligence explain <event_id>
+safeai intelligence compliance --framework hipaa
+safeai intelligence integrate --target langchain --path .
 ```
 
 ## Framework and Agent Integrations
@@ -353,6 +364,7 @@ Project and planning:
 - Security: [`docs/project/security.md`](docs/project/security.md)
 - Governance: [`docs/project/governance.md`](docs/project/governance.md)
 - Compatibility: [`docs/project/compatibility.md`](docs/project/compatibility.md)
+- Intelligence layer: [`docs/guides/intelligence.md`](docs/guides/intelligence.md)
 - Delivery tracker: [`docs/brainstom/15-delivery-tracker.md`](docs/brainstom/15-delivery-tracker.md)
 
 Notebooks:

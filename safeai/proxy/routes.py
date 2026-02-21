@@ -610,6 +610,131 @@ async def proxy_forward(payload: ProxyForwardPayload, request: Request) -> dict[
     }
 
 
+class IntelligenceExplainPayload(BaseModel):
+    event_id: str
+
+
+class IntelligenceRecommendPayload(BaseModel):
+    since: str = "7d"
+
+
+class IntelligenceCompliancePayload(BaseModel):
+    framework: str = "hipaa"
+
+
+@router.get("/v1/intelligence/status")
+def intelligence_status(request: Request) -> dict[str, Any]:
+    runtime = request.app.state.runtime
+    started = time.perf_counter()
+    try:
+        cfg = runtime.config if hasattr(runtime, "config") else None
+        if cfg and hasattr(cfg, "intelligence") and cfg.intelligence.enabled:
+            elapsed = time.perf_counter() - started
+            runtime.metrics.observe_request(
+                endpoint="/v1/intelligence/status",
+                status_code=200,
+                latency_seconds=elapsed,
+                decision_action="allow",
+            )
+            return {
+                "enabled": True,
+                "backend": cfg.intelligence.backend.provider,
+                "model": cfg.intelligence.backend.model,
+            }
+    except Exception:
+        pass
+    elapsed = time.perf_counter() - started
+    runtime.metrics.observe_request(
+        endpoint="/v1/intelligence/status",
+        status_code=200,
+        latency_seconds=elapsed,
+        decision_action="allow",
+    )
+    return {"enabled": False, "backend": None, "model": None}
+
+
+@router.post("/v1/intelligence/explain")
+def intelligence_explain(payload: IntelligenceExplainPayload, request: Request) -> dict[str, Any]:
+    started = time.perf_counter()
+    runtime = request.app.state.runtime
+    try:
+        result = runtime.safeai.intelligence_explain(payload.event_id)
+    except Exception as exc:
+        _record_error(runtime=runtime, endpoint="/v1/intelligence/explain", started=started, status_code=503)
+        raise HTTPException(status_code=503, detail=f"Intelligence layer not configured: {exc}") from exc
+    elapsed = time.perf_counter() - started
+    runtime.metrics.observe_request(
+        endpoint="/v1/intelligence/explain",
+        status_code=200,
+        latency_seconds=elapsed,
+        decision_action="allow",
+    )
+    return {
+        "advisor": result.advisor_name,
+        "status": result.status,
+        "summary": result.summary,
+        "response": result.raw_response,
+        "model": result.model_used,
+        "metadata": result.metadata,
+    }
+
+
+@router.post("/v1/intelligence/recommend")
+def intelligence_recommend(
+    payload: IntelligenceRecommendPayload, request: Request
+) -> dict[str, Any]:
+    started = time.perf_counter()
+    runtime = request.app.state.runtime
+    try:
+        result = runtime.safeai.intelligence_recommend(since=payload.since)
+    except Exception as exc:
+        _record_error(runtime=runtime, endpoint="/v1/intelligence/recommend", started=started, status_code=503)
+        raise HTTPException(status_code=503, detail=f"Intelligence layer not configured: {exc}") from exc
+    elapsed = time.perf_counter() - started
+    runtime.metrics.observe_request(
+        endpoint="/v1/intelligence/recommend",
+        status_code=200,
+        latency_seconds=elapsed,
+        decision_action="allow",
+    )
+    return {
+        "advisor": result.advisor_name,
+        "status": result.status,
+        "summary": result.summary,
+        "artifacts": result.artifacts,
+        "model": result.model_used,
+        "metadata": result.metadata,
+    }
+
+
+@router.post("/v1/intelligence/compliance")
+def intelligence_compliance(
+    payload: IntelligenceCompliancePayload, request: Request
+) -> dict[str, Any]:
+    started = time.perf_counter()
+    runtime = request.app.state.runtime
+    try:
+        result = runtime.safeai.intelligence_compliance(framework=payload.framework)
+    except Exception as exc:
+        _record_error(runtime=runtime, endpoint="/v1/intelligence/compliance", started=started, status_code=503)
+        raise HTTPException(status_code=503, detail=f"Intelligence layer not configured: {exc}") from exc
+    elapsed = time.perf_counter() - started
+    runtime.metrics.observe_request(
+        endpoint="/v1/intelligence/compliance",
+        status_code=200,
+        latency_seconds=elapsed,
+        decision_action="allow",
+    )
+    return {
+        "advisor": result.advisor_name,
+        "status": result.status,
+        "summary": result.summary,
+        "artifacts": result.artifacts,
+        "model": result.model_used,
+        "metadata": result.metadata,
+    }
+
+
 def _resolve_forward_url(*, upstream_url: str | None, upstream_base_url: str | None, path: str | None) -> str:
     if upstream_url:
         return str(upstream_url).strip()

@@ -102,6 +102,26 @@ Expanded extensibility and community infrastructure.
 
 ---
 
+## Phase 7: Intelligence Layer :white_check_mark:
+
+**Version: 0.7.0**
+
+Added AI advisory agents for configuration and understanding.
+
+- BYOM backend abstraction (Ollama, OpenAI-compatible)
+- Metadata sanitizer ensuring AI never sees raw protected data
+- Auto-config agent: codebase structure to SafeAI configuration
+- Policy recommender: audit aggregates to policy improvements
+- Incident explainer: sanitized event classification and remediation
+- Compliance mapper: HIPAA, PCI-DSS, SOC2, GDPR policy generation
+- Integration generator: framework-specific integration code
+- `safeai intelligence` CLI with 5 subcommands
+- Proxy and dashboard intelligence endpoints
+- Human approval via staging directory workflow
+- 94 new tests across 8 test files
+
+---
+
 ## Future
 
 The following items are planned but not yet scheduled:
@@ -112,7 +132,7 @@ The following items are planned but not yet scheduled:
 | **Cloud offering** | Managed SafeAI service with hosted policy management, audit storage, and dashboard |
 | **Browser extension** | Client-side boundary enforcement for browser-based AI interfaces |
 | **Policy marketplace** | Community-contributed policy template library with discovery and ratings |
-| **Compliance packs** | Pre-built policy sets for SOC 2, HIPAA, GDPR, and PCI DSS |
+| **Compliance packs** | ~~Pre-built policy sets for SOC 2, HIPAA, GDPR, and PCI DSS~~ (delivered in v0.7.0 via intelligence compliance agent) |
 | **Real-time alerting** | Webhook and Slack/Teams integrations for enforcement event notifications |
 | **Agent observability** | Distributed tracing integration for boundary decisions across multi-agent systems |
 
