@@ -39,7 +39,55 @@ PROVIDERS = {
         "base_url": "https://api.anthropic.com/v1",
         "api_key_env": "ANTHROPIC_API_KEY",
     },
-    "Other (OpenAI-compatible endpoint)": {
+    "Google Gemini": {
+        "provider": "openai-compatible",
+        "model": "gemini-2.0-flash",
+        "base_url": "https://generativelanguage.googleapis.com/v1beta/openai",
+        "api_key_env": "GOOGLE_API_KEY",
+    },
+    "Mistral": {
+        "provider": "openai-compatible",
+        "model": "mistral-large-latest",
+        "base_url": "https://api.mistral.ai/v1",
+        "api_key_env": "MISTRAL_API_KEY",
+    },
+    "Groq": {
+        "provider": "openai-compatible",
+        "model": "llama-3.3-70b-versatile",
+        "base_url": "https://api.groq.com/openai/v1",
+        "api_key_env": "GROQ_API_KEY",
+    },
+    "Azure OpenAI": {
+        "provider": "openai-compatible",
+        "model": "gpt-4o",
+        "base_url": None,
+        "api_key_env": "AZURE_OPENAI_API_KEY",
+    },
+    "Cohere": {
+        "provider": "openai-compatible",
+        "model": "command-r-plus",
+        "base_url": "https://api.cohere.com/v1",
+        "api_key_env": "COHERE_API_KEY",
+    },
+    "Together AI": {
+        "provider": "openai-compatible",
+        "model": "meta-llama/Llama-3.3-70B-Instruct-Turbo",
+        "base_url": "https://api.together.xyz/v1",
+        "api_key_env": "TOGETHER_API_KEY",
+    },
+    "Fireworks AI": {
+        "provider": "openai-compatible",
+        "model": "accounts/fireworks/models/llama-v3p3-70b-instruct",
+        "base_url": "https://api.fireworks.ai/inference/v1",
+        "api_key_env": "FIREWORKS_API_KEY",
+    },
+    "DeepSeek": {
+        "provider": "openai-compatible",
+        "model": "deepseek-chat",
+        "base_url": "https://api.deepseek.com/v1",
+        "api_key_env": "DEEPSEEK_API_KEY",
+    },
+    "Other (any OpenAI-compatible endpoint)": {
         "provider": "openai-compatible",
         "model": None,
         "base_url": None,
