@@ -145,6 +145,17 @@ SafeAI enforces security at the **boundaries** where data enters, exits, and cro
 
 ---
 
+## See it in action
+
+!!! example "OpenClaw: Legal AI Platform"
+    A complete walkthrough building a production legal AI assistant with three agents, six tools, encrypted memory, human approval workflows, capability tokens, and full audit logging — all enforced by SafeAI.
+
+    Covers: secret detection, PII protection, tool contracts, agent identity, approval gates, encrypted memory, capability tokens, agent messaging, structured scanning, audit trail, LangChain integration, and proxy mode.
+
+    **[Read the full use case :material-arrow-right:](examples/openclaw.md)**
+
+---
+
 ## Works with everything
 
 <div class="compat-table" markdown>
