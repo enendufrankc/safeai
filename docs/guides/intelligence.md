@@ -71,6 +71,54 @@ intelligence:
         api_key_env: ANTHROPIC_API_KEY
     ```
 
+=== "Google Gemini"
+
+    ```yaml
+    intelligence:
+      enabled: true
+      backend:
+        provider: openai-compatible
+        model: gemini-2.0-flash
+        base_url: https://generativelanguage.googleapis.com/v1beta/openai
+        api_key_env: GOOGLE_API_KEY
+    ```
+
+=== "Mistral"
+
+    ```yaml
+    intelligence:
+      enabled: true
+      backend:
+        provider: openai-compatible
+        model: mistral-large-latest
+        base_url: https://api.mistral.ai/v1
+        api_key_env: MISTRAL_API_KEY
+    ```
+
+=== "Groq"
+
+    ```yaml
+    intelligence:
+      enabled: true
+      backend:
+        provider: openai-compatible
+        model: llama-3.3-70b-versatile
+        base_url: https://api.groq.com/openai/v1
+        api_key_env: GROQ_API_KEY
+    ```
+
+=== "DeepSeek"
+
+    ```yaml
+    intelligence:
+      enabled: true
+      backend:
+        provider: openai-compatible
+        model: deepseek-chat
+        base_url: https://api.deepseek.com/v1
+        api_key_env: DEEPSEEK_API_KEY
+    ```
+
 === "Programmatic"
 
     ```python

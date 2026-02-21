@@ -61,7 +61,15 @@ Choose your AI backend:
   1. Ollama (local, free — no API key needed)
   2. OpenAI
   3. Anthropic
-  4. Other (OpenAI-compatible endpoint)
+  4. Google Gemini
+  5. Mistral
+  6. Groq
+  7. Azure OpenAI
+  8. Cohere
+  9. Together AI
+  10. Fireworks AI
+  11. DeepSeek
+  12. Other (any OpenAI-compatible endpoint)
 
 Select provider [1]: 1
 
