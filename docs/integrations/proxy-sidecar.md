@@ -370,7 +370,7 @@ audit:
 
 ```dockerfile
 FROM python:3.11-slim
-RUN pip install safeai
+RUN pip install uv && uv pip install safeai --system
 COPY safeai.yaml /app/safeai.yaml
 WORKDIR /app
 EXPOSE 8000

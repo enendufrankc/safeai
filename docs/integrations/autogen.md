@@ -7,7 +7,7 @@ Wrap AutoGen tools so every function call in your multi-agent conversation passe
 ## Install
 
 ```bash
-pip install safeai pyautogen
+uv pip install safeai pyautogen
 ```
 
 ---

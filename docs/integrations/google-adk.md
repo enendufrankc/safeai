@@ -7,7 +7,7 @@ Wrap Google ADK tools so every tool invocation passes through SafeAI's policy en
 ## Install
 
 ```bash
-pip install safeai google-genai
+uv pip install safeai google-genai
 ```
 
 ---

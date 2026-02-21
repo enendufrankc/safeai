@@ -7,7 +7,7 @@ Wrap any LangChain tool so every invocation passes through SafeAI's policy engin
 ## Install
 
 ```bash
-pip install safeai langchain
+uv pip install safeai langchain
 ```
 
 ---
