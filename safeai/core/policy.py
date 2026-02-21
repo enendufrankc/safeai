@@ -5,11 +5,11 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 from threading import RLock
-from typing import Any, Callable, Iterable
+from typing import Any, Callable, Iterable, Literal
 
 from safeai.core.models import PolicyDecisionModel, PolicyRuleModel
 
-DecisionAction = str
+DecisionAction = Literal["allow", "redact", "block", "require_approval"]
 PolicyRuleLoader = Callable[[], list["PolicyRule"]]
 
 

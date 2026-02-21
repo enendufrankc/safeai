@@ -21,3 +21,15 @@ policies:
     priority: 1000
     action: allow
     reason: Allow when no restrictive policy matched.
+
+  - name: allow-action-by-default
+    boundary: action
+    priority: 1000
+    action: allow
+    reason: Allow action calls when no restrictive policy matched.
+
+  - name: allow-output-by-default
+    boundary: output
+    priority: 1000
+    action: allow
+    reason: Allow output when no restrictive policy matched.

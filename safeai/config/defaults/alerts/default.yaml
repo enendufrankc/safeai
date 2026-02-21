@@ -1,0 +1,11 @@
+version: v1alpha1
+alert_rules:
+  - rule_id: high-block-rate
+    name: High blocked decision volume
+    filters:
+      actions:
+        - block
+    threshold: 5
+    window: 15m
+    channels:
+      - file

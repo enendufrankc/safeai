@@ -12,6 +12,10 @@ DEFAULT_FILES = {
     Path("policies/default.yaml"): Path("config/defaults/policies/default.yaml"),
     Path("contracts/example.yaml"): Path("config/defaults/contracts/example.yaml"),
     Path("schemas/memory.yaml"): Path("config/defaults/schemas/memory.yaml"),
+    Path("agents/default.yaml"): Path("config/defaults/agents/default.yaml"),
+    Path("plugins/example.py"): Path("config/defaults/plugins/example.py"),
+    Path("tenants/policy-sets.yaml"): Path("config/defaults/tenants/policy-sets.yaml"),
+    Path("alerts/default.yaml"): Path("config/defaults/alerts/default.yaml"),
 }
 
 

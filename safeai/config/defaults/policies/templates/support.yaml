@@ -1,0 +1,32 @@
+version: v1alpha1
+policies:
+  - name: support-block-secret-credentials
+    boundary: [input, action, output]
+    priority: 10
+    condition:
+      data_tags: [secret, secret.token, secret.credential]
+    action: block
+    reason: Support channels must not expose credentials.
+
+  - name: support-redact-personal-data-output
+    boundary: [output]
+    priority: 20
+    condition:
+      data_tags: [personal, personal.pii]
+    action: redact
+    reason: Personal data should be redacted in support responses.
+
+  - name: support-require-approval-account-actions
+    boundary: [action]
+    priority: 30
+    condition:
+      tools: [reset_account_email, disable_mfa]
+      data_tags: [personal, confidential]
+    action: require_approval
+    reason: High-impact account actions require human approval.
+
+  - name: support-allow-action-default
+    boundary: [action]
+    priority: 1000
+    action: allow
+    reason: Allow when no support restriction matches.

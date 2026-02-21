@@ -6,5 +6,41 @@ paths:
     - contracts/*.yaml
   memory_schema_files:
     - schemas/*.yaml
+  identity_files:
+    - agents/*.yaml
 audit:
   file_path: logs/audit.log
+approvals:
+  file_path: logs/approvals.log
+  default_ttl: 30m
+memory_runtime:
+  auto_purge_expired: true
+plugins:
+  enabled: true
+  plugin_files:
+    - plugins/*.py
+dashboard:
+  enabled: true
+  rbac_enabled: true
+  user_header: x-safeai-user
+  tenant_header: x-safeai-tenant
+  tenant_policy_file: tenants/policy-sets.yaml
+  alert_rules_file: alerts/default.yaml
+  alert_log_file: logs/alerts.log
+  users:
+    - user_id: security-admin
+      role: admin
+      tenants:
+        - "*"
+    - user_id: security-approver
+      role: approver
+      tenants:
+        - default
+    - user_id: security-auditor
+      role: auditor
+      tenants:
+        - default
+    - user_id: security-viewer
+      role: viewer
+      tenants:
+        - default

@@ -1,0 +1,32 @@
+version: v1alpha1
+policies:
+  - name: healthcare-block-secret-credentials
+    boundary: [input, action, output]
+    priority: 10
+    condition:
+      data_tags: [secret, secret.token, secret.credential]
+    action: block
+    reason: Secrets must not be exposed in healthcare workflows.
+
+  - name: healthcare-redact-phi-in-output
+    boundary: [output]
+    priority: 20
+    condition:
+      data_tags: [personal.phi, personal, confidential]
+    action: redact
+    reason: Protected health information must be redacted in outbound responses.
+
+  - name: healthcare-require-approval-care-plan-actions
+    boundary: [action]
+    priority: 30
+    condition:
+      tools: [approve_care_plan, authorize_medication_change]
+      data_tags: [personal.phi, confidential]
+    action: require_approval
+    reason: Care-plan and medication changes require human approval.
+
+  - name: healthcare-allow-output-default
+    boundary: [output]
+    priority: 1000
+    action: allow
+    reason: Allow when no healthcare restriction matches.

@@ -8,7 +8,7 @@ from glob import glob
 from pathlib import Path
 from typing import Any, Iterable
 
-import yaml
+import yaml  # type: ignore[import-untyped]
 from jsonschema import Draft202012Validator
 
 from safeai.config.models import SafeAIConfig
@@ -20,6 +20,14 @@ class PolicySchemaValidationError(ValueError):
 
 class MemorySchemaValidationError(ValueError):
     """Raised when a memory schema file does not match SafeAI schema rules."""
+
+
+class ContractSchemaValidationError(ValueError):
+    """Raised when a tool contract file does not match SafeAI schema rules."""
+
+
+class IdentitySchemaValidationError(ValueError):
+    """Raised when an agent identity file does not match SafeAI schema rules."""
 
 
 def load_yaml_file(path: Path) -> dict[str, Any]:
@@ -62,6 +70,14 @@ def resolve_memory_schema_files(config_path: str | Path, patterns: list[str]) ->
     return resolve_files(config_path, patterns)
 
 
+def resolve_contract_files(config_path: str | Path, patterns: list[str]) -> list[Path]:
+    return resolve_files(config_path, patterns)
+
+
+def resolve_identity_files(config_path: str | Path, patterns: list[str]) -> list[Path]:
+    return resolve_files(config_path, patterns)
+
+
 def load_policy_documents(
     config_path: str | Path,
     patterns: list[str],
@@ -79,6 +95,26 @@ def load_memory_documents(
     version: str = "v1alpha1",
 ) -> list[dict[str, Any]]:
     _, docs = load_memory_bundle(config_path, patterns, version=version)
+    return docs
+
+
+def load_contract_documents(
+    config_path: str | Path,
+    patterns: list[str],
+    *,
+    version: str = "v1alpha1",
+) -> list[dict[str, Any]]:
+    _, docs = load_contract_bundle(config_path, patterns, version=version)
+    return docs
+
+
+def load_identity_documents(
+    config_path: str | Path,
+    patterns: list[str],
+    *,
+    version: str = "v1alpha1",
+) -> list[dict[str, Any]]:
+    _, docs = load_identity_bundle(config_path, patterns, version=version)
     return docs
 
 
@@ -116,6 +152,40 @@ def load_memory_bundle(
     return files, docs
 
 
+def load_contract_bundle(
+    config_path: str | Path,
+    patterns: list[str],
+    *,
+    version: str = "v1alpha1",
+) -> tuple[list[Path], list[dict[str, Any]]]:
+    files = resolve_contract_files(config_path, patterns)
+    docs: list[dict[str, Any]] = []
+
+    for file_path in files:
+        loaded = load_yaml_file(file_path)
+        validate_contract_document(loaded, file_path, version=version)
+        docs.extend(_extract_contract_documents(loaded))
+
+    return files, docs
+
+
+def load_identity_bundle(
+    config_path: str | Path,
+    patterns: list[str],
+    *,
+    version: str = "v1alpha1",
+) -> tuple[list[Path], list[dict[str, Any]]]:
+    files = resolve_identity_files(config_path, patterns)
+    docs: list[dict[str, Any]] = []
+
+    for file_path in files:
+        loaded = load_yaml_file(file_path)
+        validate_identity_document(loaded, file_path, version=version)
+        docs.extend(_extract_identity_documents(loaded))
+
+    return files, docs
+
+
 def validate_policy_document(document: dict[str, Any], source: Path, *, version: str = "v1alpha1") -> None:
     validator = _schema_validator("policy", version)
     _raise_on_schema_errors(
@@ -135,6 +205,28 @@ def validate_memory_document(document: dict[str, Any], source: Path, *, version:
         source=source,
         error_type=MemorySchemaValidationError,
         label="Memory schema validation",
+    )
+
+
+def validate_contract_document(document: dict[str, Any], source: Path, *, version: str = "v1alpha1") -> None:
+    validator = _schema_validator("tool-contract", version)
+    _raise_on_schema_errors(
+        validator=validator,
+        document=document,
+        source=source,
+        error_type=ContractSchemaValidationError,
+        label="Tool contract schema validation",
+    )
+
+
+def validate_identity_document(document: dict[str, Any], source: Path, *, version: str = "v1alpha1") -> None:
+    validator = _schema_validator("agent-identity", version)
+    _raise_on_schema_errors(
+        validator=validator,
+        document=document,
+        source=source,
+        error_type=IdentitySchemaValidationError,
+        label="Agent identity schema validation",
     )
 
 
@@ -181,6 +273,32 @@ def _extract_memory_documents(document: dict[str, Any]) -> list[dict[str, Any]]:
     memories = document.get("memories", [])
     if isinstance(memories, list) and memories:
         docs.append({"version": document.get("version", "v1alpha1"), "memories": memories})
+
+    return docs
+
+
+def _extract_contract_documents(document: dict[str, Any]) -> list[dict[str, Any]]:
+    docs: list[dict[str, Any]] = []
+    contract = document.get("contract")
+    if isinstance(contract, dict):
+        docs.append({"version": document.get("version", "v1alpha1"), "contract": contract})
+
+    contracts = document.get("contracts", [])
+    if isinstance(contracts, list) and contracts:
+        docs.append({"version": document.get("version", "v1alpha1"), "contracts": contracts})
+
+    return docs
+
+
+def _extract_identity_documents(document: dict[str, Any]) -> list[dict[str, Any]]:
+    docs: list[dict[str, Any]] = []
+    agent = document.get("agent")
+    if isinstance(agent, dict):
+        docs.append({"version": document.get("version", "v1alpha1"), "agent": agent})
+
+    agents = document.get("agents", [])
+    if isinstance(agents, list) and agents:
+        docs.append({"version": document.get("version", "v1alpha1"), "agents": agents})
 
     return docs
 

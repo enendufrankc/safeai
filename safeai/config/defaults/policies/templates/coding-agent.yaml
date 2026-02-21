@@ -1,0 +1,65 @@
+version: v1alpha1
+policies:
+  - name: block-secrets-everywhere
+    boundary: [input, action, output]
+    priority: 10
+    condition:
+      data_tags: [secret, secret.credential, secret.token]
+    action: block
+    reason: Secrets must never cross any boundary.
+
+  - name: block-dangerous-commands
+    boundary: [action]
+    priority: 15
+    condition:
+      tools: [shell, Bash, run_command]
+      data_tags: [dangerous.command]
+    action: block
+    reason: Dangerous shell commands are not allowed.
+
+  - name: redact-pii-in-output
+    boundary: [output]
+    priority: 20
+    condition:
+      data_tags: [personal, personal.pii, personal.phi, personal.financial]
+    action: redact
+    reason: Personal data must not appear in outbound responses.
+
+  - name: require-approval-destructive
+    boundary: [action]
+    priority: 25
+    condition:
+      tools:
+        - shell
+        - Bash
+        - run_command
+        - file_write
+        - Write
+        - write_file
+        - file_edit
+        - Edit
+        - edit_file
+      data_tags: [destructive]
+    action: require_approval
+    reason: Destructive operations require human approval.
+
+  - name: redact-pii-in-writes
+    boundary: [input, action]
+    priority: 30
+    condition:
+      tools:
+        - file_write
+        - Write
+        - write_file
+        - file_edit
+        - Edit
+        - edit_file
+      data_tags: [personal, personal.pii]
+    action: redact
+    reason: Personal data must be redacted before writing to files.
+
+  - name: allow-by-default
+    boundary: [input, action, output]
+    priority: 1000
+    action: allow
+    reason: Allow when no restrictive policy matched.
