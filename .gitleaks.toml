@@ -1,0 +1,18 @@
+title = "SafeAI Gitleaks Configuration"
+
+# SafeAI is a security framework that intentionally contains example API keys,
+# tokens, and credentials in tests, documentation, and notebooks for
+# demonstrating secret detection capabilities. These are all fake/placeholder
+# values and not real credentials.
+
+[allowlist]
+description = "Allow known test fixtures, documentation examples, and notebooks"
+
+paths = [
+    '''tests/''',
+    '''notebook/''',
+    '''docs/''',
+    '''examples/''',
+    '''search/''',
+    '''README\.md''',
+]
