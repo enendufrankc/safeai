@@ -115,7 +115,7 @@ nav:
     - Quickstart: getting-started/quickstart.md
     - Configuration: getting-started/configuration.md
   - Examples:
-    - "OpenClaw: Legal AI Platform": examples/openclaw.md
+    - "Securing OpenClaw": examples/openclaw.md
   - Guides:
     - Secret Detection: guides/secret-detection.md
     - PII Protection: guides/pii-protection.md
