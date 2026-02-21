@@ -2,6 +2,13 @@
 
 SafeAI scans all inbound text for leaked credentials before they reach your agent. The `scan_input` method detects API keys, tokens, passwords, and other secrets using a library of built-in pattern detectors, blocking or redacting them so sensitive material never enters your pipeline.
 
+!!! tip "Auto-configure detection"
+    The intelligence layer can analyze your project and recommend which secret detectors to enable:
+    ```bash
+    safeai intelligence auto-config --path . --apply
+    ```
+    Use this guide to tune detection patterns or add custom detectors.
+
 ## Quick Example
 
 ```python

@@ -2,6 +2,13 @@
 
 SafeAI is **framework-agnostic** -- it works with any AI agent framework, coding assistant, or deployment topology. Choose the integration mode that fits your stack.
 
+!!! tip "Auto-generate integration code"
+    The intelligence layer can generate framework-specific integration code for your project:
+    ```bash
+    safeai intelligence integrate --target <framework> --path . --apply
+    ```
+    See the [Intelligence Layer guide](../guides/intelligence.md) for details.
+
 ---
 
 ## Integration Modes

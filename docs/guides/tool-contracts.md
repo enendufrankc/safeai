@@ -2,6 +2,13 @@
 
 Tool contracts declare what data each tool is allowed to accept and emit. Before a tool call executes, SafeAI validates the request against the contract and strips unauthorized fields from the response. This prevents tools from receiving data they should not see and stops sensitive fields from leaking back to the agent.
 
+!!! tip "Auto-generate contracts"
+    The intelligence layer can analyze your tools and generate contracts automatically:
+    ```bash
+    safeai intelligence auto-config --path . --apply
+    ```
+    Use this guide when you need to customize the generated contracts or write them from scratch.
+
 ## Quick Example
 
 ```python

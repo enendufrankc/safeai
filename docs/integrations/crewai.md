@@ -2,6 +2,12 @@
 
 Wrap CrewAI tools so every agent action in your crew passes through SafeAI's policy engine -- secret detection, PII filtering, tool contracts, and audit logging are enforced transparently.
 
+!!! tip "Auto-generate CrewAI integration"
+    Let the intelligence layer generate SafeAI-wrapped tools for your CrewAI project:
+    ```bash
+    safeai intelligence integrate --target crewai --path . --apply
+    ```
+
 ---
 
 ## Install

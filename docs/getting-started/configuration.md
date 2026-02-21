@@ -1,10 +1,18 @@
 # Configuration
 
-SafeAI supports two configuration paths: keyword arguments for quick programmatic setup, and YAML files for full config-driven deployments. This page covers both approaches and explains the policy engine that powers runtime decisions.
+SafeAI can configure itself automatically using the intelligence layer, or you can set everything up manually for full control. This page covers both paths, starting with the easiest.
 
-## Scaffold with `safeai init`
+## The Easiest Way: `safeai init` + Intelligence Auto-Config
 
-Running `safeai init` in your project root creates the following structure:
+The fastest way to a production-ready configuration is to scaffold your project and let the intelligence layer figure out the right policies for you. No YAML editing required.
+
+### Step 1: Scaffold your project
+
+```bash
+safeai init
+```
+
+This creates the standard project structure:
 
 ```
 .
@@ -19,11 +27,52 @@ Running `safeai init` in your project root creates the following structure:
     └── default.yaml         # Agent role definitions
 ```
 
-Each file is pre-populated with commented examples you can edit immediately.
+### Step 2: Let intelligence auto-configure
 
-## quickstart() Keyword Arguments
+```bash
+safeai intelligence auto-config
+```
 
-`SafeAI.quickstart()` accepts keyword arguments that override the defaults without requiring any YAML files:
+The intelligence layer analyzes your project, detects what you are building, and generates appropriate policies, guardrails, and scanner rules automatically. It writes the results directly into your `safeai.yaml` and `policies/` directory. You review the output, tweak if needed, and you are done.
+
+!!! tip
+    This is the recommended path for most users. The intelligence layer produces sensible defaults tuned to your project. You can always refine the generated configuration later using `safeai intelligence recommend` or by editing the YAML files directly.
+
+### Intelligence Layer Configuration Reference
+
+The intelligence layer requires a configured AI backend. Add this to your `safeai.yaml` (or let `safeai init` generate it for you):
+
+```yaml
+# safeai.yaml
+intelligence:
+  enabled: true
+  backend:
+    provider: ollama              # or "openai-compatible"
+    model: llama3.2
+    base_url: http://localhost:11434
+    api_key_env: null             # env var name (NOT the key itself)
+  max_events_per_query: 500
+  metadata_only: true             # false = user opts into raw content (air-gapped)
+```
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `intelligence.enabled` | `bool` | `false` | Enable/disable the intelligence layer |
+| `intelligence.backend.provider` | `str` | `ollama` | Backend provider (`ollama` or `openai-compatible`) |
+| `intelligence.backend.model` | `str` | `llama3.2` | Model name to use |
+| `intelligence.backend.base_url` | `str` | `http://localhost:11434` | Backend API URL |
+| `intelligence.backend.api_key_env` | `str\|null` | `null` | Environment variable name containing the API key |
+| `intelligence.max_events_per_query` | `int` | `500` | Maximum audit events per intelligence query |
+| `intelligence.metadata_only` | `bool` | `true` | When true, AI agents only see metadata, never raw content |
+
+!!! warning
+    No AI model is bundled with SafeAI. You must have a running model backend (Ollama, OpenAI, etc.) for intelligence commands to work. The rest of SafeAI works fully without any LLM.
+
+See the [Intelligence Layer guide](../guides/intelligence.md) for full usage details including `recommend`, `explain`, and `generate-policy` commands.
+
+## `quickstart()` -- Programmatic Setup
+
+If you prefer to configure SafeAI in code rather than through the CLI, `SafeAI.quickstart()` accepts keyword arguments that override the defaults without requiring any YAML files:
 
 ```python
 from safeai import SafeAI
@@ -48,11 +97,11 @@ ai = SafeAI.quickstart(
 | `audit_path`    | `str \| None` | `None`   | File path for persistent audit logging           |
 
 !!! tip
-    `quickstart()` is ideal for prototyping and single-script use cases. For production deployments with multiple agents or complex policies, use `from_config()` instead.
+    `quickstart()` is ideal for prototyping and single-script use cases. For production deployments with multiple agents or complex policies, use `from_config()` or the intelligence auto-config path instead.
 
-## from_config() -- Full YAML Configuration
+## `from_config()` -- Full YAML Configuration (Advanced)
 
-Load configuration from your `safeai.yaml` file:
+For users who want fine-grained manual control over every setting, load configuration from your `safeai.yaml` file directly:
 
 ```python
 from safeai import SafeAI
@@ -164,40 +213,8 @@ rules:
 !!! note
     Priority is about evaluation order, not importance. A rule with `priority: 1` is evaluated **before** a rule with `priority: 10`. Use low numbers for your most specific overrides and high numbers for broad defaults.
 
-## Intelligence Layer Configuration
-
-The intelligence layer provides AI advisory agents for auto-configuring SafeAI, recommending policy improvements, explaining incidents, generating compliance policies, and producing integration code. It is disabled by default and requires a configured AI backend.
-
-```yaml
-# safeai.yaml
-intelligence:
-  enabled: true
-  backend:
-    provider: ollama              # or "openai-compatible"
-    model: llama3.2
-    base_url: http://localhost:11434
-    api_key_env: null             # env var name (NOT the key itself)
-  max_events_per_query: 500
-  metadata_only: true             # false = user opts into raw content (air-gapped)
-```
-
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `intelligence.enabled` | `bool` | `false` | Enable/disable the intelligence layer |
-| `intelligence.backend.provider` | `str` | `ollama` | Backend provider (`ollama` or `openai-compatible`) |
-| `intelligence.backend.model` | `str` | `llama3.2` | Model name to use |
-| `intelligence.backend.base_url` | `str` | `http://localhost:11434` | Backend API URL |
-| `intelligence.backend.api_key_env` | `str\|null` | `null` | Environment variable name containing the API key |
-| `intelligence.max_events_per_query` | `int` | `500` | Maximum audit events per intelligence query |
-| `intelligence.metadata_only` | `bool` | `true` | When true, AI agents only see metadata, never raw content |
-
-!!! warning
-    No AI model is bundled with SafeAI. You must have a running model backend (Ollama, OpenAI, etc.) for intelligence commands to work. The rest of SafeAI works fully without any LLM.
-
-See the [Intelligence Layer guide](../guides/intelligence.md) for full usage details.
-
 ## Next Steps
 
 - [Quickstart](quickstart.md) -- see configuration in action with live examples.
 - Explore the `policies/`, `contracts/`, and `agents/` directories generated by `safeai init` for annotated templates.
-- [Intelligence Layer](../guides/intelligence.md) -- AI advisory agents for configuration and understanding.
+- [Intelligence Layer](../guides/intelligence.md) -- AI advisory agents for configuration, recommendations, and incident analysis.

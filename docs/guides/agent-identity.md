@@ -2,6 +2,13 @@
 
 SafeAI binds each agent to a declared set of tools and clearance levels. Before an agent calls a tool or accesses tagged data, `validate_agent_identity` checks that the agent is authorized. Agents that attempt to use unbound tools or access data above their clearance are denied.
 
+!!! tip "Auto-discover agents"
+    The intelligence layer can analyze your project and generate agent identity documents automatically:
+    ```bash
+    safeai intelligence auto-config --path . --apply
+    ```
+    Use this guide to customize generated identities or define them manually.
+
 ## Quick Example
 
 ```python

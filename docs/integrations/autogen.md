@@ -2,6 +2,12 @@
 
 Wrap AutoGen tools so every function call in your multi-agent conversation passes through SafeAI's policy engine -- secret detection, PII filtering, tool contracts, and audit logging are enforced transparently.
 
+!!! tip "Auto-generate AutoGen integration"
+    Let the intelligence layer generate SafeAI wrappers for your AutoGen agents:
+    ```bash
+    safeai intelligence integrate --target autogen --path . --apply
+    ```
+
 ---
 
 ## Install

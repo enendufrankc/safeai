@@ -2,6 +2,12 @@
 
 SafeAI provides first-class support for AI-powered coding assistants. One CLI command installs hooks that intercept every tool call your coding agent makes -- file writes, shell commands, API calls -- and enforce your security policy.
 
+!!! tip "Auto-generate policies for your coding agent"
+    After connecting SafeAI, let the intelligence layer generate security policies tailored to your project:
+    ```bash
+    safeai intelligence auto-config --path . --apply
+    ```
+
 ---
 
 ## Supported Agents

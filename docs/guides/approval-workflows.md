@@ -2,6 +2,13 @@
 
 When a policy evaluates to `require_approval`, SafeAI pauses the operation and queues it for human review. Approvers can list, approve, or deny pending requests through the Python API or the CLI. This gives you a human-in-the-loop checkpoint for high-risk actions without changing your agent code.
 
+!!! tip "Auto-detect high-risk actions"
+    The intelligence layer can recommend which actions should require approval based on your project structure:
+    ```bash
+    safeai intelligence auto-config --path . --apply
+    ```
+    Use this guide to customize approval rules or define them manually.
+
 ## Quick Example
 
 ```python

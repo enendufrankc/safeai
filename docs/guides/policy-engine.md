@@ -2,6 +2,13 @@
 
 The SafeAI policy engine evaluates every request against a set of YAML-defined rules. Policies use priority-based, first-match evaluation: the highest-priority matching rule determines the action. This gives you fine-grained, declarative control over what data flows where, without writing application code.
 
+!!! tip "Auto-generate policies"
+    Instead of writing policies by hand, use the intelligence layer to generate them automatically:
+    ```bash
+    safeai intelligence auto-config --path . --apply
+    ```
+    The AI analyzes your project and generates tailored policies. Use this guide when you need to customize or fine-tune the generated rules.
+
 ## Quick Example
 
 ```yaml title="safeai.yaml"

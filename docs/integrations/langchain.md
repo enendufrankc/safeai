@@ -2,6 +2,12 @@
 
 Wrap any LangChain tool so every invocation passes through SafeAI's policy engine -- secret detection, PII filtering, tool contracts, and audit logging all happen transparently.
 
+!!! tip "Auto-generate LangChain integration"
+    Let the intelligence layer generate SafeAI-wrapped tools for your LangChain project:
+    ```bash
+    safeai intelligence integrate --target langchain --path . --apply
+    ```
+
 ---
 
 ## Install

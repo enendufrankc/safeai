@@ -2,6 +2,12 @@
 
 Wrap Google ADK tools so every tool invocation passes through SafeAI's policy engine -- secret detection, PII filtering, tool contracts, and audit logging are enforced transparently.
 
+!!! tip "Auto-generate Google ADK integration"
+    Let the intelligence layer generate SafeAI adapters for your Gemini tools:
+    ```bash
+    safeai intelligence integrate --target google-adk --path . --apply
+    ```
+
 ---
 
 ## Install

@@ -57,6 +57,7 @@ print(guard.safe_output)
 
 [Get Started](getting-started/installation.md){ .md-button .md-button--primary }
 [View on GitHub](https://github.com/enendufrankc/safeai){ .md-button }
+[Auto-Configure with Intelligence Layer](guides/intelligence.md){ .md-button }
 
 </div>
 
@@ -65,6 +66,11 @@ print(guard.safe_output)
 ## Everything you need to secure AI agents
 
 <div class="feature-grid" markdown>
+
+<div class="feature-card" markdown>
+### :material-brain: Intelligence Layer
+5 AI advisory agents for auto-config, policy recommendations, incident explanation, compliance mapping, and integration code generation. BYOM -- bring your own model.
+</div>
 
 <div class="feature-card" markdown>
 ### :material-shield-lock: Secret Detection
@@ -124,11 +130,6 @@ Policy-gated agent-to-agent communication across trust boundaries.
 <div class="feature-card" markdown>
 ### :material-alert-octagon: Dangerous Commands
 Block `rm -rf /`, `DROP TABLE`, fork bombs, pipe-to-shell, and force pushes.
-</div>
-
-<div class="feature-card" markdown>
-### :material-brain: Intelligence Layer
-5 AI advisory agents for auto-config, policy recommendations, incident explanation, compliance mapping, and integration code generation. BYOM -- bring your own model.
 </div>
 
 </div>

@@ -105,6 +105,17 @@ print(answer)
 
 The same pattern works with any provider -- OpenAI, Claude, LangChain, CrewAI, AutoGen, Google ADK, or Claude ADK. Replace the model call in step 2 and the rest stays the same.
 
+## Next: Auto-Configure with Intelligence
+
+After trying the quickstart, let the intelligence layer generate a full configuration tailored to your project:
+
+```bash
+safeai init
+safeai intelligence auto-config --path . --apply
+```
+
+This analyzes your project structure and generates policies, contracts, and agent identities automatically. See the [Intelligence Layer guide](../guides/intelligence.md) for details.
+
 ## Next Steps
 
 - [Configuration](configuration.md) -- customize policies, rules, and audit settings via YAML.
