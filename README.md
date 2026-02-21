@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="public/image/image.png" alt="SafeAI Banner" width="100%" />
+  <img src="docs/assets/banner.png" alt="SafeAI Banner" width="100%" />
 </p>
 
 <h3 align="center">SECURE. INTELLIGENT. TRUSTED.</h3>
