@@ -17,11 +17,19 @@ git remote add upstream https://github.com/enendufrankc/safeai.git
 
 ### 2. Install development dependencies
 
-```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install -e ".[dev,all]"
-```
+=== "uv (recommended)"
+
+    ```bash
+    uv sync --extra dev --extra all
+    ```
+
+=== "pip"
+
+    ```bash
+    python -m venv .venv
+    source .venv/bin/activate
+    pip install -e ".[dev,all]"
+    ```
 
 ### 3. Scaffold the configuration
 
@@ -31,19 +39,23 @@ safeai init
 
 ### 4. Run quality gates
 
-```bash
-# Tests
-pytest tests/ -v --tb=short
+=== "uv (recommended)"
 
-# Linting
-ruff check safeai/ tests/
+    ```bash
+    uv run pytest tests/ -v --tb=short
+    uv run ruff check safeai/ tests/
+    uv run mypy safeai/
+    uv run safeai validate
+    ```
 
-# Type checking
-mypy safeai/
+=== "pip"
 
-# Validate config
-safeai validate
-```
+    ```bash
+    pytest tests/ -v --tb=short
+    ruff check safeai/ tests/
+    mypy safeai/
+    safeai validate
+    ```
 
 All four must pass before you submit any PR.
 
@@ -91,10 +103,10 @@ Add new detection capabilities (e.g., new PII types, custom patterns).
 
 Before opening a pull request, verify all of the following:
 
-- [ ] Tests pass: `pytest tests/ -v`
-- [ ] Linting passes: `ruff check safeai/ tests/`
-- [ ] Type checks pass: `mypy safeai/`
-- [ ] Config validates: `safeai validate`
+- [ ] Tests pass: `uv run pytest tests/ -v`
+- [ ] Linting passes: `uv run ruff check safeai/ tests/`
+- [ ] Type checks pass: `uv run mypy safeai/`
+- [ ] Config validates: `uv run safeai validate`
 - [ ] Commit is signed off: `git commit -s -m "..."`
 - [ ] PR description includes Why, What, Security Impact, Verification, Compatibility
 - [ ] Documentation updated if user-facing behavior changed

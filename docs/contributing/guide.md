@@ -24,7 +24,7 @@ All contributions must meet these quality standards:
 - **Tests are required.** Every new feature or bug fix must include corresponding tests. Run the full test suite before submitting:
 
     ```bash
-    pytest tests/ -v
+    uv run pytest tests/ -v
     ```
 
 - **Keep changes focused.** Each pull request should address a single concern. Avoid mixing unrelated changes in one PR.
@@ -35,9 +35,9 @@ All contributions must meet these quality standards:
 
     ```bash
     # Run the full quality gate locally
-    pytest tests/ -v --tb=short
-    ruff check safeai/ tests/
-    mypy safeai/
+    uv run pytest tests/ -v --tb=short
+    uv run ruff check safeai/ tests/
+    uv run mypy safeai/
     ```
 
 ---

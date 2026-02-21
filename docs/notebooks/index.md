@@ -122,7 +122,7 @@ Demonstrates running the SafeAI proxy server in-process using FastAPI's TestClie
 
 ```bash
 # Install SafeAI with notebook dependencies
-pip install safeai[all]
+uv pip install "safeai[all]"
 
 # Launch Jupyter
 jupyter notebook notebook/

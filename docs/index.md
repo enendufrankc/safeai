@@ -163,18 +163,37 @@ SafeAI enforces security at the **boundaries** where data enters, exits, and cro
 
 ## Install
 
-```bash
-pip install safeai
-```
+=== "uv (recommended)"
 
-Or with extras:
+    ```bash
+    uv pip install safeai
+    ```
 
-```bash
-pip install safeai[vault]       # HashiCorp Vault backend
-pip install safeai[aws]         # AWS Secrets Manager backend
-pip install safeai[mcp]         # MCP server for coding agents
-pip install safeai[all]         # Everything
-```
+=== "pip"
+
+    ```bash
+    pip install safeai
+    ```
+
+With extras:
+
+=== "uv (recommended)"
+
+    ```bash
+    uv pip install "safeai[vault]"   # HashiCorp Vault backend
+    uv pip install "safeai[aws]"     # AWS Secrets Manager backend
+    uv pip install "safeai[mcp]"     # MCP server for coding agents
+    uv pip install "safeai[all]"     # Everything
+    ```
+
+=== "pip"
+
+    ```bash
+    pip install safeai[vault]       # HashiCorp Vault backend
+    pip install safeai[aws]         # AWS Secrets Manager backend
+    pip install safeai[mcp]         # MCP server for coding agents
+    pip install safeai[all]         # Everything
+    ```
 
 <div class="cta" markdown>
 

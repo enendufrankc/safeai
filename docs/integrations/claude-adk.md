@@ -7,7 +7,7 @@ Wrap Claude ADK tools so every tool invocation passes through SafeAI's policy en
 ## Install
 
 ```bash
-pip install safeai anthropic
+uv pip install safeai anthropic
 ```
 
 ---

@@ -7,7 +7,7 @@ Wrap CrewAI tools so every agent action in your crew passes through SafeAI's pol
 ## Install
 
 ```bash
-pip install safeai crewai
+uv pip install safeai crewai
 ```
 
 ---

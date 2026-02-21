@@ -84,17 +84,23 @@ SafeAI is intentionally broad. This is the complete capability set currently imp
 ## Install
 
 ```bash
+uv pip install safeai
+```
+
+Or with pip:
+
+```bash
 pip install safeai
 ```
 
 Optional extras:
 
 ```bash
-pip install "safeai[vault]"   # HashiCorp Vault backend
-pip install "safeai[aws]"     # AWS Secrets Manager backend
-pip install "safeai[mcp]"     # MCP server support
-pip install "safeai[all]"     # Vault + AWS + MCP
-pip install "safeai[dev]"     # local development tooling
+uv pip install "safeai[vault]"   # HashiCorp Vault backend
+uv pip install "safeai[aws]"     # AWS Secrets Manager backend
+uv pip install "safeai[mcp]"     # MCP server support
+uv pip install "safeai[all]"     # Vault + AWS + MCP
+uv pip install "safeai[dev]"     # local development tooling
 ```
 
 ## Quick Start (SDK)
@@ -370,15 +376,21 @@ Core project policies:
 ```bash
 git clone https://github.com/enendufrankc/safeai.git
 cd safeai
-python3 -m pip install -e ".[dev,all]"
+uv sync --extra dev --extra all
+```
+
+Or with pip:
+
+```bash
+pip install -e ".[dev,all]"
 ```
 
 Quality gates used in CI:
 
 ```bash
-ruff check safeai tests
-mypy safeai
-python3 -m unittest discover -s tests -v
+uv run ruff check safeai tests
+uv run mypy safeai
+uv run python -m pytest tests/ -v
 ```
 
 ## License

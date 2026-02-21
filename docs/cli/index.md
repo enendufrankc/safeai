@@ -3,7 +3,7 @@
 SafeAI ships a single `safeai` command with subcommands for scanning, serving, auditing, and managing your safety configuration.
 
 ```bash
-pip install safeai
+uv pip install safeai
 safeai --help
 ```
 
