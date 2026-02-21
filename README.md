@@ -6,8 +6,8 @@
 
 <p align="center">
   <a href="https://github.com/enendufrankc/safeai/actions/workflows/quality.yml"><img src="https://img.shields.io/github/actions/workflow/status/enendufrankc/safeai/quality.yml?label=build&style=flat-square" alt="Build"></a>
-  <a href="https://github.com/enendufrankc/safeai/releases"><img src="https://img.shields.io/badge/release-v0.7.0-blue?style=flat-square" alt="Release"></a>
-  <a href="https://pypi.org/project/safeai/"><img src="https://img.shields.io/pypi/v/safeai?style=flat-square&label=pypi" alt="PyPI"></a>
+  <a href="https://github.com/enendufrankc/safeai/releases"><img src="https://img.shields.io/badge/release-v0.8.0-blue?style=flat-square" alt="Release"></a>
+  <a href="https://pypi.org/project/safeai-sdk/"><img src="https://img.shields.io/pypi/v/safeai-sdk?style=flat-square&label=pypi" alt="PyPI"></a>
   <a href="https://opensource.org/licenses/Apache-2.0"><img src="https://img.shields.io/badge/license-Apache--2.0-green?style=flat-square" alt="License"></a>
   <a href="https://github.com/enendufrankc/safeai/stargazers"><img src="https://img.shields.io/github/stars/enendufrankc/safeai?style=flat-square" alt="Stars"></a>
 </p>
@@ -85,23 +85,23 @@ SafeAI is intentionally broad. This is the complete capability set currently imp
 ## Install
 
 ```bash
-uv pip install safeai
+uv pip install safeai-sdk
 ```
 
 Or with pip:
 
 ```bash
-pip install safeai
+pip install safeai-sdk
 ```
 
 Optional extras:
 
 ```bash
-uv pip install "safeai[vault]"   # HashiCorp Vault backend
-uv pip install "safeai[aws]"     # AWS Secrets Manager backend
-uv pip install "safeai[mcp]"     # MCP server support
-uv pip install "safeai[all]"     # Vault + AWS + MCP
-uv pip install "safeai[dev]"     # local development tooling
+uv pip install "safeai-sdk[vault]"   # HashiCorp Vault backend
+uv pip install "safeai-sdk[aws]"     # AWS Secrets Manager backend
+uv pip install "safeai-sdk[mcp]"     # MCP server support
+uv pip install "safeai-sdk[all]"     # Vault + AWS + MCP
+uv pip install "safeai-sdk[dev]"     # local development tooling
 ```
 
 ## Quick Start (SDK)

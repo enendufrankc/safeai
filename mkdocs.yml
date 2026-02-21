@@ -94,7 +94,7 @@ extra:
     - icon: fontawesome/brands/github
       link: https://github.com/enendufrankc/safeai
     - icon: fontawesome/brands/python
-      link: https://pypi.org/project/safeai/
+      link: https://pypi.org/project/safeai-sdk/
   generator: false
 
 extra_css:

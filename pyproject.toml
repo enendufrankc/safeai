@@ -3,8 +3,8 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "safeai"
-version = "0.7.0"
+name = "safeai-sdk"
+version = "0.8.0"
 description = "Framework-agnostic runtime boundary enforcement for AI systems"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -12,6 +12,18 @@ license = { text = "Apache-2.0" }
 authors = [
   { name = "SafeAI Contributors" }
 ]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "Topic :: Security",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+  "License :: OSI Approved :: Apache Software License",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+]
+keywords = ["ai-safety", "guardrails", "llm", "agent-security", "policy-engine"]
 dependencies = [
   "click>=8.1,<9",
   "pydantic>=2.7,<3",
@@ -54,6 +66,12 @@ docs = [
   "mkdocs-minify-plugin>=0.8,<1"
 ]
 
+[project.urls]
+Homepage = "https://enendufrankc.github.io/safeai/"
+Repository = "https://github.com/enendufrankc/safeai"
+Documentation = "https://enendufrankc.github.io/safeai/"
+"Bug Tracker" = "https://github.com/enendufrankc/safeai/issues"
+
 [project.scripts]
 safeai = "safeai.cli.main:cli"
 
@@ -64,7 +82,7 @@ include-package-data = true
 include = ["safeai*"]
 
 [tool.setuptools.package-data]
-"safeai" = ["config/defaults/**/*.yaml", "config/defaults/**/*.py", "schemas/**/*.json"]
+"safeai" = ["config/defaults/**/*.yaml", "config/defaults/**/*.py", "config/defaults/**/*.json", "schemas/**/*.json"]
 
 [tool.ruff]
 line-length = 100

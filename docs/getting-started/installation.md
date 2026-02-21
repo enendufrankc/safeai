@@ -21,13 +21,13 @@ SafeAI installs as a standard Python package with optional extras for vault inte
 === "uv (recommended)"
 
     ```bash
-    uv pip install safeai
+    uv pip install safeai-sdk
     ```
 
 === "pip"
 
     ```bash
-    pip install safeai
+    pip install safeai-sdk
     ```
 
 This installs the core framework with secret scanning, PII redaction, policy enforcement, tool control, and action approval.
@@ -47,19 +47,19 @@ SafeAI provides optional dependency groups for extended functionality:
 === "uv (recommended)"
 
     ```bash
-    uv pip install "safeai[vault]"
-    uv pip install "safeai[aws]"
-    uv pip install "safeai[mcp]"
-    uv pip install "safeai[all]"
+    uv pip install "safeai-sdk[vault]"
+    uv pip install "safeai-sdk[aws]"
+    uv pip install "safeai-sdk[mcp]"
+    uv pip install "safeai-sdk[all]"
     ```
 
 === "pip"
 
     ```bash
-    pip install safeai[vault]
-    pip install safeai[aws]
-    pip install safeai[mcp]
-    pip install safeai[all]
+    pip install safeai-sdk[vault]
+    pip install safeai-sdk[aws]
+    pip install safeai-sdk[mcp]
+    pip install safeai-sdk[all]
     ```
 
 !!! tip "Choosing extras"
