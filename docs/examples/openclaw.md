@@ -673,6 +673,147 @@ safeai_requests_total{boundary="output",action="allow"} 2034
 
 ---
 
+## Step 11 — Use the Intelligence Layer
+
+SafeAI's intelligence layer provides AI advisory agents that help you configure, monitor, and improve your OpenClaw security setup. The agents never see raw secrets or PII — they work on metadata, code structure, and audit aggregates only.
+
+### Enable the intelligence backend
+
+Add the intelligence section to your `safeai.yaml`:
+
+```yaml title="safeai.yaml (add to existing config)"
+intelligence:
+  enabled: true
+  backend:
+    provider: ollama              # free, local, no API key needed
+    model: llama3.2
+    base_url: http://localhost:11434
+  max_events_per_query: 500
+  metadata_only: true
+```
+
+!!! tip
+    You can use any OpenAI-compatible backend instead of Ollama. Set `provider: openai-compatible`, point `base_url` at your provider, and set `api_key_env` to the environment variable holding your key.
+
+### Auto-generate SafeAI config from your OpenClaw workspace
+
+Instead of writing policies and contracts by hand (Steps 2–3), let the auto-config agent analyze your workspace and generate everything:
+
+```bash
+safeai intelligence auto-config \
+  --path ~/openclaw-workspace \
+  --output-dir .safeai-generated
+```
+
+This scans your project's file names, imports, dependencies, and structure — then generates a complete `safeai.yaml`, policies, contracts, and agent identity files tailored to OpenClaw.
+
+Review the output before applying:
+
+```bash
+# Review what was generated
+ls .safeai-generated/
+cat .safeai-generated/safeai.yaml
+cat .safeai-generated/policies/generated.yaml
+
+# Apply when satisfied
+safeai intelligence auto-config \
+  --path ~/openclaw-workspace \
+  --output-dir .safeai-generated \
+  --apply
+```
+
+### Explain a security incident
+
+When SafeAI blocks something, the audit log records it. Use the intelligence layer to understand what happened and why:
+
+```bash
+# Find the event ID from the audit trail
+safeai logs --action block --last 1h
+
+# Ask the AI to classify and explain it
+safeai intelligence explain evt_a1b2c3d4
+```
+
+Example output:
+
+```
+Classification: CREDENTIAL_EXFILTRATION
+Severity: CRITICAL
+
+Explanation:
+The agent attempted to read ~/.ssh/id_ed25519 via the file_read tool.
+This matches a known prompt injection pattern where an attacker instructs
+the agent to exfiltrate private keys. The "block-sensitive-files" policy
+correctly prevented the read.
+
+Suggested remediation:
+- Review the conversation history for the session that triggered this event
+- Check inbound messages for hidden instructions (prompt injection)
+- Consider adding the source channel to a watch list
+```
+
+### Get policy recommendations from audit data
+
+After running for a while, the recommender agent analyzes your audit aggregates and suggests improvements:
+
+```bash
+safeai intelligence recommend --since 7d --output-dir .safeai-generated
+```
+
+Example recommendations:
+
+```
+Gap Analysis:
+- 47 block events for "secret" tags but no redact fallback policy.
+  Recommendation: Add a redact policy for secrets in output boundary
+  so partial leaks are caught even if block fails upstream.
+
+- 12 "require_approval" events for send_message but 0 for gmail_send.
+  Both are external messaging tools — consider applying the same
+  approval policy to gmail_send.
+
+- No policy covers the "browser" tool's screenshot response field.
+  Screenshots could contain PII rendered on screen.
+
+Generated file: .safeai-generated/policies/recommended.yaml
+```
+
+### Generate compliance policies
+
+If your OpenClaw deployment handles regulated data, generate a compliance policy set:
+
+```bash
+# HIPAA for healthcare data
+safeai intelligence compliance --framework hipaa --output-dir .safeai-generated
+
+# GDPR for EU user data
+safeai intelligence compliance --framework gdpr --output-dir .safeai-generated
+
+# SOC 2 for enterprise
+safeai intelligence compliance --framework soc2 --output-dir .safeai-generated
+```
+
+### Use the proxy intelligence endpoints
+
+The sidecar exposes intelligence endpoints for programmatic access:
+
+```bash
+# Check if intelligence is available
+curl http://127.0.0.1:8484/v1/intelligence/status
+
+# Explain an incident via API
+curl -X POST http://127.0.0.1:8484/v1/intelligence/explain \
+  -H "content-type: application/json" \
+  -d '{"event_id": "evt_a1b2c3d4"}'
+
+# Get policy recommendations via API
+curl -X POST http://127.0.0.1:8484/v1/intelligence/recommend \
+  -H "content-type: application/json" \
+  -d '{"since": "7d"}'
+```
+
+---
+
 ## What SafeAI prevents
 
 | Threat | Without SafeAI | With SafeAI |
@@ -759,6 +900,7 @@ The key integration points:
 4. **Structured scanning** — `POST /v1/scan/structured` for webhook payloads
 5. **Approvals** — `safeai approvals` CLI for human-in-the-loop gates
 6. **Audit** — `safeai logs` and `/v1/audit/query` for full decision trail
+7. **Intelligence** — `safeai intelligence` for AI-powered config generation, incident explanation, policy recommendations, and compliance mapping
 
 ---
 
@@ -769,4 +911,5 @@ The key integration points:
 - [Policy Engine](../guides/policy-engine.md) — design custom rules
 - [Dangerous Commands](../guides/dangerous-commands.md) — destructive command detection
 - [Approval Workflows](../guides/approval-workflows.md) — human-in-the-loop gates
+- [Intelligence Layer](../guides/intelligence.md) — AI advisory agents for config generation, incident analysis, and compliance
 - [OpenClaw Documentation](https://github.com/openclaw/openclaw) — OpenClaw setup and skills
