@@ -150,10 +150,11 @@ More concretely: a security engineer should be able to open the audit log, pick 
 | [Delivery Tracker](./15-delivery-tracker.md) | Single source of truth for implementation status and next tasks |
 | [Architecture Review 2026-02-20](./16-architecture-review-2026-02-20.md) | Sprint 0 architecture review record and decisions |
 | [Quickstart](./17-quickstart.md) | Install-to-first-value guide with end-to-end SDK example |
+| [Contributor Onboarding Playbook](./18-contributor-onboarding-playbook.md) | External contributor workflow for plugins, adapters, templates, and security review |
 
 ---
 
 ## Status
 
-Sprint 0 and Phase 1 are complete, with `v0.1.0rc1` prepared.
+Sprint 0 through Phase 6 are complete, with `v0.6.0` release gate passed.
 Current execution status and next tasks are tracked in `docs/15-delivery-tracker.md`.
