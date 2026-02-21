@@ -1,0 +1,32 @@
+version: v1alpha1
+policies:
+  - name: finance-block-secret-credentials
+    boundary: [input, action, output]
+    priority: 10
+    condition:
+      data_tags: [secret, secret.token, secret.credential]
+    action: block
+    reason: Finance flows must never transmit secret material.
+
+  - name: finance-redact-personal-financial-output
+    boundary: [output]
+    priority: 20
+    condition:
+      data_tags: [personal.financial, personal.pii]
+    action: redact
+    reason: Personal financial data must be redacted before output.
+
+  - name: finance-require-approval-wire-actions
+    boundary: [action]
+    priority: 30
+    condition:
+      tools: [initiate_wire_transfer, update_payment_destination]
+      data_tags: [financial, confidential]
+    action: require_approval
+    reason: Wire and payment-destination actions require human approval.
+
+  - name: finance-allow-output-default
+    boundary: [output]
+    priority: 1000
+    action: allow
+    reason: Allow when no finance restriction matches.

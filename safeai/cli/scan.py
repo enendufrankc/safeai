@@ -21,17 +21,17 @@ def scan_command(config_path: str, input_text: str, boundary: str) -> None:
     safeai = SafeAI.from_config(config_path)
 
     if boundary == "input":
-        result = safeai.scan_input(input_text)
-        filtered = result.filtered
-        decision = result.decision
-        detections = result.detections
+        scan_result = safeai.scan_input(input_text)
+        filtered = scan_result.filtered
+        decision = scan_result.decision
+        detections = scan_result.detections
         fallback_used = False
     else:
-        result = safeai.guard_output(input_text)
-        filtered = result.safe_output
-        decision = result.decision
-        detections = result.detections
-        fallback_used = result.fallback_used
+        guard_result = safeai.guard_output(input_text)
+        filtered = guard_result.safe_output
+        decision = guard_result.decision
+        detections = guard_result.detections
+        fallback_used = guard_result.fallback_used
 
     click.echo(f"Decision: {decision.action}")
     click.echo(f"Policy: {decision.policy_name or 'default deny'}")
