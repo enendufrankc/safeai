@@ -1,0 +1,10 @@
+version: v1alpha1
+tenants:
+  - tenant_id: default
+    name: Default Tenant
+    policy_files:
+      - policies/default.yaml
+    agents:
+      - default-agent
+      - planner-agent
+      - executor-agent

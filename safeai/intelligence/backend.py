@@ -100,7 +100,15 @@ class OpenAICompatibleBackend:
                 json=payload,
                 headers=headers,
             )
-            resp.raise_for_status()
+            if resp.status_code != 200:
+                try:
+                    detail = resp.json()
+                    err_msg = detail.get("error", {}).get("message", "") or resp.text
+                except Exception:
+                    err_msg = resp.text
+                raise RuntimeError(
+                    f"HTTP {resp.status_code} from {self._base_url}: {err_msg}"
+                )
         data = resp.json()
         choices = data.get("choices", [])
         content = choices[0]["message"]["content"] if choices else ""

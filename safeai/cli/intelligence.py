@@ -23,6 +23,14 @@ def _build_backend_from_config(cfg):
     api_key = ""
     if bcfg.api_key_env:
         api_key = os.environ.get(bcfg.api_key_env, "")
+        if not api_key:
+            import click as _click
+
+            _click.echo(
+                f"Warning: {bcfg.api_key_env} is not set. "
+                f"Set it with: export {bcfg.api_key_env}=<your-key>",
+                err=True,
+            )
     return OpenAICompatibleBackend(
         model=bcfg.model,
         api_key=api_key,

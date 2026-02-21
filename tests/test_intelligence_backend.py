@@ -166,6 +166,7 @@ class OpenAICompatibleBackendTests(unittest.TestCase):
     @patch("safeai.intelligence.backend.httpx.Client")
     def test_complete_calls_api(self, mock_client_cls: MagicMock) -> None:
         mock_resp = MagicMock()
+        mock_resp.status_code = 200
         mock_resp.json.return_value = {
             "model": "gpt-4",
             "choices": [{"message": {"content": "Response here"}}],
@@ -197,6 +198,7 @@ class OpenAICompatibleBackendTests(unittest.TestCase):
     @patch("safeai.intelligence.backend.httpx.Client")
     def test_empty_choices(self, mock_client_cls: MagicMock) -> None:
         mock_resp = MagicMock()
+        mock_resp.status_code = 200
         mock_resp.json.return_value = {"model": "gpt-4", "choices": [], "usage": {}}
         mock_client = MagicMock()
         mock_client.__enter__ = MagicMock(return_value=mock_client)

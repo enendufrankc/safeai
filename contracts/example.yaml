@@ -1,0 +1,17 @@
+version: v1alpha1
+contract:
+  tool_name: send_email
+  description: Sends email notifications to approved recipients.
+  accepts:
+    tags: [internal, confidential]
+    fields: [to, subject, body]
+  emits:
+    tags: [internal]
+    fields: [message_id, status]
+  stores:
+    fields: [to, subject, sent_at]
+    retention: 30d
+  side_effects:
+    reversible: false
+    requires_approval: true
+    description: External message delivery is irreversible.

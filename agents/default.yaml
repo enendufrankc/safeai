@@ -1,0 +1,6 @@
+version: v1alpha1
+agent:
+  agent_id: default-agent
+  description: Baseline identity for local development.
+  tools: [send_email]
+  clearance_tags: [internal, personal]
