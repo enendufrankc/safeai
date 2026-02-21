@@ -203,7 +203,7 @@ def dashboard_intelligence_explain(
     payload: IntelligenceExplainPayload, request: Request
 ) -> dict[str, Any]:
     runtime = request.app.state.runtime
-    principal = runtime.dashboard.authorize_request(request.headers, permission="intelligence:explain")
+    runtime.dashboard.authorize_request(request.headers, permission="intelligence:explain")
     try:
         result = runtime.safeai.intelligence_explain(payload.event_id)
     except Exception as exc:

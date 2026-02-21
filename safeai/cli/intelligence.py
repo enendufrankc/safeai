@@ -59,7 +59,7 @@ def _write_artifacts(artifacts: dict[str, str], output_dir: str, apply: bool) ->
         click.echo(f"  wrote {dest}")
 
     if apply:
-        for filename, content in artifacts.items():
+        for filename, _content in artifacts.items():
             target = Path(".") / filename
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(str(out / filename), str(target))
