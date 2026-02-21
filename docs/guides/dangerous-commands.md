@@ -2,6 +2,13 @@
 
 SafeAI detects and blocks destructive commands before agents can execute them. Commands like `rm -rf /`, `DROP TABLE`, fork bombs, pipe-to-shell patterns, and force pushes are identified through the data classifier and enforced by the policy engine. This protects your infrastructure from accidental or adversarial agent actions.
 
+!!! tip "Auto-generate command policies"
+    The intelligence layer can recommend dangerous command policies based on your agent's capabilities:
+    ```bash
+    safeai intelligence auto-config --path . --apply
+    ```
+    Use this guide to customize detection rules or define them manually.
+
 ## Quick Example
 
 ```python

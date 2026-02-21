@@ -2,6 +2,12 @@
 
 Wrap Claude ADK tools so every tool invocation passes through SafeAI's policy engine -- secret detection, PII filtering, tool contracts, and audit logging are enforced transparently.
 
+!!! tip "Auto-generate Claude ADK integration"
+    Let the intelligence layer generate SafeAI adapters for your Claude tools:
+    ```bash
+    safeai intelligence integrate --target claude-adk --path . --apply
+    ```
+
 ---
 
 ## Install

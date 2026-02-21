@@ -2,6 +2,12 @@
 
 Extend SafeAI with custom detectors, adapters, and policy templates -- no forking required. Drop a Python file into your project, enable plugins in config, and SafeAI loads your extensions at startup.
 
+!!! tip "Intelligence-recommended plugins"
+    The intelligence layer can analyze your configuration and recommend useful plugin patterns:
+    ```bash
+    safeai intelligence recommend --since 7d
+    ```
+
 ---
 
 ## How Plugins Work

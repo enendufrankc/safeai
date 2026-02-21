@@ -2,6 +2,13 @@
 
 SafeAI prevents your agent from leaking personally identifiable information. The `guard_output` method scans outbound text for emails, phone numbers, Social Security numbers, credit card numbers, and other PII, then blocks or redacts the response before it reaches the end user.
 
+!!! tip "Auto-configure PII settings"
+    The intelligence layer can recommend PII protection settings based on your domain:
+    ```bash
+    safeai intelligence auto-config --path . --apply
+    ```
+    Use this guide to customize PII detection or configure manually.
+
 ## Quick Example
 
 ```python

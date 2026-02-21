@@ -138,6 +138,16 @@ audit:
 !!! warning "Do not enable `include_content` in production"
     Storing raw content in audit logs defeats the purpose of scanning for secrets and PII. Use content hashes to correlate events without retaining sensitive data.
 
+## Incident Explanation with Intelligence
+
+Use the intelligence layer to classify and explain audit events:
+
+```bash
+safeai intelligence explain <event_id>
+```
+
+The AI reads the sanitized event metadata and provides a classification, explanation, and suggested remediation. See the [Intelligence Layer guide](intelligence.md) for details.
+
 ## See Also
 
 - [API Reference — Audit Logging](../reference/audit.md)
