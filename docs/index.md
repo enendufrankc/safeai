@@ -6,7 +6,7 @@ hide:
 
 <div class="hero" markdown>
 
-![SafeAI Banner](assets/banner.png)
+![SafeAI Banner](assets/bannerv2.png)
 
 # SafeAI
 
