@@ -18,21 +18,42 @@ SafeAI's intelligence layer provides 5 AI advisory agents that help you **config
 
 ---
 
-## Configuration
+## Setup
 
-Enable the intelligence layer in `safeai.yaml`:
+The easiest way to configure the intelligence layer is through the interactive CLI:
 
-```yaml
-intelligence:
-  enabled: true
-  backend:
-    provider: ollama              # or "openai-compatible"
-    model: llama3.2
-    base_url: http://localhost:11434
-    api_key_env: null             # env var name (NOT the key itself)
-  max_events_per_query: 500
-  metadata_only: true             # false = user opts into raw content (air-gapped)
+```bash
+safeai init
 ```
+
+The CLI prompts you to choose an AI backend from 12 supported providers (Ollama, OpenAI, Anthropic, Google Gemini, Mistral, Groq, Azure OpenAI, Cohere, Together AI, Fireworks AI, DeepSeek, or any OpenAI-compatible endpoint) and writes the configuration to `safeai.yaml` automatically.
+
+```
+Intelligence Layer Setup
+
+Enable the intelligence layer? [Y/n]: Y
+
+Choose your AI backend:
+  1. Ollama (local, free — no API key needed)
+  2. OpenAI
+  3. Anthropic
+  4. Google Gemini
+  5. Mistral
+  6. Groq
+  ...
+
+Select provider [1]: 1
+
+Intelligence layer configured!
+  provider: ollama
+  model:    llama3.2
+```
+
+Already ran `safeai init`? Re-run it — it will skip existing files and just prompt for intelligence setup.
+
+### Manual configuration
+
+If you prefer to edit `safeai.yaml` directly, here are the backend options:
 
 ### Backend Options
 
