@@ -35,6 +35,7 @@ theme:
 
 plugins:
   - search
+  - meta
   - mkdocstrings:
       handlers:
         python:

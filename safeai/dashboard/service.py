@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from collections import deque
 from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
@@ -166,10 +167,20 @@ class TenantPolicySetManager:
 class AlertRuleManager:
     """File-backed alert rules and alert event sink."""
 
-    def __init__(self, *, rules_file: Path | None, alert_log_file: Path | None) -> None:
+    def __init__(
+        self,
+        *,
+        rules_file: Path | None,
+        alert_log_file: Path | None,
+        cooldown_seconds: int = 60,
+    ) -> None:
         self.rules_file = rules_file
         self.alert_log_file = alert_log_file
+        self.cooldown_seconds = max(cooldown_seconds, 0)
         self._rules: dict[str, AlertRule] = {}
+        self._sliding_windows: dict[str, deque[datetime]] = {}
+        self._last_alert_time: dict[str, datetime] = {}
+        self._alert_channels: list[Any] = []
         self._load()
 
     def list_rules(self) -> list[AlertRule]:
@@ -197,6 +208,57 @@ class AlertRuleManager:
         if limit <= 0:
             return rows
         return rows[:limit]
+
+    def set_alert_channels(self, channels: list[Any]) -> None:
+        """Set external alert channels for multi-channel dispatch."""
+        self._alert_channels = list(channels)
+
+    def evaluate_single_event(self, event: dict[str, Any]) -> list[dict[str, Any]]:
+        """Push-based alert evaluation for a single incoming event."""
+        now = datetime.now(timezone.utc)
+        triggered: list[dict[str, Any]] = []
+        for rule in self.list_rules():
+            if not _matches_rule(event, rule):
+                continue
+            window_duration = _parse_duration(rule.window)
+            window = self._sliding_windows.setdefault(rule.rule_id, deque())
+            window.append(now)
+            cutoff = now - window_duration
+            while window and window[0] < cutoff:
+                window.popleft()
+            if len(window) < rule.threshold:
+                continue
+            last_fired = self._last_alert_time.get(rule.rule_id)
+            if last_fired and self.cooldown_seconds > 0:
+                if (now - last_fired).total_seconds() < self.cooldown_seconds:
+                    continue
+            self._last_alert_time[rule.rule_id] = now
+            alert = {
+                "alert_id": f"alr_{now.strftime('%Y%m%d%H%M%S')}_{rule.rule_id}",
+                "rule_id": rule.rule_id,
+                "rule_name": rule.name,
+                "threshold": rule.threshold,
+                "window": rule.window,
+                "count": len(window),
+                "channels": list(rule.channels),
+                "sample_event_ids": [str(event.get("event_id", ""))],
+                "timestamp": now.isoformat(),
+            }
+            self._dispatch_to_channels(alert)
+            self._notify(alert)
+            triggered.append(alert)
+        return triggered
+
+    def _dispatch_to_channels(self, alert: dict[str, Any]) -> None:
+        """Dispatch an alert to registered external channels."""
+        if not self._alert_channels:
+            return
+        try:
+            from safeai.alerting.channels import dispatch_alert
+
+            dispatch_alert(alert, self._alert_channels)
+        except Exception:
+            pass
 
     def evaluate(self, *, events: list[dict[str, Any]]) -> list[dict[str, Any]]:
         now = datetime.now(timezone.utc)
@@ -490,6 +552,44 @@ class DashboardService:
         )
         self._tenant_sets.upsert(updated)
         return self._tenant_policy_to_dict(updated)
+
+    def agent_timeline(
+        self,
+        principal: DashboardPrincipal,
+        *,
+        agent_id: str | None = None,
+        last: str = "24h",
+        limit: int = 200,
+    ) -> list[dict[str, Any]]:
+        """Query views over existing audit log grouped by agent."""
+        filters: dict[str, Any] = {"last": last, "limit": max(limit * 5, 500), "newest_first": True}
+        if agent_id:
+            filters["agent_id"] = agent_id
+        events = self.query_events(principal, filters=filters)
+        agents: dict[str, dict[str, Any]] = {}
+        for event in events:
+            aid = str(event.get("agent_id", "unknown"))
+            if aid not in agents:
+                agents[aid] = {"agent_id": aid, "event_count": 0, "events": [], "last_seen": None}
+            agents[aid]["event_count"] += 1
+            if agents[aid]["last_seen"] is None:
+                agents[aid]["last_seen"] = event.get("timestamp")
+            if len(agents[aid]["events"]) < limit:
+                agents[aid]["events"].append(event)
+        return sorted(agents.values(), key=lambda x: x.get("last_seen") or "", reverse=True)
+
+    def session_trace(
+        self,
+        principal: DashboardPrincipal,
+        *,
+        session_id: str,
+        limit: int = 200,
+    ) -> list[dict[str, Any]]:
+        """Return chronological event trace for a given session."""
+        events = self.query_events(
+            principal, filters={"session_id": session_id, "limit": max(limit, 1), "newest_first": False}
+        )
+        return events[:limit]
 
     def list_alert_rules(self) -> list[dict[str, Any]]:
         return [self._alert_rule_to_dict(row) for row in self._alerts.list_rules()]

@@ -194,6 +194,52 @@ def dashboard_upsert_alert_rule(payload: AlertRulePayload, request: Request) -> 
     )
 
 
+@router.get("/v1/dashboard/observe/agents")
+def dashboard_observe_agents(request: Request, last: str = "24h") -> dict[str, Any]:
+    runtime = request.app.state.runtime
+    principal = runtime.dashboard.authorize_request(request.headers, permission="audit:read")
+    agents = runtime.dashboard.agent_timeline(principal, last=last)
+    for item in agents:
+        item.pop("events", None)
+    return {"count": len(agents), "agents": agents}
+
+
+@router.get("/v1/dashboard/observe/agents/{agent_id}")
+def dashboard_observe_agent_detail(agent_id: str, request: Request, last: str = "24h", limit: int = 100) -> dict[str, Any]:
+    runtime = request.app.state.runtime
+    principal = runtime.dashboard.authorize_request(request.headers, permission="audit:read")
+    timelines = runtime.dashboard.agent_timeline(principal, agent_id=agent_id, last=last, limit=limit)
+    if not timelines:
+        return {"agent_id": agent_id, "event_count": 0, "events": []}
+    return timelines[0]
+
+
+@router.get("/v1/dashboard/observe/sessions/{session_id}")
+def dashboard_observe_session(session_id: str, request: Request, limit: int = 200) -> dict[str, Any]:
+    runtime = request.app.state.runtime
+    principal = runtime.dashboard.authorize_request(request.headers, permission="audit:read")
+    events = runtime.dashboard.session_trace(principal, session_id=session_id, limit=limit)
+    return {"session_id": session_id, "count": len(events), "events": events}
+
+
+@router.get("/v1/dashboard/observe/metrics")
+def dashboard_observe_metrics(request: Request) -> dict[str, Any]:
+    runtime = request.app.state.runtime
+    _ = runtime.dashboard.authorize_request(request.headers, permission="audit:read")
+    return {
+        "agents": runtime.metrics.agent_summary(),
+        "tools": runtime.metrics.tool_summary(),
+    }
+
+
+@router.get("/v1/dashboard/alerts/history")
+def dashboard_alert_history(request: Request, limit: int = 50) -> dict[str, Any]:
+    runtime = request.app.state.runtime
+    _ = runtime.dashboard.authorize_request(request.headers, permission="alert:read")
+    alerts = runtime.dashboard._alerts.recent_alerts(limit=limit)
+    return {"count": len(alerts), "alerts": alerts}
+
+
 class IntelligenceExplainPayload(BaseModel):
     event_id: str
 
@@ -216,6 +262,51 @@ def dashboard_intelligence_explain(
         "model": result.model_used,
         "metadata": result.metadata,
     }
+
+
+@router.get("/v1/dashboard/templates")
+def dashboard_list_templates(request: Request) -> dict[str, Any]:
+    runtime = request.app.state.runtime
+    _ = runtime.dashboard.authorize_request(request.headers, permission="dashboard:view")
+    rows = runtime.safeai.list_policy_templates()
+    return {"count": len(rows), "templates": rows}
+
+
+class TemplateSearchPayload(BaseModel):
+    query: str | None = None
+    category: str | None = None
+    tags: list[str] = Field(default_factory=list)
+    compliance: str | None = None
+
+
+@router.post("/v1/dashboard/templates/search")
+def dashboard_search_templates(payload: TemplateSearchPayload, request: Request) -> dict[str, Any]:
+    runtime = request.app.state.runtime
+    _ = runtime.dashboard.authorize_request(request.headers, permission="dashboard:view")
+    results = runtime.safeai.search_policy_templates(
+        query=payload.query,
+        category=payload.category,
+        tags=payload.tags if payload.tags else None,
+        compliance=payload.compliance,
+    )
+    return {"count": len(results), "templates": results}
+
+
+class TemplateInstallPayload(BaseModel):
+    name: str
+
+
+@router.post("/v1/dashboard/templates/install")
+def dashboard_install_template(payload: TemplateInstallPayload, request: Request) -> dict[str, Any]:
+    runtime = request.app.state.runtime
+    _ = runtime.dashboard.authorize_request(request.headers, permission="alert:manage")
+    try:
+        path = runtime.safeai.install_policy_template(payload.name)
+    except (KeyError, ValueError, RuntimeError) as exc:
+        from fastapi import HTTPException
+
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return {"installed": True, "name": payload.name, "path": path}
 
 
 @router.post("/v1/dashboard/alerts/evaluate")

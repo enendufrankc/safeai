@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 from collections import defaultdict
+from datetime import datetime, timezone
 from threading import RLock
+from typing import Any
 
 
 class ProxyMetrics:
@@ -18,6 +20,9 @@ class ProxyMetrics:
         self._latency_count: dict[tuple[str], int] = defaultdict(int)
         self._latency_sum: dict[tuple[str], float] = defaultdict(float)
         self._latency_bucket_count: dict[tuple[str, float], int] = defaultdict(int)
+        self._agent_request_count: dict[str, int] = defaultdict(int)
+        self._agent_last_seen: dict[str, str] = {}
+        self._tool_request_count: dict[str, int] = defaultdict(int)
 
     def observe_request(
         self,
@@ -26,6 +31,8 @@ class ProxyMetrics:
         status_code: int,
         latency_seconds: float,
         decision_action: str | None = None,
+        agent_id: str | None = None,
+        tool_name: str | None = None,
     ) -> None:
         endpoint_token = str(endpoint).strip() or "unknown"
         status_token = str(status_code)
@@ -39,6 +46,35 @@ class ProxyMetrics:
                 if latency_seconds <= bound:
                     self._latency_bucket_count[(endpoint_token, bound)] += 1
             self._latency_bucket_count[(endpoint_token, float("inf"))] += 1
+            if agent_id and str(agent_id).strip().lower() != "unknown":
+                agent_token = str(agent_id).strip().lower()
+                self._agent_request_count[agent_token] += 1
+                self._agent_last_seen[agent_token] = datetime.now(timezone.utc).isoformat()
+            if tool_name and str(tool_name).strip():
+                tool_token = str(tool_name).strip().lower()
+                self._tool_request_count[tool_token] += 1
+
+    def agent_summary(self) -> list[dict[str, Any]]:
+        """Return per-agent request counts and last-seen timestamps."""
+        with self._lock:
+            return [
+                {
+                    "agent_id": agent_id,
+                    "request_count": self._agent_request_count[agent_id],
+                    "last_seen": self._agent_last_seen.get(agent_id),
+                }
+                for agent_id in sorted(self._agent_request_count.keys())
+            ]
+
+    def tool_summary(self) -> list[dict[str, Any]]:
+        """Return per-tool request counts."""
+        with self._lock:
+            return [
+                {"tool_name": tool_name, "request_count": count}
+                for tool_name, count in sorted(
+                    self._tool_request_count.items(), key=lambda x: (-x[1], x[0])
+                )
+            ]
 
     def render_prometheus(self) -> str:
         with self._lock:

@@ -1,3 +1,7 @@
+---
+description: "Install SafeAI with pip or uv — includes optional extras for vault, AWS, MCP, and documentation tooling."
+---
+
 # Installation
 
 SafeAI installs as a standard Python package with optional extras for vault integration, AWS services, and MCP server support. The core package has minimal dependencies and works out of the box for most use cases.

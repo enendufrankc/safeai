@@ -59,4 +59,31 @@ def create_app(
     app.include_router(router)
     app.include_router(dashboard_router)
     register_websocket_routes(app)
+
+    if cfg.alerting.enabled:
+        _wire_alerting(sdk=sdk, dashboard=dashboard, alerting_config=cfg.alerting)
+
     return app
+
+
+def _wire_alerting(*, sdk: SafeAI, dashboard: DashboardService, alerting_config: object) -> None:
+    """Connect audit emit callbacks to real-time alert evaluation."""
+    from safeai.alerting.channels import FileChannel, SlackChannel, WebhookChannel
+
+    channels: list[object] = []
+    if dashboard._alerts.alert_log_file:
+        channels.append(FileChannel(dashboard._alerts.alert_log_file))
+    if alerting_config.channels.webhook_url:
+        channels.append(WebhookChannel(alerting_config.channels.webhook_url))
+    if alerting_config.channels.slack_webhook_url:
+        channels.append(SlackChannel(alerting_config.channels.slack_webhook_url))
+    dashboard._alerts.set_alert_channels(channels)
+    dashboard._alerts.cooldown_seconds = alerting_config.cooldown_seconds
+
+    def _on_audit_event(event_dict: dict) -> None:
+        try:
+            dashboard._alerts.evaluate_single_event(event_dict)
+        except Exception:
+            pass
+
+    sdk.audit.register_on_emit(_on_audit_event)

@@ -736,6 +736,12 @@ class SafeAI:
     def load_policy_template(self, name: str) -> dict[str, Any]:
         return self.templates.load(name)
 
+    def search_policy_templates(self, **kwargs: Any) -> list[dict[str, Any]]:
+        return self.templates.search(**kwargs)
+
+    def install_policy_template(self, name: str) -> str:
+        return self.templates.install(name)
+
     # --- Intelligence layer (lazy imports) ---
 
     def _ensure_ai_registry(self) -> Any:
