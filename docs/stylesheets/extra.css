@@ -1,0 +1,130 @@
+/* Hero section */
+.md-typeset .hero {
+  text-align: center;
+  padding: 2rem 0 1rem;
+}
+
+.md-typeset .hero img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 12px;
+  margin-bottom: 1rem;
+}
+
+.md-typeset .hero h1 {
+  font-size: 2.4rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.md-typeset .hero .tagline {
+  font-size: 1.2rem;
+  color: var(--md-default-fg-color--light);
+  margin-bottom: 1.5rem;
+}
+
+/* Badges row */
+.md-typeset .badges {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.md-typeset .badges img {
+  margin: 0 4px;
+}
+
+/* CTA buttons */
+.md-typeset .cta {
+  text-align: center;
+  margin: 2rem 0;
+}
+
+.md-typeset .cta a.md-button {
+  margin: 0 0.5rem;
+  font-weight: 600;
+}
+
+/* Feature grid */
+.md-typeset .feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+.md-typeset .feature-card {
+  border: 1px solid var(--md-default-fg-color--lightest);
+  border-radius: 8px;
+  padding: 1.2rem;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.md-typeset .feature-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.md-typeset .feature-card h3 {
+  margin-top: 0;
+  font-size: 1rem;
+}
+
+.md-typeset .feature-card p {
+  font-size: 0.85rem;
+  color: var(--md-default-fg-color--light);
+  margin-bottom: 0;
+}
+
+/* Compatibility table */
+.md-typeset .compat-table {
+  margin: 2rem 0;
+}
+
+.md-typeset .compat-table table {
+  width: 100%;
+}
+
+/* Quickstart code block emphasis */
+.md-typeset .quickstart-block {
+  margin: 2rem 0;
+}
+
+/* Section headers */
+.md-typeset .section-header {
+  text-align: center;
+  margin: 3rem 0 1.5rem;
+}
+
+.md-typeset .section-header h2 {
+  font-weight: 700;
+}
+
+/* Notebook gallery */
+.md-typeset .notebook-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+.md-typeset .notebook-card {
+  border: 1px solid var(--md-default-fg-color--lightest);
+  border-radius: 8px;
+  padding: 1.2rem;
+  transition: box-shadow 0.2s;
+}
+
+.md-typeset .notebook-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.md-typeset .notebook-card h3 {
+  margin-top: 0;
+  font-size: 0.95rem;
+}
+
+.md-typeset .notebook-card p {
+  font-size: 0.85rem;
+  color: var(--md-default-fg-color--light);
+  margin-bottom: 0;
+}
