@@ -53,7 +53,7 @@ OpenClaw is a Node.js/TypeScript application. SafeAI is Python. The integration 
 
 ---
 
-## Step 1 — Install and scaffold
+## Step 1 — Install and initialize
 
 ```bash
 # Install OpenClaw
@@ -63,75 +63,63 @@ openclaw onboard --install-daemon
 # Install SafeAI
 uv pip install safeai
 
-# Scaffold SafeAI config in your workspace
+# Initialize SafeAI in your workspace
 cd ~/openclaw-workspace
 safeai init
 ```
 
----
+`safeai init` scaffolds config files and walks you through an interactive setup:
 
-## Step 2 — Auto-generate policies with the intelligence layer
+```
+SafeAI initialized
+  created: safeai.yaml
+  created: policies/default.yaml
+  created: contracts/example.yaml
+  ...
 
-Instead of writing policies, contracts, and agent identities by hand, let SafeAI's AI analyze your workspace and generate everything.
+Intelligence Layer Setup
+SafeAI can use an AI backend to auto-generate policies,
+explain incidents, and recommend improvements.
 
-First, configure an AI backend. Add this to your `safeai.yaml`:
+Enable the intelligence layer? [Y/n]: Y
 
-=== "Ollama (local, free)"
+Choose your AI backend:
+  1. Ollama (local, free — no API key needed)
+  2. OpenAI
+  3. Anthropic
+  4. Other (OpenAI-compatible endpoint)
 
-    ```yaml title="safeai.yaml"
-    intelligence:
-      enabled: true
-      backend:
-        provider: ollama
-        model: llama3.2
-        base_url: http://localhost:11434
-      metadata_only: true
-    ```
+Select provider [1]: 1
 
-=== "OpenAI"
+Intelligence layer configured!
+  provider: ollama
+  model:    llama3.2
 
-    ```yaml title="safeai.yaml"
-    intelligence:
-      enabled: true
-      backend:
-        provider: openai-compatible
-        model: gpt-4o
-        base_url: https://api.openai.com/v1
-        api_key_env: OPENAI_API_KEY
-      metadata_only: true
-    ```
+Next steps:
+  safeai intelligence auto-config --path . --apply
+  safeai serve --mode sidecar --port 8000
+```
 
-=== "Anthropic"
-
-    ```yaml title="safeai.yaml"
-    intelligence:
-      enabled: true
-      backend:
-        provider: openai-compatible
-        model: claude-sonnet-4-20250514
-        base_url: https://api.anthropic.com/v1
-        api_key_env: ANTHROPIC_API_KEY
-      metadata_only: true
-    ```
+That's it — no YAML editing needed. The interactive setup writes the intelligence configuration to `safeai.yaml` for you.
 
 !!! tip
     The AI backend is only used for advisory tasks (generating configs, explaining incidents). It is never in the enforcement loop. SafeAI enforces policies deterministically — no LLM involved at runtime.
 
-Now generate the full configuration:
+---
+
+## Step 2 — Auto-generate policies
+
+Let SafeAI's intelligence layer analyze your workspace and generate policies, contracts, and agent identities — all tailored to OpenClaw:
 
 ```bash
 safeai intelligence auto-config --path . --output-dir .safeai-generated
 ```
 
-SafeAI scans your project's file names, imports, dependencies, and structure — then generates a complete `safeai.yaml`, policies, tool contracts, and agent identity files tailored to OpenClaw.
-
 Review what was generated:
 
 ```bash
 ls .safeai-generated/
-cat .safeai-generated/safeai.yaml
 cat .safeai-generated/policies/generated.yaml
-cat .safeai-generated/contracts/generated.yaml
 ```
 
 Apply when you're satisfied:
@@ -140,7 +128,7 @@ Apply when you're satisfied:
 safeai intelligence auto-config --path . --output-dir .safeai-generated --apply
 ```
 
-The generated policies will cover secrets, PII, dangerous commands, sensitive file paths, outbound messaging approvals, and more — all inferred from your project structure.
+The generated policies cover secrets, PII, dangerous commands, sensitive file paths, outbound messaging approvals, and more — all inferred from your project structure.
 
 ---
 
@@ -425,13 +413,13 @@ For always-on operation, run SafeAI alongside OpenClaw's daemon.
 Securing OpenClaw with SafeAI takes 4 commands:
 
 ```bash
-safeai init                                           # scaffold config
-safeai intelligence auto-config --path . --apply      # generate policies
+safeai init                                                       # interactive setup
+safeai intelligence auto-config --path . --apply                  # generate policies
 safeai intelligence integrate --target openclaw --path . --apply  # generate skill
-safeai serve --mode sidecar --port 8484               # enforce
+safeai serve --mode sidecar --port 8484                           # enforce
 ```
 
-No manual policy writing. No manual contract definitions. The intelligence layer analyzes your project and generates everything — you just review and apply.
+No YAML editing. No manual policy writing. The interactive CLI configures your AI backend, the intelligence layer generates everything else — you just review and apply.
 
 ---
 

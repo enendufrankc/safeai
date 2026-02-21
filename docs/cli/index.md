@@ -11,26 +11,67 @@ safeai --help
 
 ## `safeai init`
 
-Scaffold a `.safeai/` configuration directory in the current project.
+Scaffold SafeAI configuration files and interactively configure the intelligence layer.
 
 ```bash
-safeai init
+safeai init [--path DIR] [--non-interactive]
 ```
+
+### Flags
+
+| Flag | Type | Default | Description |
+|------|------|---------|-------------|
+| `--path` | path | `.` | Project directory to initialize |
+| `--non-interactive` | flag | off | Skip interactive prompts (scaffold files only) |
+
+### What it does
+
+1. **Scaffolds config files** — creates default policies, contracts, schemas, and agent identities
+2. **Interactive intelligence setup** — walks you through choosing an AI backend (Ollama, OpenAI, Anthropic, or custom) and writes the configuration to `safeai.yaml`
 
 This creates:
 
 | Path | Purpose |
 |------|---------|
-| `.safeai/safeai.yaml` | Main configuration file |
-| `.safeai/policies/` | Policy rule files |
-| `.safeai/schemas/` | Memory and contract schemas |
-| `.safeai/agents/` | Agent identity documents |
-| `.safeai/plugins/example.py` | Plugin starter template |
-| `.safeai/tenants/` | Multi-tenant policy sets |
-| `.safeai/alerts/` | Alert rule definitions |
+| `safeai.yaml` | Main configuration file (with intelligence config if enabled) |
+| `policies/` | Policy rule files |
+| `contracts/` | Tool contract definitions |
+| `schemas/` | Memory and state schemas |
+| `agents/` | Agent identity documents |
+| `plugins/example.py` | Plugin starter template |
+| `tenants/` | Multi-tenant policy sets |
+| `alerts/` | Alert rule definitions |
+
+### Example
+
+```
+$ safeai init
+SafeAI initialized
+  created: safeai.yaml
+  created: policies/default.yaml
+  ...
+
+Intelligence Layer Setup
+SafeAI can use an AI backend to auto-generate policies,
+explain incidents, and recommend improvements.
+
+Enable the intelligence layer? [Y/n]: Y
+
+Choose your AI backend:
+  1. Ollama (local, free — no API key needed)
+  2. OpenAI
+  3. Anthropic
+  4. Other (OpenAI-compatible endpoint)
+
+Select provider [1]: 1
+
+Intelligence layer configured!
+  provider: ollama
+  model:    llama3.2
+```
 
 !!! tip
-    Run `safeai init` at the root of every repository that uses AI agents. The scaffold provides safe defaults that you can customize incrementally.
+    Run `safeai init` at the root of every repository that uses AI agents. The interactive setup means you never need to edit YAML by hand.
 
 ---
 
