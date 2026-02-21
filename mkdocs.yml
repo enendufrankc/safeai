@@ -107,6 +107,7 @@ nav:
     - Configuration: getting-started/configuration.md
   - Examples:
     - "Securing OpenClaw": examples/openclaw.md
+    - "Securing Coding Agents": examples/coding-agents.md
   - Guides:
     - Secret Detection: guides/secret-detection.md
     - PII Protection: guides/pii-protection.md
