@@ -7,13 +7,13 @@ import click
 from safeai.cli.approvals import approvals_group
 from safeai.cli.hook import hook_command
 from safeai.cli.init import init_command
+from safeai.cli.intelligence import intelligence_group
 from safeai.cli.logs import logs_command
 from safeai.cli.mcp import mcp_command
 from safeai.cli.scan import scan_command
 from safeai.cli.serve import serve_command
 from safeai.cli.setup import setup_group
 from safeai.cli.templates import templates_group
-from safeai.cli.intelligence import intelligence_group
 from safeai.cli.validate import validate_command
 
 

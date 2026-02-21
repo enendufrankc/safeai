@@ -85,7 +85,7 @@ def _parse_file_artifacts(content: str) -> dict[str, str]:
     if len(parts) < 3:
         stripped = content.strip()
         if stripped:
-            artifacts[f"integration.py"] = stripped
+            artifacts["integration.py"] = stripped
         return artifacts
     for i in range(1, len(parts) - 1, 2):
         filename = parts[i].strip()

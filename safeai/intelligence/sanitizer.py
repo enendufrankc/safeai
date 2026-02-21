@@ -8,7 +8,6 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
-
 BANNED_METADATA_KEYS = frozenset({
     "secret_key",
     "capability_token_id",
