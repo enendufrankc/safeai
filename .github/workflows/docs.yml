@@ -2,7 +2,7 @@ name: Deploy Documentation
 
 on:
   push:
-    branches: [main]
+    branches: [main, bootstrap/sprint0-phase1]
     paths:
       - "docs/**"
       - "mkdocs.yml"
@@ -35,5 +35,5 @@ jobs:
         run: mkdocs build --strict
 
       - name: Deploy to GitHub Pages
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/bootstrap/sprint0-phase1')
         run: mkdocs gh-deploy --force
