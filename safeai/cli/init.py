@@ -3,10 +3,13 @@
 from __future__ import annotations
 
 import shutil
+from importlib.metadata import version as pkg_version
 from pathlib import Path
 
 import click
 import yaml
+
+from safeai.cli import ui
 
 DEFAULT_FILES = {
     Path("safeai.yaml"): Path("config/defaults/safeai.yaml"),
@@ -95,31 +98,61 @@ PROVIDERS = {
 }
 
 
+def _get_version() -> str:
+    """Return the installed safeai-sdk version, or 'dev'."""
+    try:
+        return pkg_version("safeai-sdk")
+    except Exception:
+        return "dev"
+
+
+def _scaffold_files(
+    base: Path, package_root: Path
+) -> tuple[list[Path], list[Path]]:
+    """Copy default config files into the project directory."""
+    created: list[Path] = []
+    skipped: list[Path] = []
+    for rel_target, rel_source in DEFAULT_FILES.items():
+        source = package_root / rel_source
+        target = base / rel_target
+        target.parent.mkdir(parents=True, exist_ok=True)
+        if target.exists():
+            skipped.append(rel_target)
+            continue
+        shutil.copyfile(source, target)
+        created.append(rel_target)
+    return created, skipped
+
+
+def _write_intelligence_config(base: Path, intel_config: dict) -> None:
+    """Merge intelligence config into safeai.yaml."""
+    safeai_yaml = base / "safeai.yaml"
+    with open(safeai_yaml) as f:
+        config = yaml.safe_load(f) or {}
+    config["intelligence"] = intel_config
+    with open(safeai_yaml, "w") as f:
+        yaml.dump(config, f, default_flow_style=False, sort_keys=False)
+
+
 def _prompt_intelligence_config() -> dict | None:
     """Interactive prompt to configure the intelligence layer."""
-    click.echo()
-    click.secho("Intelligence Layer Setup", bold=True)
-    click.echo("SafeAI can use an AI backend to auto-generate policies,")
-    click.echo("explain incidents, and recommend improvements.")
-    click.echo()
+    ui.bar()
+    ui.step_active("Intelligence Layer Setup")
+    ui.bar("SafeAI can use an AI backend to auto-generate policies,")
+    ui.bar("explain incidents, and recommend improvements.")
+    ui.bar()
 
-    enable = click.confirm("Enable the intelligence layer?", default=True)
+    enable = ui.confirm("Enable the intelligence layer?", default=True)
     if not enable:
+        ui.step_done("Intelligence layer", "skipped")
         return None
 
-    click.echo()
-    click.secho("Choose your AI backend:", bold=True)
-    provider_names = list(PROVIDERS.keys())
-    for i, name in enumerate(provider_names, 1):
-        click.echo(f"  {i}. {name}")
-    click.echo()
+    ui.bar()
+    ui.step_active("Choose your AI provider")
 
-    choice = click.prompt(
-        "Select provider",
-        type=click.IntRange(1, len(provider_names)),
-        default=1,
-    )
-    selected = PROVIDERS[provider_names[choice - 1]]
+    provider_names = list(PROVIDERS.keys())
+    chosen_name = ui.select("Provider", choices=provider_names, default=provider_names[0])
+    selected = PROVIDERS[chosen_name]
 
     provider = selected["provider"]
     model = selected["model"]
@@ -128,25 +161,26 @@ def _prompt_intelligence_config() -> dict | None:
 
     # For "Other", prompt for details
     if model is None:
-        model = click.prompt("Model name", type=str)
+        model = ui.text_input("Model name")
     if base_url is None:
-        base_url = click.prompt("Base URL", type=str)
+        base_url = ui.text_input("Base URL")
 
     # Allow overriding defaults
-    click.echo()
-    if click.confirm("Customize model and URL?", default=False):
-        model = click.prompt("Model", default=model, type=str)
-        base_url = click.prompt("Base URL", default=base_url, type=str)
+    if ui.confirm("Customize model and URL?", default=False):
+        model = ui.text_input("Model", default=model or "")
+        base_url = ui.text_input("Base URL", default=base_url or "")
 
     # API key env var
     if provider == "openai-compatible" and api_key_env is None:
-        api_key_env = click.prompt(
-            "Environment variable for API key (or 'none')",
-            default="none",
-            type=str,
-        )
+        api_key_env = ui.text_input("Environment variable for API key (or 'none')", default="none")
         if api_key_env.lower() == "none":
             api_key_env = None
+
+    ui.bar()
+    ui.step_done("Provider", chosen_name)
+    ui.step_done("Model", model or "")
+    if api_key_env:
+        ui.step_done("API key env", api_key_env)
 
     config = {
         "enabled": True,
@@ -170,44 +204,52 @@ def init_command(target_path: str, non_interactive: bool) -> None:
     """Scaffold default SafeAI config files and configure intelligence."""
     base = Path(target_path).expanduser().resolve()
     package_root = Path(__file__).resolve().parents[1]
+    version = _get_version()
 
-    created: list[Path] = []
-    skipped: list[Path] = []
+    # ── Banner ──────────────────────────────────────────────────────
+    ui.banner(version)
+    ui.step_done("Project path", str(base))
+    ui.bar()
 
-    for rel_target, rel_source in DEFAULT_FILES.items():
-        source = package_root / rel_source
-        target = base / rel_target
-        target.parent.mkdir(parents=True, exist_ok=True)
-        if target.exists():
-            skipped.append(target)
-            continue
-        shutil.copyfile(source, target)
-        created.append(target)
+    # ── Scaffold files ──────────────────────────────────────────────
+    ui.step_active("Scaffolding config files...")
+    created, skipped = _scaffold_files(base, package_root)
 
-    click.echo("SafeAI initialized")
     for path in created:
-        click.echo(f"  created: {path}")
+        ui.file_result("created", str(path))
     for path in skipped:
-        click.echo(f"  skipped: {path} (already exists)")
+        ui.file_result("skipped", str(path))
+    if not skipped:
+        ui.file_result("skipped", "(none)")
 
-    # Interactive intelligence setup
+    # ── Intelligence setup ──────────────────────────────────────────
+    intel_config = None
     if not non_interactive:
         intel_config = _prompt_intelligence_config()
-        if intel_config:
-            safeai_yaml = base / "safeai.yaml"
-            with open(safeai_yaml) as f:
-                config = yaml.safe_load(f) or {}
-            config["intelligence"] = intel_config
-            with open(safeai_yaml, "w") as f:
-                yaml.dump(config, f, default_flow_style=False, sort_keys=False)
-            click.echo()
-            click.secho("Intelligence layer configured!", fg="green", bold=True)
-            click.echo(f"  provider: {intel_config['backend']['provider']}")
-            click.echo(f"  model:    {intel_config['backend']['model']}")
-            click.echo()
-            click.echo("Next steps:")
-            click.echo("  safeai intelligence auto-config --path . --apply")
-            click.echo("  safeai serve --mode sidecar --port 8000")
-        else:
-            click.echo()
-            click.echo("Intelligence layer skipped. You can enable it later in safeai.yaml.")
+
+    if intel_config:
+        _write_intelligence_config(base, intel_config)
+
+        # Summary box
+        rows = [
+            ("provider", intel_config["backend"]["provider"]),
+            ("model", intel_config["backend"]["model"] or ""),
+        ]
+        if "api_key_env" in intel_config["backend"]:
+            rows.append(("api_key", intel_config["backend"]["api_key_env"]))
+        ui.summary_box("Configuration Summary", rows)
+    else:
+        ui.bar()
+        if not non_interactive:
+            ui.bar("Intelligence layer skipped. Enable it later in safeai.yaml.", style="dim")
+        ui.bar()
+
+    # ── Next steps ──────────────────────────────────────────────────
+    ui.next_steps(
+        [
+            "safeai intelligence auto-config --path . --apply",
+            "safeai serve --mode sidecar --port 8910",
+        ]
+    )
+
+    ui.step_end("Done. Happy guarding!")
