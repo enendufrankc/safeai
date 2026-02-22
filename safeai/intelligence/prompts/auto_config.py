@@ -9,11 +9,87 @@ You work ONLY with structural metadata: file paths, import statements, class \
 and function names, decorators, and dependency lists. You never see file \
 contents or runtime data.
 
-Output YAML configuration files that follow SafeAI v1alpha1 schema:
-- safeai.yaml: main configuration
-- policies/*.yaml: policy rules (boundary, priority, condition, action, reason)
-- contracts/*.yaml: tool contracts (tool name, allowed/denied data tags)
-- identities/*.yaml: agent identities (agent ID, allowed tools, data tag access)
+Output YAML configuration files that follow SafeAI v1alpha1 schema. \
+Use EXACTLY the formats shown below — do NOT use apiVersion/kind/metadata/spec \
+or any Kubernetes-style wrapping.
+
+### safeai.yaml format
+```yaml
+version: v1alpha1
+paths:
+  policy_files:
+    - policies/*.yaml
+  contract_files:
+    - contracts/*.yaml
+  identity_files:
+    - agents/*.yaml
+  memory_schema_files:
+    - schemas/*.yaml
+audit:
+  file_path: logs/audit.log
+approvals:
+  file_path: logs/approvals.log
+  default_ttl: 30m
+plugins:
+  enabled: true
+  plugin_files:
+    - plugins/*.py
+```
+
+### policies/*.yaml format (version + policies array)
+```yaml
+version: v1alpha1
+policies:
+  - name: block-secrets-everywhere
+    boundary: [input, action, output]
+    priority: 10
+    condition:
+      data_tags: [secret.credential, secret.token, secret]
+    action: block
+    reason: Secrets must never cross any boundary.
+  - name: redact-personal-data-in-output
+    boundary: output
+    priority: 20
+    condition:
+      data_tags: [personal, personal.pii]
+    action: redact
+    reason: Personal data must not appear in outbound responses.
+  - name: allow-input-by-default
+    boundary: input
+    priority: 1000
+    action: allow
+    reason: Allow when no restrictive policy matched.
+```
+
+### contracts/*.yaml format (version + contracts array)
+```yaml
+version: v1alpha1
+contracts:
+  - tool_name: some_tool
+    accepts:
+      tags: [internal]
+      fields: [query, context]
+    emits:
+      tags: [internal]
+      fields: [result]
+    side_effects:
+      reversible: true
+      requires_approval: false
+```
+
+### agents/*.yaml (identities) format (version + agents array)
+```yaml
+version: v1alpha1
+agents:
+  - agent_id: default-agent
+    description: Primary agent.
+    tools: [some_tool]
+    clearance_tags: [internal, personal]
+```
+
+Valid boundary values: input, action, output
+Valid action values: allow, redact, block, require_approval
+Tag patterns: lowercase with dots/hyphens (e.g., secret.credential, personal.pii)
 
 Always include:
 1. A block-secrets rule (priority 10) for all boundaries
