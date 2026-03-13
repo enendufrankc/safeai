@@ -130,21 +130,22 @@ def create_mcp_server(safeai: SafeAI) -> Any:
 
 def _handle_tool(safeai: SafeAI, name: str, arguments: dict) -> dict:
     """Dispatch a tool call to the corresponding SafeAI method."""
+    result: Any
     if name == "scan_input":
-        res = safeai.scan_input(arguments["text"], agent_id=arguments.get("agent_id", "mcp-client"))
-        return _serializable(res)
+        result = safeai.scan_input(arguments["text"], agent_id=arguments.get("agent_id", "mcp-client"))
+        return _serializable(result)
 
     if name == "guard_output":
-        res = safeai.guard_output(
+        result = safeai.guard_output(
             arguments["text"], agent_id=arguments.get("agent_id", "mcp-client")
         )
-        return _serializable(res)
+        return _serializable(result)
 
     if name == "scan_structured":
-        res = safeai.scan_structured_input(
+        result = safeai.scan_structured_input(
             arguments["payload"], agent_id=arguments.get("agent_id", "mcp-client")
         )
-        return _serializable(res)
+        return _serializable(result)
 
     if name == "query_audit":
         rows = safeai.query_audit(**{k: v for k, v in arguments.items() if v is not None})
@@ -154,14 +155,14 @@ def _handle_tool(safeai: SafeAI, name: str, arguments: dict) -> dict:
         return {"templates": safeai.list_policy_templates()}
 
     if name == "check_tool":
-        res = safeai.intercept_tool_request(
+        result = safeai.intercept_tool_request(
             tool_name=arguments["tool_name"],
             parameters=arguments.get("parameters", {}),
             data_tags=arguments.get("data_tags", []),
             agent_id=arguments.get("agent_id", "mcp-client"),
             session_id=arguments.get("session_id"),
         )
-        return _serializable(res)
+        return _serializable(result)
 
     return {"error": f"Unknown tool: {name}"}
 

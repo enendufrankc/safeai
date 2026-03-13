@@ -1,5 +1,55 @@
 # Changelog
 
+## 0.8.1 - 2026-03-13
+
+### Fixed
+
+- Use absolute URL for banner image so it renders on PyPI and GitHub.
+- Add schema examples to auto-config prompt for correct YAML generation.
+
+### Added
+
+- Default configurations for agents, alerts, contracts, and policies scaffold.
+- Clack-style interactive CLI for `safeai init`.
+
+## 0.8.0 - 2026-02-20
+
+### Added
+
+- Alert push evaluation and alert channels (file, webhook, Slack) with `safeai alerts` CLI.
+- Observability module with agent timeline, session trace, and `safeai observe agents|sessions` CLI.
+- Template marketplace with community index, search, install/uninstall, SHA-256 integrity verification.
+- Agent profiles for coding agent policy enforcement (hook adapter).
+- Published to PyPI as `safeai-sdk`.
+- CI workflows: CodeQL analysis, dependency review, secret scanning, vulnerability scanning, governance gate, docs deployment.
+- `.gitleaks.toml` for pre-commit secret scanning configuration.
+
+### Changed
+
+- Package version moved to `0.8.0`.
+- Package name changed to `safeai-sdk` for PyPI publishing.
+
+## 0.7.0 - 2026-02-20
+
+### Added
+
+- Intelligence layer with 5 AI advisory agents: auto-config, policy recommender, incident explainer, compliance mapper, integration generator.
+- BYOM (Bring Your Own Model) backend abstraction supporting Ollama and OpenAI-compatible providers.
+- Metadata sanitizer ensuring AI advisory agents never receive raw protected data.
+- `safeai intelligence auto-config|recommend|explain|compliance|integrate` CLI subcommands.
+- Proxy intelligence endpoints (`/v1/intelligence/status`, `/v1/intelligence/explain`, `/v1/intelligence/recommend`, `/v1/intelligence/compliance`).
+- Dashboard intelligence panel.
+- Human approval workflow via staging directory for AI-generated configurations.
+- Interactive intelligence setup in `safeai init` with provider selection (Ollama, OpenAI, Anthropic, Gemini, Mistral, Groq, DeepSeek).
+- MkDocs Material documentation site with 55 pages.
+- 11 interactive Jupyter notebooks for use-case walkthroughs.
+- Comprehensive OpenClaw and coding agents tutorial examples.
+
+### Changed
+
+- Package version moved to `0.7.0`.
+- Documentation promoted intelligence layer as primary feature across all guides.
+
 ## 0.6.0 - 2026-02-20
 
 ### Added

@@ -118,7 +118,7 @@ class IncidentAdvisorTests(unittest.TestCase):
 
         user_msg = backend.calls[0][1].content
         # Should include at most 5 context events
-        context_lines = [l for l in user_msg.splitlines() if l.startswith("- [2025")]
+        context_lines = [line for line in user_msg.splitlines() if line.startswith("- [2025")]
         self.assertLessEqual(len(context_lines), 5)
         # No raw_content should leak
         for i in range(10):

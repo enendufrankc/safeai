@@ -32,7 +32,7 @@ def observe_agents_command(config_path: str, last: str) -> None:
         return
     click.echo(f"{'agent_id':<30} {'events':>8}  last_seen")
     click.echo("-" * 80)
-    for agent_id, info in sorted(agents.items(), key=lambda x: x[1].get("event_count", 0), reverse=True):
+    for agent_id, info in sorted(agents.items(), key=lambda x: int(x[1].get("event_count", 0) or 0), reverse=True):
         click.echo(f"{agent_id:<30} {info['event_count']:>8}  {info.get('last_seen', '-')}")
 
 

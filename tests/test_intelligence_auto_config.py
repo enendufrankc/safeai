@@ -8,7 +8,6 @@ from pathlib import Path
 
 from safeai.intelligence.auto_config import AutoConfigAdvisor, _parse_file_artifacts
 from safeai.intelligence.backend import AIMessage, AIResponse
-from safeai.intelligence.sanitizer import MetadataSanitizer
 
 
 class FakeAIBackend:

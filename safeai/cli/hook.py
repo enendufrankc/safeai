@@ -65,19 +65,19 @@ def _extract_text(
 
     # Shell commands
     if category in SHELL_CATEGORIES or tool_name in SHELL_CATEGORIES:
-        return tool_input.get("command", tool_input.get("cmd", ""))
+        return str(tool_input.get("command", tool_input.get("cmd", "")))
 
     # File operations — scan the content/text being written
     if category in {"file_write", "file_edit"}:
-        return tool_input.get("content", tool_input.get("new_string", tool_input.get("text", "")))
+        return str(tool_input.get("content", tool_input.get("new_string", tool_input.get("text", ""))))
 
     # Search — scan the pattern/query
     if category == "search":
-        return tool_input.get("pattern", tool_input.get("query", ""))
+        return str(tool_input.get("pattern", tool_input.get("query", "")))
 
     # Web — scan the URL
     if category == "web":
-        return tool_input.get("url", tool_input.get("query", ""))
+        return str(tool_input.get("url", tool_input.get("query", "")))
 
     # Fallback: concatenate all string values
     parts = [str(v) for v in tool_input.values() if isinstance(v, str)]

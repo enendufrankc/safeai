@@ -16,6 +16,7 @@ except importlib.metadata.PackageNotFoundError:
 
 from safeai import SafeAI
 from safeai.config.loader import load_config
+from safeai.config.models import AlertingConfig
 from safeai.dashboard.routes import router as dashboard_router
 from safeai.dashboard.service import DashboardService
 from safeai.proxy.metrics import ProxyMetrics
@@ -66,7 +67,7 @@ def create_app(
     return app
 
 
-def _wire_alerting(*, sdk: SafeAI, dashboard: DashboardService, alerting_config: object) -> None:
+def _wire_alerting(*, sdk: SafeAI, dashboard: DashboardService, alerting_config: "AlertingConfig") -> None:
     """Connect audit emit callbacks to real-time alert evaluation."""
     from safeai.alerting.channels import FileChannel, SlackChannel, WebhookChannel
 

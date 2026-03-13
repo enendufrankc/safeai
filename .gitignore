@@ -13,6 +13,7 @@ coverage.xml
 htmlcov/
 dist/
 build/
+*.egg-info/
 logs/
 .DS_Store
 .claude/

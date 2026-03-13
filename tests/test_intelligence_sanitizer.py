@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import os
 import tempfile
 import unittest
 from pathlib import Path
@@ -10,9 +9,7 @@ from pathlib import Path
 from safeai.intelligence.sanitizer import (
     BANNED_METADATA_KEYS,
     SAFE_METADATA_KEYS,
-    CodebaseStructure,
     MetadataSanitizer,
-    SanitizedAuditAggregate,
     SanitizedAuditEvent,
 )
 

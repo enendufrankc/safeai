@@ -123,6 +123,7 @@ nav:
     - Agent Messaging: guides/agent-messaging.md
     - Dangerous Commands: guides/dangerous-commands.md
     - Intelligence Layer: guides/intelligence.md
+    - Troubleshooting: guides/troubleshooting.md
   - Integrations:
     - Overview: integrations/index.md
     - LangChain: integrations/langchain.md
@@ -149,6 +150,9 @@ nav:
     - Core Models: reference/models.md
     - Config Models: reference/config-models.md
     - Intelligence: reference/intelligence.md
+    - Alerting: reference/alerting.md
+    - Dashboard: reference/dashboard.md
+    - Proxy: reference/proxy.md
   - Notebooks: notebooks/index.md
   - Contributing:
     - Guide: contributing/guide.md

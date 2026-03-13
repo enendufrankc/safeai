@@ -7,7 +7,7 @@ from importlib.metadata import version as pkg_version
 from pathlib import Path
 
 import click
-import yaml
+import yaml  # type: ignore[import-untyped]
 
 from safeai.cli import ui
 
@@ -22,7 +22,7 @@ DEFAULT_FILES = {
     Path("alerts/default.yaml"): Path("config/defaults/alerts/default.yaml"),
 }
 
-PROVIDERS = {
+PROVIDERS: dict[str, dict[str, str | None]] = {
     "Ollama (local, free — no API key needed)": {
         "provider": "ollama",
         "model": "llama3.2",
@@ -152,7 +152,7 @@ def _prompt_intelligence_config() -> dict | None:
 
     provider_names = list(PROVIDERS.keys())
     chosen_name = ui.select("Provider", choices=provider_names, default=provider_names[0])
-    selected = PROVIDERS[chosen_name]
+    selected: dict[str, str | None] = PROVIDERS[chosen_name]
 
     provider = selected["provider"]
     model = selected["model"]
@@ -182,17 +182,18 @@ def _prompt_intelligence_config() -> dict | None:
     if api_key_env:
         ui.step_done("API key env", api_key_env)
 
-    config = {
-        "enabled": True,
-        "backend": {
-            "provider": provider,
-            "model": model,
-            "base_url": base_url,
-        },
-        "metadata_only": True,
+    backend: dict[str, str | None] = {
+        "provider": provider,
+        "model": model,
+        "base_url": base_url,
     }
     if api_key_env:
-        config["backend"]["api_key_env"] = api_key_env
+        backend["api_key_env"] = api_key_env
+    config: dict[str, object] = {
+        "enabled": True,
+        "backend": backend,
+        "metadata_only": True,
+    }
 
     return config
 

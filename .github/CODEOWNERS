@@ -1,0 +1,25 @@
+* @enendufrankc
+
+# Core SDK
+/safeai/core/ @enendufrankc
+/safeai/api.py @enendufrankc
+
+# Policy and config
+/safeai/config/ @enendufrankc
+/policies/ @enendufrankc
+/schemas/ @enendufrankc
+
+# Security-sensitive
+/safeai/secrets/ @enendufrankc
+/safeai/detectors/ @enendufrankc
+/safeai/core/memory.py @enendufrankc
+
+# Integrations
+/safeai/middleware/ @enendufrankc
+/safeai/mcp/ @enendufrankc
+
+# CI/CD
+/.github/ @enendufrankc
+
+# Documentation
+/docs/ @enendufrankc
