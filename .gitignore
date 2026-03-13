@@ -19,3 +19,14 @@ logs/
 .claude/
 docs/brainstom/
 site/
+
+# AI agent tooling (local to developer)
+.agents/
+skills-lock.json
+
+# Jupyter checkpoint files
+.ipynb_checkpoints/
+
+# Root-level schemas are duplicates of safeai/schemas/
+schemas/v1alpha1/
+schemas/memory.yaml

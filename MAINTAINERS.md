@@ -14,7 +14,7 @@ This file lists active maintainers and ownership areas.
 
 | Name | GitHub | Areas | Status | Last renewed |
 |---|---|---|---|---|
-| TBD | TBD | TBD | Active | TBD |
+| Frank Enendu | [@enendufrankc](https://github.com/enendufrankc) | all | Active | 2026-03 |
 
 ## Expectations
 

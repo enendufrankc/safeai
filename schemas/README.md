@@ -1,14 +1,15 @@
 # Schemas
 
-The JSON Schema files in this directory are copies of the canonical schemas
-bundled inside the `safeai` package at `safeai/schemas/v1alpha1/`.
+The canonical JSON schemas for SafeAI configuration files live inside the
+Python package at:
 
-They are provided at the project root for convenience during development
-(e.g., IDE validation, `safeai validate`). The package-bundled copies are
-the authoritative source.
-
-To keep them in sync after editing the canonical copy:
-
-```bash
-cp safeai/schemas/v1alpha1/*.json schemas/v1alpha1/
 ```
+safeai/schemas/v1alpha1/
+├── agent-identity.schema.json
+├── memory.schema.json
+├── policy.schema.json
+└── tool-contract.schema.json
+```
+
+These schemas are bundled with the `safeai-sdk` package and used at runtime
+for configuration validation. Refer to those files as the single source of truth.
