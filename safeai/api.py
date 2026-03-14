@@ -223,7 +223,7 @@ class SafeAI:
             else PluginManager()
         )
         classifier = Classifier(patterns=[*all_detectors(), *plugin_manager.detector_patterns()])
-        audit = AuditLogger(cfg.audit.file_path)
+        audit = AuditLogger(_resolve_optional_path(config_path, cfg.audit.file_path))
         capabilities = CapabilityTokenManager()
         approvals = ApprovalManager(
             file_path=_resolve_optional_path(config_path, cfg.approvals.file_path),
