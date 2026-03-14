@@ -1,0 +1,7 @@
+{
+  "name": "safeai",
+  "version": "0.8.1",
+  "description": "Everything in one install — deploys SafeAI, activates extended secrets detection, prompt injection shielding, LangChain adapter, and a universal compliance policy set (HIPAA + PCI-DSS + GDPR baselines). Starts the local observability server. Works with Claude Code, Cursor, MCP, and generic agents.",
+  "safeai": { "minVersion": "0.8.0" },
+  "postInstall": "Run: python .safeai/skills/safeai/scripts/setup.py --project-path ."
+}

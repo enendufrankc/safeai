@@ -1,0 +1,6 @@
+{
+  "name": "secrets-detector",
+  "version": "1.0.0",
+  "description": "Extended secrets and credentials detector — 40+ patterns covering Anthropic, GitHub, Slack, Stripe, Twilio, JWT, GCP, Azure, SSH keys, DB connection strings, and more.",
+  "safeai": { "minVersion": "0.8.0" }
+}

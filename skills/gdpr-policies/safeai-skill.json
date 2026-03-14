@@ -1,0 +1,6 @@
+{
+  "name": "gdpr-policies",
+  "version": "1.0.0",
+  "description": "GDPR-aligned policy set — redacts PII from all outputs, blocks cross-border data transfers on action boundary, enforces data minimisation on structured inputs.",
+  "safeai": { "minVersion": "0.8.0" }
+}

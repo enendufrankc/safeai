@@ -17,6 +17,7 @@ from safeai.cli.observe import observe_group
 from safeai.cli.scan import scan_command
 from safeai.cli.serve import serve_command
 from safeai.cli.setup import setup_group
+from safeai.cli.skills import skills_group
 from safeai.cli.templates import templates_group
 from safeai.cli.validate import validate_command
 
@@ -39,3 +40,4 @@ cli.add_command(mcp_command)
 cli.add_command(intelligence_group)
 cli.add_command(alerts_group)
 cli.add_command(observe_group)
+cli.add_command(skills_group)

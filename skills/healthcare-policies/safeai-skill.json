@@ -1,0 +1,6 @@
+{
+  "name": "healthcare-policies",
+  "version": "1.0.0",
+  "description": "HIPAA-aligned policy set — blocks PHI (SSN, DOB, names, addresses, diagnosis codes) at all three boundaries. Includes approval workflow for clinical tool calls.",
+  "safeai": { "minVersion": "0.8.0" }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "safeai-deploy",
+  "version": "0.8.1",
+  "description": "Full SafeAI deployment automation — init, intelligence auto-config, agent binding (Claude Code, Cursor, MCP), and local observability server.",
+  "safeai": {
+    "minVersion": "0.8.0"
+  },
+  "postInstall": "Run the deployment script: python .safeai/skills/safeai-deploy/scripts/deploy_safeai.py --project-path ."
+}

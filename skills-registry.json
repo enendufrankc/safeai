@@ -1,0 +1,143 @@
+{
+  "version": "1",
+  "updated": "2026-03-14",
+  "skills": [
+    {
+      "name": "safeai-deploy",
+      "description": "Full SafeAI deployment automation \u2014 init, intelligence auto-config, and agent binding (Claude Code, Cursor, MCP). Includes local observability server.",
+      "version": "0.8.1",
+      "source": "github:enendufrankc/safeai/skills/safeai-deploy",
+      "tags": [
+        "deploy",
+        "setup",
+        "claude-code",
+        "cursor",
+        "mcp",
+        "observability"
+      ],
+      "category": "automation",
+      "install_cmd": "npx skills add https://github.com/enendufrankc/safeai.git --skill safeai-deploy"
+    },
+    {
+      "name": "langchain-adapter",
+      "description": "LangChain tool wrapping adapter \u2014 enforces SafeAI input/output/action boundaries on all LangChain tools and chains. Includes a ready-to-use baseline policy template.",
+      "version": "1.0.0",
+      "source": "github:enendufrankc/safeai/skills/langchain-adapter",
+      "tags": [
+        "langchain",
+        "adapter",
+        "middleware"
+      ],
+      "category": "adapter",
+      "install_cmd": "npx skills add https://github.com/enendufrankc/safeai.git --skill langchain-adapter"
+    },
+    {
+      "name": "prompt-injection-shield",
+      "description": "Detects and blocks prompt injection attacks \u2014 instruction overrides, role jailbreaks, system prompt extraction, indirect injection via tool output, and delimiter confusion.",
+      "version": "1.0.0",
+      "source": "github:enendufrankc/safeai/skills/prompt-injection-shield",
+      "tags": [
+        "prompt-injection",
+        "jailbreak",
+        "security",
+        "detector"
+      ],
+      "category": "detector",
+      "install_cmd": "npx skills add https://github.com/enendufrankc/safeai.git --skill prompt-injection-shield"
+    },
+    {
+      "name": "secrets-detector",
+      "description": "Extended secrets and credentials detector \u2014 40+ patterns covering Anthropic, GitHub, Slack, Stripe, Twilio, JWT, GCP, Azure, SSH keys, DB connection strings, and more.",
+      "version": "1.0.0",
+      "source": "github:enendufrankc/safeai/skills/secrets-detector",
+      "tags": [
+        "secrets",
+        "detector",
+        "api-keys",
+        "credentials"
+      ],
+      "category": "detector",
+      "install_cmd": "npx skills add https://github.com/enendufrankc/safeai.git --skill secrets-detector"
+    },
+    {
+      "name": "healthcare-policies",
+      "description": "HIPAA-aligned policy set \u2014 blocks PHI (SSN, DOB, names, addresses) at all three boundaries and requires approval for clinical tool calls.",
+      "version": "1.0.0",
+      "source": "github:enendufrankc/safeai/skills/healthcare-policies",
+      "tags": [
+        "hipaa",
+        "healthcare",
+        "compliance",
+        "phi"
+      ],
+      "category": "policy",
+      "install_cmd": "npx skills add https://github.com/enendufrankc/safeai.git --skill healthcare-policies"
+    },
+    {
+      "name": "finance-policies",
+      "description": "PCI-DSS aligned policy set \u2014 blocks PANs, CVVs, routing/account numbers and requires approval for payment tool calls (charge, refund, store-card).",
+      "version": "1.0.0",
+      "source": "github:enendufrankc/safeai/skills/finance-policies",
+      "tags": [
+        "pci-dss",
+        "finance",
+        "compliance",
+        "credit-card"
+      ],
+      "category": "policy",
+      "install_cmd": "npx skills add https://github.com/enendufrankc/safeai.git --skill finance-policies"
+    },
+    {
+      "name": "gdpr-policies",
+      "description": "GDPR-aligned policy set \u2014 redacts PII from all outputs, blocks unconsented personal data on input, and requires approval for data transfers, deletions, and exports.",
+      "version": "1.0.0",
+      "source": "github:enendufrankc/safeai/skills/gdpr-policies",
+      "tags": [
+        "gdpr",
+        "compliance",
+        "pii",
+        "europe",
+        "privacy"
+      ],
+      "category": "policy",
+      "install_cmd": "npx skills add https://github.com/enendufrankc/safeai.git --skill gdpr-policies"
+    },
+    {
+      "name": "crewai-adapter",
+      "description": "CrewAI agent safety wrapper \u2014 intercepts tool calls and messages between CrewAI agents.",
+      "version": "1.0.0",
+      "source": "npm:safeai-skill-crewai",
+      "tags": [
+        "crewai",
+        "adapter",
+        "multi-agent"
+      ],
+      "category": "adapter"
+    },
+    {
+      "name": "autogen-adapter",
+      "description": "AutoGen multi-agent safety layer \u2014 intercepts group chat messages and tool calls.",
+      "version": "1.0.0",
+      "source": "npm:safeai-skill-autogen",
+      "tags": [
+        "autogen",
+        "adapter",
+        "multi-agent",
+        "microsoft"
+      ],
+      "category": "adapter"
+    },
+    {
+      "name": "soc2-policies",
+      "description": "SOC 2 compliance policy set \u2014 access controls, data handling, and audit trail enforcement.",
+      "version": "1.0.0",
+      "source": "npm:safeai-skill-soc2",
+      "tags": [
+        "soc2",
+        "compliance",
+        "audit"
+      ],
+      "category": "policy"
+    }
+  ]
+}

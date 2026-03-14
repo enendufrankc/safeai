@@ -1,0 +1,6 @@
+{
+  "name": "prompt-injection-shield",
+  "version": "1.0.0",
+  "description": "Detects and blocks prompt injection attacks — jailbreaks, role overrides, instruction leaks, and adversarial suffixes. Works on both input and output boundaries.",
+  "safeai": { "minVersion": "0.8.0" }
+}

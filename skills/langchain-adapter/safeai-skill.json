@@ -1,0 +1,7 @@
+{
+  "name": "langchain-adapter",
+  "version": "1.0.0",
+  "description": "Wraps any LangChain tool with SafeAI input/output/action boundaries. Drop-in safety layer for LangChain agents and chains.",
+  "safeai": { "minVersion": "0.8.0" },
+  "postInstall": "Import SafeAILangChainPlugin from your plugins/ directory and pass it to SafeAI.from_config()."
+}

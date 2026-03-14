@@ -1,0 +1,6 @@
+{
+  "name": "finance-policies",
+  "version": "1.0.0",
+  "description": "PCI-DSS aligned policy set — blocks PANs, CVVs, routing/account numbers, and financial credentials. Requires approval for any payment-related tool calls.",
+  "safeai": { "minVersion": "0.8.0" }
+}

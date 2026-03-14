@@ -1,0 +1,29 @@
+{
+  "name": "safeai-sdk",
+  "version": "0.8.1",
+  "description": "SafeAI zero-trust security layer — skills installer for AI agent projects",
+  "keywords": ["safeai", "security", "ai", "agents", "zero-trust", "llm", "guardrails"],
+  "author": "SafeAI Contributors",
+  "license": "Apache-2.0",
+  "homepage": "https://enendufrankc.github.io/safeai/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/enendufrankc/safeai.git"
+  },
+  "bugs": {
+    "url": "https://github.com/enendufrankc/safeai/issues"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "bin": {
+    "safeai": "./bin/safeai.js",
+    "safeai-sdk": "./bin/safeai.js"
+  },
+  "files": [
+    "bin/",
+    "lib/",
+    "skills-registry.json"
+  ],
+  "type": "commonjs"
+}
