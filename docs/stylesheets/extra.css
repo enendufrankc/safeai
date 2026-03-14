@@ -1,6 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Fira+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap");
 
 :root {
+  color-scheme: dark;
   --safeai-bg: #000000;
   --safeai-surface: #0a0a0a;
   --safeai-surface-2: #121212;
@@ -14,6 +15,8 @@
   --safeai-accent-soft: rgba(255, 178, 0, 0.18);
   --safeai-success: #00ca52;
   --safeai-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+  --safeai-focus-ring: 0 0 0 2px var(--safeai-bg), 0 0 0 4px var(--safeai-accent);
+  --safeai-transition-speed: 0.18s;
   --md-default-bg-color: var(--safeai-bg);
   --md-default-fg-color: var(--safeai-text);
   --md-default-fg-color--light: var(--safeai-text-muted);
@@ -30,6 +33,7 @@
 }
 
 [data-md-color-scheme="slate"] {
+  color-scheme: dark;
   --md-default-bg-color: var(--safeai-bg);
   --md-default-fg-color: var(--safeai-text);
   --md-default-fg-color--light: var(--safeai-text-muted);
@@ -43,6 +47,12 @@
   --md-code-fg-color: var(--safeai-text);
   --md-footer-bg-color: var(--safeai-bg);
   --md-footer-fg-color: var(--safeai-text-muted);
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-tap-highlight-color: rgba(255, 178, 0, 0.15);
+  touch-action: manipulation;
 }
 
 html,
@@ -52,6 +62,36 @@ body,
     radial-gradient(circle at top left, rgba(255, 255, 255, 0.05), transparent 28%),
     radial-gradient(circle at top right, rgba(255, 178, 0, 0.06), transparent 18%),
     linear-gradient(180deg, #030303 0%, #000000 100%);
+}
+
+::selection {
+  background: var(--safeai-accent-soft);
+  color: var(--safeai-text);
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+@supports (scrollbar-color: auto) {
+  * {
+    scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
+    scrollbar-width: thin;
+  }
 }
 
 body,
@@ -124,6 +164,7 @@ pre,
 .md-typeset h4 {
   letter-spacing: -0.03em;
   color: var(--safeai-text);
+  text-wrap: balance;
 }
 
 .md-typeset h1 {
@@ -324,11 +365,12 @@ pre,
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0.01)),
     var(--safeai-surface-2);
-  transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+  transition: transform var(--safeai-transition-speed) ease, opacity var(--safeai-transition-speed) ease;
 }
 
 .md-typeset .feature-card:hover {
   transform: translateY(-2px);
+  opacity: 0.95;
   border-color: var(--safeai-border-strong);
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.015)),
@@ -371,6 +413,7 @@ pre,
 
 .md-typeset table:not([class]) td {
   color: var(--safeai-text-muted);
+  font-variant-numeric: tabular-nums;
 }
 
 .md-typeset .architecture-link {
@@ -467,4 +510,112 @@ pre,
   .md-typeset .section-header {
     margin-top: 2.8rem;
   }
+}
+
+/* Focus states — visible keyboard focus on all interactive elements */
+:focus-visible {
+  outline: none;
+  box-shadow: var(--safeai-focus-ring);
+  border-radius: 6px;
+}
+
+.md-typeset .cta a.md-button:focus-visible {
+  box-shadow: var(--safeai-focus-ring);
+}
+
+.md-tabs__link:focus-visible,
+.md-nav__link:focus-visible,
+.md-search__input:focus-visible {
+  box-shadow: var(--safeai-focus-ring);
+  border-radius: 6px;
+}
+
+.md-header__button:focus-visible {
+  box-shadow: var(--safeai-focus-ring);
+  border-radius: 6px;
+}
+
+.md-typeset a:focus-visible {
+  box-shadow: var(--safeai-focus-ring);
+  border-radius: 4px;
+}
+
+.md-typeset .architecture-link:focus-visible {
+  box-shadow: var(--safeai-focus-ring);
+  border-radius: 4px;
+}
+
+.md-typeset .feature-card:focus-within {
+  border-color: var(--safeai-accent);
+  box-shadow: 0 0 0 1px var(--safeai-accent);
+}
+
+/* Hover & interactive states — increased contrast */
+.md-typeset a:hover {
+  color: var(--safeai-accent);
+}
+
+.md-header__button:hover {
+  opacity: 0.85;
+}
+
+.md-typeset .cta a.md-button:active {
+  transform: scale(0.98);
+}
+
+.md-typeset .feature-card:active {
+  transform: scale(0.99);
+}
+
+/* Prefers reduced motion — disable all transitions and transforms */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .md-typeset .feature-card:hover {
+    transform: none;
+  }
+
+  .md-typeset .cta a.md-button:active {
+    transform: none;
+  }
+
+  .md-typeset .feature-card:active {
+    transform: none;
+  }
+}
+
+/* Safe areas for notched devices */
+@supports (padding: env(safe-area-inset-bottom)) {
+  .md-header {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+
+  .md-footer {
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+
+  .md-content__inner {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+}
+
+/* Modal / dialog scroll containment */
+.md-search__overlay {
+  overscroll-behavior: contain;
+}
+
+/* Smooth anchor scroll offset for sticky header */
+[id] {
+  scroll-margin-top: 4rem;
 }

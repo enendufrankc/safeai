@@ -8,7 +8,7 @@ hide:
 <div class="hero" markdown>
 
 <div class="hero-shell">
-<pre class="hero-ascii">███████  █████  ███████ ███████  █████  ██
+<pre class="hero-ascii" aria-hidden="true">███████  █████  ███████ ███████  █████  ██
 ██      ██   ██ ██      ██      ██   ██ ██
 ███████ ███████ █████   █████   ███████ ██
      ██ ██   ██ ██      ██      ██   ██ ██
@@ -23,24 +23,24 @@ hide:
 Secure the full path from prompt to tool call to model output across any provider, framework, and deployment surface.</p>
 
 <div class="hero-command">
-<code>$ uv pip install safeai && python -c "from safeai import SafeAI; SafeAI.quickstart()"</code>
+<code>$ uv pip install safeai &amp;&amp; python -c "from safeai import SafeAI; SafeAI.quickstart()"</code>
 </div>
 
 </div>
 
 <div class="badges" markdown>
 
-[![Build](https://img.shields.io/github/actions/workflow/status/enendufrankc/safeai/quality.yml?label=build&style=flat-square)](https://github.com/enendufrankc/safeai/actions/workflows/quality.yml)
-[![Release](https://img.shields.io/badge/release-v0.7.0-blue?style=flat-square)](https://github.com/enendufrankc/safeai/releases)
-[![PyPI](https://img.shields.io/pypi/v/safeai?style=flat-square&label=pypi)](https://pypi.org/project/safeai/)
-[![License](https://img.shields.io/badge/license-Apache--2.0-green?style=flat-square)](https://github.com/enendufrankc/safeai/blob/main/LICENSE)
-[![Stars](https://img.shields.io/github/stars/enendufrankc/safeai?style=flat-square)](https://github.com/enendufrankc/safeai/stargazers)
+<img src="https://img.shields.io/github/actions/workflow/status/enendufrankc/safeai/quality.yml?label=build&style=flat-square" alt="Build" width="90" height="20" loading="eager">
+<img src="https://img.shields.io/badge/release-v0.7.0-blue?style=flat-square" alt="Release" width="100" height="20" loading="eager">
+<img src="https://img.shields.io/pypi/v/safeai?style=flat-square&label=pypi" alt="PyPI" width="80" height="20" loading="eager">
+<img src="https://img.shields.io/badge/license-Apache--2.0-green?style=flat-square" alt="License" width="120" height="20" loading="eager">
+<img src="https://img.shields.io/github/stars/enendufrankc/safeai?style=flat-square" alt="Stars" width="70" height="20" loading="eager">
 
 </div>
 
 <div class="section-header" markdown>
 <p class="section-kicker">Quick Start</p>
-<h2>Two lines. That's it.</h2>
+<h2>Two Lines. That's It.</h2>
 </div>
 
 <div class="quickstart-block" markdown>
@@ -78,7 +78,7 @@ print(guard.safe_output)
 
 <div class="section-header" markdown>
 <p class="section-kicker">Capabilities</p>
-<h2>Everything you need to secure AI agents</h2>
+<h2>Everything You Need to Secure AI Agents</h2>
 </div>
 
 <div class="feature-grid" markdown>
@@ -154,7 +154,7 @@ Block `rm -rf /`, `DROP TABLE`, fork bombs, pipe-to-shell, and force pushes.
 
 <div class="section-header" markdown>
 <p class="section-kicker">Architecture</p>
-<h2>How SafeAI works</h2>
+<h2>How SafeAI Works</h2>
 </div>
 
 ```text
@@ -191,7 +191,7 @@ Block `rm -rf /`, `DROP TABLE`, fork bombs, pipe-to-shell, and force pushes.
 
 SafeAI enforces security at the boundaries where data enters, exits, and crosses trust lines. Every prompt, tool call, agent message, file payload, and model response is evaluated before it moves to the next system.
 
-### End-to-end flow
+### End-to-End Flow
 
 1. Input enters through the SDK, proxy, CLI, or framework adapter.
 2. Detectors classify secrets, PII, and custom policy tags.
@@ -200,7 +200,7 @@ SafeAI enforces security at the boundaries where data enters, exits, and crosses
 5. Output is guarded before it reaches users, downstream tools, or other agents.
 6. Every decision is written to audit logs and exposed to metrics, dashboard views, and intelligence workflows.
 
-### Core runtime components
+### Core Runtime Components
 
 | Layer | What it does | Key modules |
 |:---|:---|:---|
@@ -213,7 +213,7 @@ SafeAI enforces security at the boundaries where data enters, exits, and crosses
 | Integration surfaces | Embeds SafeAI into frameworks, coding agents, APIs, and infrastructure | `safeai/middleware/*`, `safeai/proxy/*`, `safeai/mcp/server.py`, `safeai/agents/installers/*` |
 | Advisory intelligence | Generates recommendations and staged configs without entering the enforcement path | `safeai/intelligence/*` |
 
-### Deployment model
+### Deployment Model
 
 SafeAI is designed so the same enforcement model can run in multiple places:
 
@@ -223,7 +223,7 @@ SafeAI is designed so the same enforcement model can run in multiple places:
 - As an MCP server for MCP-compatible agent clients.
 - With dashboard, alerts, templates, plugins, and intelligence agents layered on top for operations at scale.
 
-### Design guarantees
+### Design Guarantees
 
 - Deterministic enforcement at runtime. AI does not make final security decisions.
 - Policy-as-data with versioned YAML instead of hidden logic in application code.
@@ -237,7 +237,7 @@ SafeAI is designed so the same enforcement model can run in multiple places:
 
 <div class="section-header" markdown>
 <p class="section-kicker">Roadmap</p>
-<h2>Platform evolution</h2>
+<h2>Platform Evolution</h2>
 </div>
 
 SafeAI has been built in phases, with each phase expanding the runtime while preserving the same boundary model.
@@ -254,7 +254,7 @@ SafeAI has been built in phases, with each phase expanding the runtime while pre
 | Phase 6: Ecosystem and Community | Complete | Plugin system, CrewAI and AutoGen adapters, structured/file scanning, templates, coding-agent hooks, MCP |
 | Phase 7: Intelligence Layer | Complete | BYOM intelligence backend, metadata sanitization, 5 advisory agents, staging workflow, proxy/dashboard intelligence endpoints |
 
-### Current platform scope
+### Current Platform Scope
 
 The project now covers the full agent security stack:
 
@@ -265,7 +265,7 @@ The project now covers the full agent security stack:
 - SDK, CLI, proxy, dashboard, coding-agent hooks, and MCP deployment surfaces.
 - Intelligence workflows for auto-configuration, policy recommendation, incident explanation, compliance mapping, and integration generation.
 
-### Planned next
+### Planned Next
 
 | Initiative | Direction |
 |:---|:---|
@@ -280,7 +280,7 @@ The project now covers the full agent security stack:
 
 ---
 
-## See it in action
+## See It in Action
 
 !!! example "Securing OpenClaw with SafeAI"
     A complete walkthrough running SafeAI as a sidecar alongside [OpenClaw](https://openclaw.ai/) — an open-source personal AI assistant with shell access, file system permissions, and messaging across WhatsApp, Telegram, Slack, Discord, and more.
@@ -291,7 +291,7 @@ The project now covers the full agent security stack:
 
 ---
 
-## Works with everything
+## Works With Everything
 
 <div class="compat-table" markdown>
 
@@ -307,7 +307,7 @@ The project now covers the full agent security stack:
 
 ---
 
-## Install
+## Install SafeAI
 
 === "uv (recommended)"
 
