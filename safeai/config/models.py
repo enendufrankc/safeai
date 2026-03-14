@@ -45,6 +45,10 @@ class PathsConfig(BaseModel):
 
 class AuditConfig(BaseModel):
     file_path: str | None = "logs/audit.log"
+    max_size_mb: int = 100
+    max_age_days: int = 90
+    compress_rotated: bool = True
+    max_rotated_files: int = 10
 
 
 class ApprovalConfig(BaseModel):
@@ -82,6 +86,49 @@ class AlertingConfig(BaseModel):
     channels: AlertChannelConfig = Field(default_factory=AlertChannelConfig)
 
 
+class BudgetRuleConfig(BaseModel):
+    scope: str = "global"
+    limit: float = 100.0
+    action: str = "warn"
+    alert_at_percent: int = 80
+
+
+class CostConfig(BaseModel):
+    enabled: bool = False
+    pricing_file: str | None = "cost/pricing.yaml"
+    budgets: list[BudgetRuleConfig] = Field(default_factory=list)
+    currency: str = "USD"
+
+
+class ProviderRoutingConfig(BaseModel):
+    name: str
+    base_url: str = ""
+    api_key_env: str | None = None
+    models: list[str] = Field(default_factory=list)
+    priority: int = 0
+
+
+class RoutingConfig(BaseModel):
+    enabled: bool = False
+    strategy: str = "priority"
+    providers: list[ProviderRoutingConfig] = Field(default_factory=list)
+    circuit_breaker_threshold: int = 5
+    circuit_breaker_cooldown: float = 60.0
+
+
+class SecretBackendConfig(BaseModel):
+    name: str
+    type: str  # "vault", "aws", "env"
+    url_env: str | None = None
+    token_env: str | None = None
+    region_env: str | None = None
+
+
+class SecretsConfig(BaseModel):
+    enabled: bool = False
+    backends: list[SecretBackendConfig] = Field(default_factory=list)
+
+
 class SafeAIConfig(BaseModel):
     version: str = "v1alpha1"
     paths: PathsConfig = Field(default_factory=PathsConfig)
@@ -92,3 +139,6 @@ class SafeAIConfig(BaseModel):
     dashboard: DashboardConfig = Field(default_factory=DashboardConfig)
     intelligence: IntelligenceConfig = Field(default_factory=IntelligenceConfig)
     alerting: AlertingConfig = Field(default_factory=AlertingConfig)
+    cost: CostConfig = Field(default_factory=CostConfig)
+    routing: RoutingConfig = Field(default_factory=RoutingConfig)
+    secrets: SecretsConfig = Field(default_factory=SecretsConfig)

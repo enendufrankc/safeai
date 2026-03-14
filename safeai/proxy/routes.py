@@ -11,7 +11,7 @@ from typing import Any, Literal
 
 import httpx
 from fastapi import APIRouter, HTTPException, Request
-from fastapi.responses import PlainTextResponse
+from fastapi.responses import JSONResponse, PlainTextResponse
 from pydantic import BaseModel, Field
 
 try:
@@ -142,7 +142,7 @@ class ProxyForwardPayload(BaseModel):
     destination_agent_id: str | None = None
 
 
-@router.post("/v1/scan/input")
+@router.post("/v1/scan/input", summary="Scan input text", description="Run policy-based PII/sensitive-data detection on free-text input and return the enforcement decision.")
 def scan_input(payload: ScanInputPayload, request: Request) -> dict[str, Any]:
     started = time.perf_counter()
     runtime = request.app.state.runtime
@@ -205,12 +205,20 @@ def scan_structured(payload: StructuredScanPayload, request: Request) -> dict[st
     }
 
 
-@router.post("/v1/scan/file")
+@router.post("/v1/scan/file", summary="Scan a file", description="Run policy-based detection on a local file (text, JSON, CSV) and return the enforcement decision with detections.")
 def scan_file(payload: FileScanPayload, request: Request) -> dict[str, Any]:
     started = time.perf_counter()
     runtime = request.app.state.runtime
     try:
         result = runtime.safeai.scan_file_input(payload.path, agent_id=payload.agent_id)
+        result_dict = {
+            "mode": result.mode,
+            "file_path": result.file_path,
+            "size_bytes": result.size_bytes,
+            "decision": result.decision,
+            "detections": result.detections,
+            "filtered": result.filtered,
+        }
     except (FileNotFoundError, ValueError, json.JSONDecodeError) as exc:
         _record_error(
             runtime=runtime,
@@ -224,12 +232,12 @@ def scan_file(payload: FileScanPayload, request: Request) -> dict[str, Any]:
         endpoint="/v1/scan/file",
         status_code=200,
         latency_seconds=elapsed,
-        decision_action=result.get("decision", {}).get("action"),
+        decision_action=result_dict.get("decision", {}).get("action"),
     )
-    return result
+    return result_dict
 
 
-@router.post("/v1/guard/output")
+@router.post("/v1/guard/output", summary="Guard output text", description="Scan agent/LLM output for policy violations, optionally redact sensitive data, and apply fallback responses when configured.")
 def guard_output(payload: GuardOutputPayload, request: Request) -> dict[str, Any]:
     started = time.perf_counter()
     runtime = request.app.state.runtime
@@ -261,7 +269,7 @@ def guard_output(payload: GuardOutputPayload, request: Request) -> dict[str, Any
     }
 
 
-@router.post("/v1/intercept/tool")
+@router.post("/v1/intercept/tool", summary="Intercept tool call", description="Enforce policies on an agent tool invocation, including capability-token validation and approval workflows.")
 def intercept_tool(payload: ToolInterceptPayload, request: Request) -> dict[str, Any]:
     started = time.perf_counter()
     runtime = request.app.state.runtime
@@ -431,7 +439,7 @@ def memory_purge_expired(request: Request) -> dict[str, Any]:
     return {"purged": purged}
 
 
-@router.post("/v1/audit/query")
+@router.post("/v1/audit/query", summary="Query audit events", description="Search and filter the audit log by boundary, action, agent, time range, cost, and other dimensions.")
 def audit_query(payload: AuditQueryPayload, request: Request) -> dict[str, Any]:
     started = time.perf_counter()
     runtime = request.app.state.runtime
@@ -534,7 +542,7 @@ def get_policy_template(template_name: str, request: Request) -> dict[str, Any]:
     return payload
 
 
-@router.post("/v1/proxy/forward")
+@router.post("/v1/proxy/forward", summary="Forward request through proxy", description="Forward an HTTP request to an upstream provider, scanning input before sending and guarding output on the response. Used in sidecar/gateway mode.")
 async def proxy_forward(payload: ProxyForwardPayload, request: Request) -> dict[str, Any]:
     started = time.perf_counter()
     runtime = request.app.state.runtime
@@ -736,6 +744,32 @@ def intelligence_compliance(
         "model": result.model_used,
         "metadata": result.metadata,
     }
+
+
+@router.post("/v1/route/completion")
+async def route_completion(request: Request) -> dict[str, Any]:
+    """Route an LLM completion request to the best available provider."""
+    body = await request.json()
+    model = body.get("model")
+    preferred_provider = body.get("provider")
+
+    registry = getattr(request.app.state, "provider_registry", None)
+    if registry is None:
+        return JSONResponse(
+            status_code=503,
+            content={"error": "Routing not configured. Fix: Set routing.enabled: true in safeai.yaml."},
+        )
+
+    try:
+        decision = registry.route(model=model, preferred_provider=preferred_provider)
+        return {
+            "provider": decision.provider,
+            "model": decision.model,
+            "base_url": decision.base_url,
+            "reason": decision.reason,
+        }
+    except RuntimeError as exc:
+        return JSONResponse(status_code=503, content={"error": str(exc)})
 
 
 def _resolve_forward_url(*, upstream_url: str | None, upstream_base_url: str | None, path: str | None) -> str:

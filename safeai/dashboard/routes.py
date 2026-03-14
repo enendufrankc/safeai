@@ -70,7 +70,7 @@ def dashboard_index(request: Request) -> str:
     return runtime.dashboard.render_dashboard_page()
 
 
-@router.get("/v1/dashboard/overview")
+@router.get("/v1/dashboard/overview", summary="Dashboard overview", description="Return an aggregated security overview including event counts, top policies, blocked actions, and trend data for the given time window.")
 def dashboard_overview(request: Request, last: str = "24h") -> dict[str, Any]:
     runtime = request.app.state.runtime
     principal = runtime.dashboard.authorize_request(request.headers, permission="dashboard:view")
@@ -316,3 +316,10 @@ def dashboard_evaluate_alerts(payload: AlertEvaluatePayload, request: Request) -
     runtime = request.app.state.runtime
     principal = runtime.dashboard.authorize_request(request.headers, permission="alert:read")
     return runtime.dashboard.evaluate_alerts(principal, last=payload.last)
+
+
+@router.get("/v1/dashboard/cost/summary")
+def dashboard_cost_summary(request: Request) -> dict[str, Any]:
+    runtime = request.app.state.runtime
+    principal = runtime.dashboard.authorize_request(request.headers, permission="dashboard:view")
+    return runtime.dashboard.cost_summary(principal)
