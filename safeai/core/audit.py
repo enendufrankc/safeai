@@ -7,7 +7,6 @@ from __future__ import annotations
 import gzip
 import hashlib
 import json
-import os
 import shutil
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timedelta, timezone

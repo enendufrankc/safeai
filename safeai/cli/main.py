@@ -8,12 +8,14 @@ import click
 
 from safeai.cli.alerts import alerts_group
 from safeai.cli.approvals import approvals_group
+from safeai.cli.cost import cost_group
 from safeai.cli.hook import hook_command
 from safeai.cli.init import init_command
 from safeai.cli.intelligence import intelligence_group
 from safeai.cli.logs import logs_command
 from safeai.cli.mcp import mcp_command
 from safeai.cli.observe import observe_group
+from safeai.cli.plugins import plugins_group
 from safeai.cli.scan import scan_command
 from safeai.cli.serve import serve_command
 from safeai.cli.setup import setup_group
@@ -39,8 +41,10 @@ cli.add_command(setup_group)
 cli.add_command(mcp_command)
 cli.add_command(intelligence_group)
 cli.add_command(alerts_group)
+cli.add_command(cost_group)
 cli.add_command(observe_group)
 cli.add_command(skills_group)
+cli.add_command(plugins_group)
 
 if __name__ == "__main__":
     cli()
