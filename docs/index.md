@@ -31,7 +31,7 @@ Secure the full path from prompt to tool call to model output across any provide
 <div class="badges" markdown>
 
 <img src="https://img.shields.io/github/actions/workflow/status/enendufrankc/safeai/quality.yml?label=build&style=flat-square" alt="Build" width="90" height="20" loading="eager">
-<img src="https://img.shields.io/badge/release-v0.8.1-blue?style=flat-square" alt="Release" width="100" height="20" loading="eager">
+<img src="https://img.shields.io/badge/release-v0.8.2-blue?style=flat-square" alt="Release" width="100" height="20" loading="eager">
 <img src="https://img.shields.io/pypi/v/safeai?style=flat-square&label=pypi" alt="PyPI" width="80" height="20" loading="eager">
 <img src="https://img.shields.io/badge/license-Apache--2.0-green?style=flat-square" alt="License" width="120" height="20" loading="eager">
 <img src="https://img.shields.io/github/stars/enendufrankc/safeai?style=flat-square" alt="Stars" width="70" height="20" loading="eager">

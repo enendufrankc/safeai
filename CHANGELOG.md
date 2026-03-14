@@ -20,6 +20,14 @@
 - Repository housekeeping: removed generated configs, release notes, unused assets, tracked tooling files.
 - CI governance gate now tracks `v1alpha1` schema files.
 
+## 0.8.2 - 2026-03-14
+
+### Fixed
+
+- Align release-facing documentation and badges with the current package version.
+- Modernize package metadata to use SPDX license syntax and remove deprecated license classifier usage during builds.
+- Publish a user-first end-to-end test plan for fresh-machine validation of the SDK, CLI, proxy, integrations, and release install flow.
+
 ## 0.8.1 - 2026-03-13
 
 ### Fixed

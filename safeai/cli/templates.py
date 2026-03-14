@@ -21,7 +21,10 @@ def templates_group() -> None:
 @click.option("--config", "config_path", default="safeai.yaml", show_default=True, help="Config path.")
 def templates_list_command(config_path: str) -> None:
     """List available policy templates."""
-    sdk = SafeAI.from_config(config_path)
+    try:
+        sdk = SafeAI.from_config(config_path)
+    except Exception as exc:  # pragma: no cover - surfaced via click CLI.
+        raise click.ClickException(str(exc)) from exc
     rows = sdk.list_policy_templates()
     if not rows:
         click.echo("No policy templates found.")
@@ -40,7 +43,10 @@ def templates_list_command(config_path: str) -> None:
 @click.option("--format", "output_format", type=click.Choice(["yaml", "json"]), default="yaml", show_default=True)
 def templates_show_command(config_path: str, template_name: str, output_format: str) -> None:
     """Render one policy template."""
-    sdk = SafeAI.from_config(config_path)
+    try:
+        sdk = SafeAI.from_config(config_path)
+    except Exception as exc:  # pragma: no cover - surfaced via click CLI.
+        raise click.ClickException(str(exc)) from exc
     try:
         payload = sdk.load_policy_template(template_name)
     except KeyError as exc:

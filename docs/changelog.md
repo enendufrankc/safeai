@@ -25,6 +25,14 @@ All notable changes to SafeAI are documented in this file. The format follows [K
 
 ---
 
+## 0.8.2 -- 2026-03-14
+
+### Fixed
+
+- Aligned release-facing documentation and badges with the current package version.
+- Updated package metadata to use SPDX license syntax and removed deprecated license classifier usage during builds.
+- Added a user-first end-to-end validation plan for fresh-machine install and usage flows.
+
 ## 0.8.1 -- 2026-03-13
 
 ### Fixed

@@ -51,6 +51,14 @@ class PolicyTemplateTests(unittest.TestCase):
             self.assertEqual(shown.exit_code, 0, msg=shown.output)
             self.assertIn("healthcare-redact-phi-in-output", shown.output)
 
+    def test_templates_cli_reports_missing_config_cleanly(self) -> None:
+        runner = CliRunner()
+        with runner.isolated_filesystem():
+            result = runner.invoke(cli, ["templates", "list"])
+        self.assertNotEqual(result.exit_code, 0)
+        self.assertIn("Error:", result.output)
+        self.assertIn("safeai.yaml", result.output)
+
 
 if __name__ == "__main__":
     unittest.main()

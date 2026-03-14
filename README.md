@@ -6,7 +6,7 @@
 
 <p align="center">
   <a href="https://github.com/enendufrankc/safeai/actions/workflows/quality.yml"><img src="https://img.shields.io/github/actions/workflow/status/enendufrankc/safeai/quality.yml?label=build&style=flat-square" alt="Build"></a>
-  <a href="https://github.com/enendufrankc/safeai/releases"><img src="https://img.shields.io/badge/release-v0.8.1-blue?style=flat-square" alt="Release"></a>
+  <a href="https://github.com/enendufrankc/safeai/releases"><img src="https://img.shields.io/badge/release-v0.8.2-blue?style=flat-square" alt="Release"></a>
   <a href="https://pypi.org/project/safeai-sdk/"><img src="https://img.shields.io/pypi/v/safeai-sdk?style=flat-square&label=pypi" alt="PyPI"></a>
   <a href="https://opensource.org/licenses/Apache-2.0"><img src="https://img.shields.io/badge/license-Apache--2.0-green?style=flat-square" alt="License"></a>
   <a href="https://github.com/enendufrankc/safeai/stargazers"><img src="https://img.shields.io/github/stars/enendufrankc/safeai?style=flat-square" alt="Stars"></a>
@@ -56,7 +56,7 @@ That model keeps policy decisions close to execution, where incidents actually h
                               SafeAI Runtime
 ```
 
-Current status: Phases 1–7 complete, with the current release at `v0.8.1`.
+Current status: Phases 1–7 complete, with the current release at `v0.8.2`.
 
 ## What SafeAI Is Not
 
