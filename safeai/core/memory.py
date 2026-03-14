@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2026 SafeAI Contributors
 """Schema-bound in-memory store with retention enforcement."""
 
 from __future__ import annotations

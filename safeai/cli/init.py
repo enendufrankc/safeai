@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2026 SafeAI Contributors
 """safeai init command."""
 
 from __future__ import annotations

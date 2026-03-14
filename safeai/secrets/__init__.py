@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2026 SafeAI Contributors
 """Secret backend integrations."""
 
 from safeai.secrets.aws import AWSSecretBackend

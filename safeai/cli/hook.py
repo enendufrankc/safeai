@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2026 SafeAI Contributors
 """Universal hook adapter — reads JSON from stdin, enforces SafeAI boundaries."""
 
 from __future__ import annotations

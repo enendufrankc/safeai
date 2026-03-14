@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2026 SafeAI Contributors
 """End-to-end tool-control flow tests for Phase 2."""
 
 from __future__ import annotations

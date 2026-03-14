@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2026 SafeAI Contributors
 """In-process Prometheus-style metrics for proxy endpoints."""
 
 from __future__ import annotations

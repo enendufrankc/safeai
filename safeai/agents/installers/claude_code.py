@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2026 SafeAI Contributors
 """Claude Code hook installer — writes .claude/settings.json."""
 
 from __future__ import annotations

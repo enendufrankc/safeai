@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2026 SafeAI Contributors
 """Lightweight performance regression gates for boundary paths."""
 
 from __future__ import annotations

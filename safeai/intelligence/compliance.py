@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2026 SafeAI Contributors
 """Compliance advisory agent — generates compliance policy sets."""
 
 from __future__ import annotations

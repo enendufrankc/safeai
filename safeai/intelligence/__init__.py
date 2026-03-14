@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2026 SafeAI Contributors
 """SafeAI Intelligence Layer — AI advisory agents for configuration and understanding."""
 
 from safeai.intelligence.advisor import AdvisorResult, BaseAdvisor

@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2026 SafeAI Contributors
 """End-to-end integration tests for core boundary flows."""
 
 from __future__ import annotations

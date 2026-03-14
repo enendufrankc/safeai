@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2026 SafeAI Contributors
 """Policy engine unit tests for evaluation and reload behavior."""
 
 from __future__ import annotations

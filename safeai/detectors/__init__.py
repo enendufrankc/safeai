@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2026 SafeAI Contributors
 """Built-in detector registry."""
 
 from safeai.detectors.api_key import API_KEY_PATTERNS

@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2026 SafeAI Contributors
 """Integration advisory agent — generates framework-specific integration code."""
 
 from __future__ import annotations

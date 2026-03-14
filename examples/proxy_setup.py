@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2026 SafeAI Contributors
 """SafeAI proxy setup example — start and test the sidecar proxy."""
 
 import subprocess

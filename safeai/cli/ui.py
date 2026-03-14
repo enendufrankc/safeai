@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2026 SafeAI Contributors
 """Clack-style CLI rendering helpers for SafeAI."""
 
 from __future__ import annotations

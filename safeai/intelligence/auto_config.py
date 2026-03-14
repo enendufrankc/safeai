@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2026 SafeAI Contributors
 """Auto-Config advisory agent — generates SafeAI configuration from codebase structure."""
 
 from __future__ import annotations

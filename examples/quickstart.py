@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2026 SafeAI Contributors
 """SafeAI quickstart example — minimal setup with built-in defaults."""
 
 from safeai import SafeAI

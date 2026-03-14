@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2026 SafeAI Contributors
 """Policy template catalog (built-in + plugin-provided + community packs)."""
 
 from __future__ import annotations

@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2026 SafeAI Contributors
 """Proxy latency/throughput regression gates for Phase 4."""
 
 from __future__ import annotations

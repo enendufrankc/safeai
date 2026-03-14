@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2026 SafeAI Contributors
 """Email detector patterns."""
 
 EMAIL_PATTERNS: list[tuple[str, str, str]] = [

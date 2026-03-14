@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2026 SafeAI Contributors
 """Community template registry: fetch, search, install, and manage templates."""
 
 from __future__ import annotations

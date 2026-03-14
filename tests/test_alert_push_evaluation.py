@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2026 SafeAI Contributors
 """Tests for push-based alert evaluation, sliding window, and cooldown."""
 
 from __future__ import annotations

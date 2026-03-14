@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2026 SafeAI Contributors
 """FastAPI app factory for sidecar/gateway mode."""
 
 from __future__ import annotations

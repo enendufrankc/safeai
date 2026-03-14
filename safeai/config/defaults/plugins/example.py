@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2026 SafeAI Contributors
 """Example SafeAI plugin scaffold.
 
 This file is copied by `safeai init` to `plugins/example.py`.

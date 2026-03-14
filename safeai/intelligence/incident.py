@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2026 SafeAI Contributors
 """Incident Response advisory agent — classifies and explains security events."""
 
 from __future__ import annotations

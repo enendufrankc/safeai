@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2026 SafeAI Contributors
 """Tests for the safeai alerts CLI commands."""
 
 from __future__ import annotations

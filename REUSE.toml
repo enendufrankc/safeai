@@ -1,0 +1,88 @@
+version = 1
+SPDX-PackageName = "SafeAI"
+SPDX-PackageSupplier = "SafeAI Contributors"
+SPDX-PackageDownloadLocation = "https://github.com/enendufrankc/safeai"
+
+[[annotations]]
+path = [".gitignore", ".github/CODEOWNERS"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 SafeAI Contributors"
+SPDX-License-Identifier = "Apache-2.0"
+
+[[annotations]]
+path = ".github/**"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 SafeAI Contributors"
+SPDX-License-Identifier = "Apache-2.0"
+
+[[annotations]]
+path = "**.md"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 SafeAI Contributors"
+SPDX-License-Identifier = "Apache-2.0"
+
+[[annotations]]
+path = ["**.yml", "**.yaml", "**.toml", "**.cfg", "**.ini", "**.json"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 SafeAI Contributors"
+SPDX-License-Identifier = "Apache-2.0"
+
+[[annotations]]
+path = ["pyproject.toml", "setup.cfg", "Makefile"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 SafeAI Contributors"
+SPDX-License-Identifier = "Apache-2.0"
+
+[[annotations]]
+path = ["**.lock", "skills-lock.json"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 SafeAI Contributors"
+SPDX-License-Identifier = "Apache-2.0"
+
+[[annotations]]
+path = ["schemas/**", "contracts/**", "policies/**", "tenants/**", "alerts/**", "agents/**"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 SafeAI Contributors"
+SPDX-License-Identifier = "Apache-2.0"
+
+[[annotations]]
+path = ["dist/**", "htmlcov/**", "site/**", "**.egg-info/**"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 SafeAI Contributors"
+SPDX-License-Identifier = "Apache-2.0"
+
+[[annotations]]
+path = "docs/**"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 SafeAI Contributors"
+SPDX-License-Identifier = "Apache-2.0"
+
+[[annotations]]
+path = "logs/**"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 SafeAI Contributors"
+SPDX-License-Identifier = "Apache-2.0"
+
+[[annotations]]
+path = "notebook/**"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 SafeAI Contributors"
+SPDX-License-Identifier = "Apache-2.0"
+
+[[annotations]]
+path = "examples/**"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 SafeAI Contributors"
+SPDX-License-Identifier = "Apache-2.0"
+
+[[annotations]]
+path = "plugins/**"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 SafeAI Contributors"
+SPDX-License-Identifier = "Apache-2.0"
+
+[[annotations]]
+path = ["**.png", "**.jpg", "**.jpeg", "**.gif", "**.svg", "**.ico"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 SafeAI Contributors"
+SPDX-License-Identifier = "Apache-2.0"

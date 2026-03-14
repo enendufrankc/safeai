@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2026 SafeAI Contributors
 """Capability-token issuance and action-boundary enforcement tests."""
 
 from __future__ import annotations

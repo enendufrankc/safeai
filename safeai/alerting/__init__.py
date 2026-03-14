@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2026 SafeAI Contributors
 """Real-time alerting channels and dispatch."""
 
 from safeai.alerting.channels import (

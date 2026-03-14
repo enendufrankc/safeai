@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2026 SafeAI Contributors
 """SafeAI plugin authoring example — custom detector and policy template."""
 
 from safeai import SafeAI

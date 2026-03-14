@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2026 SafeAI Contributors
 """Proxy route definitions for sidecar and gateway operation."""
 
 from __future__ import annotations
