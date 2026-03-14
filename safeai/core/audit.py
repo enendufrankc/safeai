@@ -32,6 +32,11 @@ class AuditEvent:
     context_hash: str | None = None
     metadata: dict[str, Any] = field(default_factory=dict)
     timestamp: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    tokens_in: int | None = None
+    tokens_out: int | None = None
+    estimated_cost: float | None = None
+    cost_model: str | None = None
+    cost_provider: str | None = None
 
 
 class AuditLogger:
@@ -77,8 +82,14 @@ class AuditLogger:
         for callback in self._on_emit_callbacks:
             try:
                 callback(event_dict)
-            except Exception:
-                pass
+            except Exception as exc:
+                import logging as _logging
+
+                _logging.getLogger(__name__).warning(
+                    "Audit callback %s failed: %s. Fix: check your callback implementation.",
+                    getattr(callback, "__name__", repr(callback)),
+                    exc,
+                )
 
     def query(
         self,
@@ -99,6 +110,8 @@ class AuditLogger:
         since: str | datetime | None = None,
         until: str | datetime | None = None,
         last: str | None = None,
+        min_cost: float | None = None,
+        max_cost: float | None = None,
         limit: int = 100,
         newest_first: bool = True,
     ) -> list[dict[str, Any]]:
@@ -141,6 +154,14 @@ class AuditLogger:
                 until=effective_until,
             ):
                 continue
+            if min_cost is not None or max_cost is not None:
+                ec = validated.get("estimated_cost")
+                if ec is None:
+                    continue
+                if min_cost is not None and ec < min_cost:
+                    continue
+                if max_cost is not None and ec > max_cost:
+                    continue
             parsed.append(validated)
 
         parsed.sort(key=lambda item: item.get("timestamp", ""), reverse=newest_first)

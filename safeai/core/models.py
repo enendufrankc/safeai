@@ -197,6 +197,11 @@ class AuditEventModel(BaseModel):
     context_hash: str = Field(min_length=1)
     metadata: dict[str, Any] = Field(default_factory=dict)
     timestamp: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    tokens_in: int | None = None
+    tokens_out: int | None = None
+    estimated_cost: float | None = None
+    cost_model: str | None = None
+    cost_provider: str | None = None
 
     @model_validator(mode="after")
     def validate_tags(self) -> "AuditEventModel":
