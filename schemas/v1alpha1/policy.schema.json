@@ -1,0 +1,157 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://safeai.dev/schemas/v1alpha1/policy.schema.json",
+  "title": "SafeAI Policy Schema (v1alpha1)",
+  "description": "Schema for SafeAI boundary policy definitions.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "type": "string",
+      "const": "v1alpha1"
+    },
+    "policy": {
+      "$ref": "#/$defs/policy"
+    },
+    "policies": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/policy"
+      }
+    }
+  },
+  "oneOf": [
+    {
+      "required": [
+        "policy"
+      ]
+    },
+    {
+      "required": [
+        "policies"
+      ]
+    }
+  ],
+  "$defs": {
+    "boundary": {
+      "oneOf": [
+        {
+          "type": "string",
+          "enum": [
+            "input",
+            "action",
+            "output"
+          ]
+        },
+        {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": [
+              "input",
+              "action",
+              "output"
+            ]
+          }
+        }
+      ]
+    },
+    "tagList": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9_.-]*$"
+      }
+    },
+    "stringList": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "condition": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "data_tags": {
+          "$ref": "#/$defs/tagList"
+        },
+        "tool": {
+          "type": "string",
+          "minLength": 1
+        },
+        "tools": {
+          "$ref": "#/$defs/stringList"
+        },
+        "agent": {
+          "type": "string",
+          "minLength": 1
+        },
+        "agents": {
+          "$ref": "#/$defs/stringList"
+        },
+        "direction": {
+          "type": "string",
+          "enum": [
+            "inbound",
+            "outbound"
+          ]
+        }
+      }
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "boundary",
+        "action",
+        "reason"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string"
+        },
+        "boundary": {
+          "$ref": "#/$defs/boundary"
+        },
+        "priority": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "condition": {
+          "$ref": "#/$defs/condition"
+        },
+        "action": {
+          "type": "string",
+          "enum": [
+            "allow",
+            "redact",
+            "block",
+            "require_approval"
+          ]
+        },
+        "fallback_template": {
+          "type": "string"
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}
+

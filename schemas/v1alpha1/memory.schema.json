@@ -1,0 +1,117 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://safeai.dev/schemas/v1alpha1/memory.schema.json",
+  "title": "SafeAI Memory Schema (v1alpha1)",
+  "description": "Schema for SafeAI memory configuration and field-level retention controls.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "type": "string",
+      "const": "v1alpha1"
+    },
+    "memory": {
+      "$ref": "#/$defs/memory"
+    },
+    "memories": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/memory"
+      }
+    }
+  },
+  "oneOf": [
+    {
+      "required": [
+        "memory"
+      ]
+    },
+    {
+      "required": [
+        "memories"
+      ]
+    }
+  ],
+  "$defs": {
+    "field": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "type",
+        "tag"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "string",
+            "integer",
+            "number",
+            "boolean",
+            "list",
+            "object"
+          ]
+        },
+        "tag": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_.-]*$"
+        },
+        "retention": {
+          "type": "string",
+          "minLength": 1
+        },
+        "encrypted": {
+          "type": "boolean"
+        },
+        "required": {
+          "type": "boolean"
+        }
+      }
+    },
+    "memory": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "scope",
+        "fields"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "scope": {
+          "type": "string",
+          "enum": [
+            "session",
+            "user",
+            "global"
+          ]
+        },
+        "fields": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/field"
+          }
+        },
+        "max_entries": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "default_retention": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}
+

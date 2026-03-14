@@ -27,8 +27,7 @@ skills-lock.json
 # Jupyter checkpoint files
 .ipynb_checkpoints/
 
-# Root-level schemas are duplicates of safeai/schemas/
-schemas/v1alpha1/
+# Root-level schema memory config (generated)
 schemas/memory.yaml
 
 # Generated config files (run `safeai init` to create them)
