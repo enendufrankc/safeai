@@ -649,7 +649,7 @@ class SafeAI:
         secret_keys: list[str] | None = None,
         session_id: str | None = None,
         metadata: dict[str, Any] | None = None,
-    ):
+    ) -> Any:
         """Issue a scoped, time-limited capability token to an agent.
 
         Capability tokens grant an agent permission to perform specific actions
@@ -1106,7 +1106,7 @@ class SafeAI:
             dict(response),
         )
 
-    def wrap(self, fn):
+    def wrap(self, fn: Any) -> Any:
         """Wrap a function for use with framework adapters.
 
         Args:
