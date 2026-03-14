@@ -56,7 +56,7 @@ That model keeps policy decisions close to execution, where incidents actually h
                               SafeAI Runtime
 ```
 
-Current status: Sprint 0 through Phase 7 complete, with `v0.7.0` release gate passed.
+Current status: Phases 1–7 complete, with the current release at `v0.8.1`.
 
 ## What SafeAI Is Not
 
@@ -88,10 +88,11 @@ SafeAI is intentionally broad. This is the complete capability set currently imp
 | Memory security | Schema-enforced memory controller, encrypted handle storage, retention and purge workflow |
 | Auditability | Append-only JSON logs, rich query filters (boundary/action/agent/tool/tag/session/time/metadata), context hashes and event IDs |
 | Proxy runtime | Sidecar and gateway modes, upstream forwarding, health endpoint, policy reload endpoint |
-| Observability | Prometheus-style metrics (`/v1/metrics`) with request/decision counters and latency buckets |
 | Integrations | LangChain, CrewAI, AutoGen, Claude ADK, Google ADK, coding-agent hooks, MCP server |
 | Extensibility | Plugin loader for detectors/adapters/templates, built-in policy template catalog (`finance`, `healthcare`, `support`) |
+| Skills system | Installable skill packages for policies, plugins, and deployment scripts. Pre-built skills for GDPR, HIPAA, PCI-DSS, prompt injection, secret detection, and deployment automation |
 | Operations UI | Web dashboard (`/dashboard`) for incidents, approvals, compliance summaries, tenant/RBAC controls, alerts |
+| Alerting and observability | Alert channels (file, webhook, Slack), agent timeline, session trace, Prometheus-style metrics (`/v1/metrics`) |
 | Intelligence layer | 5 AI advisory agents: auto-config, policy recommender, incident explainer, compliance mapper, integration generator. BYOM (Bring Your Own Model), metadata-only, human-approved staging |
 
 ## Install
@@ -252,6 +253,18 @@ safeai intelligence recommend --since 7d
 safeai intelligence explain <event_id>
 safeai intelligence compliance --framework hipaa
 safeai intelligence integrate --target langchain --path .
+
+safeai alerts add --channel slack --url https://hooks.slack.com/...
+safeai alerts list
+safeai alerts test --channel slack
+
+safeai observe agents
+safeai observe sessions
+
+safeai skills list
+safeai skills search secret
+safeai skills add prompt-injection-shield
+safeai skills remove prompt-injection-shield
 ```
 
 ## Framework and Agent Integrations

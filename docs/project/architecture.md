@@ -118,6 +118,24 @@ safeai/
     v1alpha1/              # Schema version
 ```
 
+### Skills system
+
+SafeAI includes an installable skill package system for distributing policies, plugins, deployment scripts, and reference documentation.
+
+```
+skills/
+  safeai/                      # Core reference skill
+  safeai-deploy/               # Deployment automation
+  langchain-adapter/           # LangChain integration plugin
+  prompt-injection-shield/     # Prompt injection detection
+  secrets-detector/            # Extended secrets detection
+  finance-policies/            # PCI-DSS compliance pack
+  gdpr-policies/               # GDPR compliance pack
+  healthcare-policies/         # HIPAA compliance pack
+```
+
+Skills are managed via `safeai skills add|remove|list|search` (Python CLI) or `npx safeai add <skill>` (Node.js installer). Each skill contains a `safeai-skill.json` manifest declaring its type, dependencies, and installation targets.
+
 ---
 
 ## Boundary Model

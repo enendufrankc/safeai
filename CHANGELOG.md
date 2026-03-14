@@ -1,5 +1,25 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- Skills system with 8 pre-built skill packages: `safeai`, `safeai-deploy`, `langchain-adapter`, `prompt-injection-shield`, `secrets-detector`, `finance-policies`, `gdpr-policies`, `healthcare-policies`.
+- Skills CLI (`safeai skills add|remove|list|search`) and Node.js installer (`npx safeai add <skill>`).
+- Skills registry (`skills-registry.json`) and lock file support.
+- JSON schema files for `v1alpha1` resources: policy, tool-contract, agent-identity, memory.
+- SPDX license headers and REUSE 3.3 compliance (`REUSE.toml`, `LICENSES/`).
+- Documentation UI overhaul: dark mode fixes (`color-scheme: dark`), focus-visible states, `prefers-reduced-motion` support, safe-area insets, smooth scrolling, custom scrollbars, Title Case headings, badge image dimensions, font preconnect, MkDocs template overrides.
+- Breakout logo in header (overflow-visible pattern).
+- Deploy script for SafeAI skill (`skills/safeai-deploy/scripts/deploy_safeai.py`).
+- Extended secrets detector skill with plugin-based pattern matching.
+
+### Changed
+
+- Open source readiness improvements across 5 areas.
+- Repository housekeeping: removed generated configs, release notes, unused assets, tracked tooling files.
+- CI governance gate now tracks `v1alpha1` schema files.
+
 ## 0.8.1 - 2026-03-13
 
 ### Fixed

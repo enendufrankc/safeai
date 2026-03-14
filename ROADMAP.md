@@ -15,6 +15,7 @@ SafeAI has completed Phases 1–7 and is at **v0.8.1**.
 | 5 | Dashboard and Enterprise | 0.5.0 | ✅ Complete |
 | 6 | Ecosystem and Community | 0.6.0 | ✅ Complete |
 | 7 | Intelligence Layer | 0.7.0 | ✅ Complete |
+| 8 | Skills and Ecosystem Hardening | 0.8.x | ✅ Complete |
 
 ## What's Next
 
@@ -23,8 +24,6 @@ SafeAI has completed Phases 1–7 and is at **v0.8.1**.
 | Go-based proxy | High-performance proxy for latency-sensitive deployments |
 | Cloud offering | Managed SafeAI service with hosted policy management |
 | Browser extension | Client-side boundary enforcement for browser AI interfaces |
-| Policy marketplace | Community-contributed policy template library |
-| Real-time alerting | Webhook and Slack/Teams integrations for enforcement events |
 | Agent observability | Distributed tracing for boundary decisions across multi-agent systems |
 
 ## How to Influence the Roadmap

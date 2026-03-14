@@ -4,6 +4,58 @@ All notable changes to SafeAI are documented in this file. The format follows [K
 
 ---
 
+## Unreleased
+
+### Added
+
+- Skills system with 8 pre-built skill packages: `safeai`, `safeai-deploy`, `langchain-adapter`, `prompt-injection-shield`, `secrets-detector`, `finance-policies`, `gdpr-policies`, `healthcare-policies`.
+- Skills CLI (`safeai skills add|remove|list|search`) and Node.js installer (`npx safeai add <skill>`).
+- Skills registry (`skills-registry.json`) and lock file support.
+- JSON schema files for `v1alpha1` resources: policy, tool-contract, agent-identity, memory.
+- SPDX license headers and REUSE 3.3 compliance (`REUSE.toml`, `LICENSES/`).
+- Documentation UI overhaul: dark mode fixes, focus-visible states, `prefers-reduced-motion` support, safe-area insets, smooth scrolling, custom scrollbars, Title Case headings, font preconnect, MkDocs template overrides.
+- Deploy script for SafeAI skill (`skills/safeai-deploy/scripts/deploy_safeai.py`).
+- Extended secrets detector skill with plugin-based pattern matching.
+
+### Changed
+
+- Open source readiness improvements across 5 areas.
+- Repository housekeeping: removed generated configs, release notes, unused assets, tracked tooling files.
+- CI governance gate now tracks `v1alpha1` schema files.
+
+---
+
+## 0.8.1 -- 2026-03-13
+
+### Fixed
+
+- Use absolute URL for banner image so it renders on PyPI and GitHub.
+- Add schema examples to auto-config prompt for correct YAML generation.
+
+### Added
+
+- Default configurations for agents, alerts, contracts, and policies scaffold.
+- Clack-style interactive CLI for `safeai init`.
+
+---
+
+## 0.8.0 -- 2026-02-20
+
+### Added
+
+- Alert push evaluation and alert channels (file, webhook, Slack) with `safeai alerts` CLI.
+- Observability module with agent timeline, session trace, and `safeai observe agents|sessions` CLI.
+- Template marketplace with community index, search, install/uninstall, SHA-256 integrity verification.
+- Agent profiles for coding agent policy enforcement (hook adapter).
+- Published to PyPI as `safeai-sdk`.
+- CI workflows: CodeQL analysis, dependency review, secret scanning, vulnerability scanning, governance gate, docs deployment.
+
+### Changed
+
+- Package name changed to `safeai-sdk` for PyPI publishing.
+
+---
+
 ## 0.7.0 -- 2026-02-21
 
 ### Added

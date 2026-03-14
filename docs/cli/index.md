@@ -429,3 +429,121 @@ safeai intelligence integrate --target <FRAMEWORK> [--path .] [--output-dir .saf
 
 !!! warning "Requires AI backend"
     All intelligence commands require `intelligence.enabled: true` in `safeai.yaml` and a configured AI backend. See the [Intelligence Layer guide](../guides/intelligence.md) for setup instructions.
+
+---
+
+## `safeai alerts`
+
+Manage alert channels for enforcement event notifications.
+
+```bash
+safeai alerts <SUBCOMMAND> [FLAGS]
+```
+
+### Subcommands
+
+| Subcommand | Description |
+|------------|-------------|
+| `add` | Register a new alert channel |
+| `list` | List configured alert channels |
+| `test` | Send a test alert to a channel |
+
+### Examples
+
+```bash
+# Add a Slack webhook channel
+safeai alerts add --channel slack --url https://hooks.slack.com/services/...
+
+# Add a file-based alert log
+safeai alerts add --channel file --path /var/log/safeai/alerts.json
+
+# Add a generic webhook
+safeai alerts add --channel webhook --url https://example.com/alerts
+
+# List all configured channels
+safeai alerts list
+
+# Send a test alert
+safeai alerts test --channel slack
+```
+
+---
+
+## `safeai observe`
+
+Observe agent activity and session traces.
+
+```bash
+safeai observe <SUBCOMMAND>
+```
+
+### Subcommands
+
+| Subcommand | Description |
+|------------|-------------|
+| `agents` | Show agent activity timeline |
+| `sessions` | Show session traces |
+
+### Examples
+
+```bash
+# View agent activity across all agents
+safeai observe agents
+
+# View session traces
+safeai observe sessions
+```
+
+---
+
+## `safeai skills`
+
+Manage installable SafeAI skill packages. Skills bundle policies, plugins, deployment scripts, and reference documentation into reusable packages.
+
+```bash
+safeai skills <SUBCOMMAND> [FLAGS]
+```
+
+### Subcommands
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List installed skills |
+| `search` | Search the skills registry |
+| `add` | Install a skill by name |
+| `install` | Install a skill by name (alias for `add`) |
+| `remove` | Uninstall a skill |
+
+### Examples
+
+```bash
+# List all installed skills
+safeai skills list
+
+# Search for skills by keyword
+safeai skills search secret
+safeai skills search gdpr
+
+# Install a skill from the registry
+safeai skills add prompt-injection-shield
+safeai skills add gdpr-policies
+
+# Remove an installed skill
+safeai skills remove prompt-injection-shield
+```
+
+### Available Skills
+
+| Skill | Description |
+|-------|-------------|
+| `safeai` | Core SafeAI reference skill with policies and plugins |
+| `safeai-deploy` | Deployment automation scripts and observability references |
+| `langchain-adapter` | LangChain integration plugin |
+| `prompt-injection-shield` | Prompt injection detection plugin and policy |
+| `secrets-detector` | Extended secrets detection plugin |
+| `finance-policies` | PCI-DSS compliance policy pack |
+| `gdpr-policies` | GDPR compliance policy pack |
+| `healthcare-policies` | HIPAA compliance policy pack |
+
+!!! tip "Node.js installer"
+    Skills can also be installed via the Node.js CLI: `npx safeai add <skill-name>`

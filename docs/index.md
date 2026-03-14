@@ -31,7 +31,7 @@ Secure the full path from prompt to tool call to model output across any provide
 <div class="badges" markdown>
 
 <img src="https://img.shields.io/github/actions/workflow/status/enendufrankc/safeai/quality.yml?label=build&style=flat-square" alt="Build" width="90" height="20" loading="eager">
-<img src="https://img.shields.io/badge/release-v0.7.0-blue?style=flat-square" alt="Release" width="100" height="20" loading="eager">
+<img src="https://img.shields.io/badge/release-v0.8.1-blue?style=flat-square" alt="Release" width="100" height="20" loading="eager">
 <img src="https://img.shields.io/pypi/v/safeai?style=flat-square&label=pypi" alt="PyPI" width="80" height="20" loading="eager">
 <img src="https://img.shields.io/badge/license-Apache--2.0-green?style=flat-square" alt="License" width="120" height="20" loading="eager">
 <img src="https://img.shields.io/github/stars/enendufrankc/safeai?style=flat-square" alt="Stars" width="70" height="20" loading="eager">
@@ -253,6 +253,7 @@ SafeAI has been built in phases, with each phase expanding the runtime while pre
 | Phase 5: Dashboard and Enterprise | Complete | Dashboard APIs/UI, RBAC, tenant isolation, alerting scaffolds, enterprise operations model |
 | Phase 6: Ecosystem and Community | Complete | Plugin system, CrewAI and AutoGen adapters, structured/file scanning, templates, coding-agent hooks, MCP |
 | Phase 7: Intelligence Layer | Complete | BYOM intelligence backend, metadata sanitization, 5 advisory agents, staging workflow, proxy/dashboard intelligence endpoints |
+| Phase 8: Skills and Ecosystem Hardening | Complete | Skills system with 8 packages, alerts CLI, observe CLI, SPDX compliance, JSON schemas, interactive init, PyPI publishing |
 
 ### Current Platform Scope
 
@@ -272,8 +273,6 @@ The project now covers the full agent security stack:
 | Go-based proxy | Lower-latency proxy runtime for high-throughput deployments |
 | Cloud offering | Hosted policy management, audit storage, and dashboard operations |
 | Browser extension | Client-side boundary enforcement for browser-based AI tools |
-| Policy marketplace | Discoverable, shareable policy templates from the community |
-| Real-time alerting | Slack, Teams, webhook, and incident pipeline integrations |
 | Agent observability | Distributed tracing and richer cross-agent runtime visibility |
 
 [Full roadmap :material-arrow-right:](project/roadmap.md){ .architecture-link }

@@ -122,6 +122,29 @@ Added AI advisory agents for configuration and understanding.
 
 ---
 
+## Phase 8: Skills and Ecosystem Hardening :white_check_mark:
+
+**Version: 0.8.x**
+
+Added installable skill packages, compliance tooling, and project-level hardening.
+
+- Skills system with installable packages for policies, plugins, and deployment scripts
+- Skills registry (`skills-registry.json`) with 8 pre-built skills
+- Skills CLI (`safeai skills add|remove|list|search`) and Node.js installer (`npx safeai add`)
+- Pre-built compliance skill packs: GDPR, HIPAA (healthcare), PCI-DSS (finance)
+- Prompt injection shield skill with detection plugin and policy
+- Extended secrets detector skill with plugin-based pattern matching
+- Deployment automation skill with deploy scripts and observability references
+- Alert channels (file, webhook, Slack) with `safeai alerts add|list|test` CLI
+- Agent observability with `safeai observe agents|sessions` CLI
+- Clack-style interactive CLI for `safeai init`
+- JSON schema files for `v1alpha1` resources (policy, tool-contract, agent-identity, memory)
+- SPDX license headers and REUSE 3.3 compliance
+- Documentation UI overhaul (accessibility, dark mode, focus states, reduced motion, safe areas)
+- Published to PyPI as `safeai-sdk` (v0.8.0, v0.8.1)
+
+---
+
 ## Future
 
 The following items are planned but not yet scheduled:
@@ -131,9 +154,6 @@ The following items are planned but not yet scheduled:
 | **Go-based proxy** | High-performance proxy implementation in Go for latency-sensitive deployments |
 | **Cloud offering** | Managed SafeAI service with hosted policy management, audit storage, and dashboard |
 | **Browser extension** | Client-side boundary enforcement for browser-based AI interfaces |
-| **Policy marketplace** | Community-contributed policy template library with discovery and ratings |
-| **Compliance packs** | ~~Pre-built policy sets for SOC 2, HIPAA, GDPR, and PCI DSS~~ (delivered in v0.7.0 via intelligence compliance agent) |
-| **Real-time alerting** | Webhook and Slack/Teams integrations for enforcement event notifications |
 | **Agent observability** | Distributed tracing integration for boundary decisions across multi-agent systems |
 
 !!! info "Want to influence the roadmap?"
