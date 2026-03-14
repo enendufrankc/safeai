@@ -58,6 +58,18 @@ That model keeps policy decisions close to execution, where incidents actually h
 
 Current status: Sprint 0 through Phase 7 complete, with `v0.7.0` release gate passed.
 
+## What SafeAI Is Not
+
+SafeAI focuses on runtime policy enforcement. It does **not**:
+
+- **Replace model safety training** — SafeAI enforces policy at runtime boundaries, not during model training or fine-tuning.
+- **Provide content moderation** — It detects secrets and PII, not toxicity, hate speech, or content quality.
+- **Act as a firewall or WAF** — It operates inside your application, not at the network perimeter.
+- **Make compliance decisions for you** — It provides tools and templates, but you are responsible for your own compliance posture.
+- **Guarantee zero false positives** — Detection is pattern-based. Tune policies for your use case.
+
+If your need falls outside these boundaries, consider [opening a discussion](https://github.com/enendufrankc/safeai/discussions) to see if the community has suggestions.
+
 ## Capability Overview
 
 SafeAI is intentionally broad. This is the complete capability set currently implemented:
@@ -382,6 +394,7 @@ Core project policies:
 - Maintainer policy: [`MAINTAINERS.md`](MAINTAINERS.md)
 - Code of conduct: [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md)
 - Compatibility and semver contract: [`COMPATIBILITY.md`](COMPATIBILITY.md)
+- Roadmap: [`ROADMAP.md`](ROADMAP.md)
 
 ## Local Development
 
