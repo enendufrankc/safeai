@@ -131,12 +131,23 @@ pre,
 
 .md-header__button.md-logo img {
   width: auto;
-  height: 2.4rem;
+  height: 5rem;
   object-fit: contain;
+  position: relative;
+  z-index: 10;
 }
 
 .md-header__button.md-logo {
-  padding: 0.2rem 0;
+  overflow: visible;
+}
+
+.md-header__inner {
+  overflow: visible;
+}
+
+.md-header {
+  overflow: visible;
+  z-index: 4;
 }
 
 .md-tabs {
