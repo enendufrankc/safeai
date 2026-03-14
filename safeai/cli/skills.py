@@ -5,10 +5,8 @@
 from __future__ import annotations
 
 import json
-import os
 import shutil
 import subprocess
-import sys
 import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
@@ -158,7 +156,8 @@ def search_command(
         return
 
     if not skills:
-        console.print(f"\n  No skills found{f' for \"{query}\"' if query else ''}.\n")
+        msg = f' for "{query}"' if query else ""
+        console.print(f"\n  No skills found{msg}.\n")
         return
 
     root = Path(project_path).resolve()
@@ -184,7 +183,7 @@ def search_command(
         )
 
     console.print(table)
-    console.print(f"\n  Install with: [bold]safeai skills add <name>[/bold]\n")
+    console.print("\n  Install with: [bold]safeai skills add <name>[/bold]\n")
 
 
 # ---------------------------------------------------------------------------
