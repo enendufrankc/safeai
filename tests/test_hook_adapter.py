@@ -115,7 +115,7 @@ class HookCommandTests(unittest.TestCase):
 
     def _init_project(self, work: Path) -> Path:
         runner = CliRunner()
-        result = runner.invoke(init_command, ["--path", str(work)])
+        result = runner.invoke(init_command, ["--path", str(work), "--full"])
         self.assertEqual(result.exit_code, 0, msg=result.output)
         return work / "safeai.yaml"
 

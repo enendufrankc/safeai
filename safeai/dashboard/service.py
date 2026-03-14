@@ -18,6 +18,7 @@ from fastapi import HTTPException
 from safeai.api import SafeAI
 from safeai.config.models import DashboardConfig, DashboardUserConfig
 from safeai.core.approval import ApprovalRequest
+from safeai.core.cost import CostTracker
 
 _ROLE_PERMISSIONS: dict[str, set[str]] = {
     "viewer": {
@@ -359,6 +360,7 @@ class DashboardService:
             rules_file=_resolve_optional_path(path, config.alert_rules_file),
             alert_log_file=_resolve_optional_path(path, config.alert_log_file),
         )
+        self._cost_tracker: CostTracker | None = None
 
     def authorize_request(self, headers: Mapping[str, str], *, permission: str) -> DashboardPrincipal:
         if not self.config.enabled:
@@ -620,6 +622,48 @@ class DashboardService:
             raise HTTPException(status_code=400, detail="invalid alert rule payload")
         self._alerts.upsert(parsed)
         return self._alert_rule_to_dict(parsed)
+
+    def set_cost_tracker(self, tracker: CostTracker) -> None:
+        """Attach an external CostTracker for the cost dashboard."""
+        self._cost_tracker = tracker
+
+    def cost_summary(self, principal: DashboardPrincipal) -> dict[str, Any]:
+        """Return aggregated cost data with budget status."""
+        tracker = self._cost_tracker
+        if tracker is None:
+            return {
+                "total_cost": 0.0,
+                "total_input_tokens": 0,
+                "total_output_tokens": 0,
+                "record_count": 0,
+                "by_model": {},
+                "by_provider": {},
+                "by_agent": {},
+                "budgets": [],
+            }
+        summary = tracker.summary()
+        budgets = tracker.check_budget()
+        return {
+            "total_cost": summary.total_cost,
+            "total_input_tokens": summary.total_input_tokens,
+            "total_output_tokens": summary.total_output_tokens,
+            "record_count": summary.record_count,
+            "by_model": summary.by_model,
+            "by_provider": summary.by_provider,
+            "by_agent": summary.by_agent,
+            "budgets": [
+                {
+                    "scope": b.scope,
+                    "scope_id": b.scope_id,
+                    "spent": b.spent,
+                    "limit": b.limit,
+                    "utilization_pct": b.utilization_pct,
+                    "action": b.action,
+                    "exceeded": b.exceeded,
+                }
+                for b in budgets
+            ],
+        }
 
     def evaluate_alerts(self, principal: DashboardPrincipal, *, last: str = "15m") -> dict[str, Any]:
         rows = self.query_events(principal, filters={"last": last, "limit": 20000, "newest_first": True})

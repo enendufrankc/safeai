@@ -19,7 +19,7 @@ from safeai.proxy.server import create_app
 
 class DashboardPhase5Tests(unittest.TestCase):
     def _build_client(self, work: Path) -> TestClient:
-        init_result = CliRunner().invoke(init_command, ["--path", str(work)])
+        init_result = CliRunner().invoke(init_command, ["--path", str(work), "--full"])
         self.assertEqual(init_result.exit_code, 0, msg=init_result.output)
         app = create_app(config_path=str(work / "safeai.yaml"), mode="sidecar")
         return TestClient(app)
@@ -113,7 +113,7 @@ class DashboardPhase5Tests(unittest.TestCase):
     def test_tenant_isolation_and_policy_set_management(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             work = Path(tmp_dir)
-            CliRunner().invoke(init_command, ["--path", str(work)])
+            CliRunner().invoke(init_command, ["--path", str(work), "--full"])
 
             config_path = work / "safeai.yaml"
             config_doc = yaml.safe_load(config_path.read_text(encoding="utf-8"))

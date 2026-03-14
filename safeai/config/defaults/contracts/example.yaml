@@ -1,17 +1,31 @@
+# Tool contract — declares what data a tool accepts, emits, and stores.
+# Contracts are validated at the action boundary before a tool is invoked.
+#
+# Fields:
+#   tool_name          — Must match the tool_name used in intercept_tool_request().
+#   description        — Human-readable purpose of the tool.
+#   accepts.tags       — Data tags this tool is allowed to receive.
+#   accepts.fields     — Parameter names this tool expects.
+#   emits.tags         — Data tags present in the tool's output.
+#   emits.fields       — Field names the tool returns.
+#   stores.fields      — Fields the tool persists (e.g., to a database).
+#   stores.retention   — How long stored data is kept. Format: 30d, 1y, etc.
+#   side_effects       — Describes irreversible or approval-gated behavior.
 version: v1alpha1
+
 contract:
   tool_name: send_email
   description: Sends email notifications to approved recipients.
   accepts:
-    tags: [internal, confidential]
-    fields: [to, subject, body]
+    tags: [internal, confidential]     # Only allow internal/confidential data in.
+    fields: [to, subject, body]        # Expected input parameters.
   emits:
-    tags: [internal]
-    fields: [message_id, status]
+    tags: [internal]                   # Output is tagged as internal.
+    fields: [message_id, status]       # Fields returned to the caller.
   stores:
-    fields: [to, subject, sent_at]
-    retention: 30d
+    fields: [to, subject, sent_at]     # Fields written to persistent storage.
+    retention: 30d                     # Auto-delete stored data after 30 days.
   side_effects:
-    reversible: false
-    requires_approval: true
+    reversible: false                  # Cannot undo a sent email.
+    requires_approval: true            # Human must approve before sending.
     description: External message delivery is irreversible.

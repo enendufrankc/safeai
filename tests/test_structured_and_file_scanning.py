@@ -18,7 +18,7 @@ from safeai.cli.init import init_command
 
 class StructuredAndFileScanningTests(unittest.TestCase):
     def _build_sdk(self, work: Path, *, redact_input_personal: bool = False) -> SafeAI:
-        init_result = CliRunner().invoke(init_command, ["--path", str(work)])
+        init_result = CliRunner().invoke(init_command, ["--path", str(work), "--full"])
         self.assertEqual(init_result.exit_code, 0, msg=init_result.output)
         if redact_input_personal:
             policy_path = work / "policies" / "default.yaml"

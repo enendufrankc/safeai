@@ -1,10 +1,20 @@
+# Tenant policy sets — isolate agents and policies per tenant (team/org/customer).
+# Each tenant gets its own policy files and agent roster.
+# The dashboard uses these to scope audit logs and approval queues.
+#
+# Fields:
+#   tenant_id      — Unique identifier. Sent via the x-safeai-tenant HTTP header.
+#   name           — Human-readable display name.
+#   policy_files   — Policy YAML files active for this tenant.
+#   agents         — Agent IDs that belong to this tenant.
 version: v1alpha1
+
 tenants:
   - tenant_id: default
     name: Default Tenant
     policy_files:
-      - policies/default.yaml
+      - policies/default.yaml         # Policy rules applied to this tenant.
     agents:
-      - default-agent
+      - default-agent                  # Agents assigned to this tenant.
       - planner-agent
       - executor-agent

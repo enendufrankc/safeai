@@ -17,7 +17,7 @@ from safeai.cli.main import cli
 
 class PolicyTemplateTests(unittest.TestCase):
     def _build_sdk(self, work: Path) -> SafeAI:
-        init_result = CliRunner().invoke(init_command, ["--path", str(work)])
+        init_result = CliRunner().invoke(init_command, ["--path", str(work), "--full"])
         self.assertEqual(init_result.exit_code, 0, msg=init_result.output)
         return SafeAI.from_config(work / "safeai.yaml")
 
@@ -36,7 +36,7 @@ class PolicyTemplateTests(unittest.TestCase):
     def test_templates_cli_list_and_show(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             work = Path(tmp_dir)
-            init_result = CliRunner().invoke(init_command, ["--path", str(work)])
+            init_result = CliRunner().invoke(init_command, ["--path", str(work), "--full"])
             self.assertEqual(init_result.exit_code, 0, msg=init_result.output)
             runner = CliRunner()
 

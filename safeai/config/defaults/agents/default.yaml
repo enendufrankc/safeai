@@ -1,6 +1,16 @@
+# Agent identity — declares who an agent is and what it's allowed to do.
+# Used by the identity registry and policy engine at the action boundary.
+#
+# Fields:
+#   agent_id        — Unique identifier passed in scan_input(agent_id=...).
+#   description     — Human-readable purpose of this agent.
+#   tools           — List of tool names this agent is permitted to invoke.
+#   clearance_tags  — Data tags this agent is cleared to access.
+#                     Hierarchical: "personal" grants access to "personal.pii" etc.
 version: v1alpha1
+
 agent:
   agent_id: default-agent
   description: Baseline identity for local development.
-  tools: [send_email]
-  clearance_tags: [internal, personal]
+  tools: [send_email]                  # Tools this agent may call.
+  clearance_tags: [internal, personal] # Data classification levels granted.

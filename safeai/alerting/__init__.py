@@ -9,11 +9,17 @@ from safeai.alerting.channels import (
     WebhookChannel,
     dispatch_alert,
 )
+from safeai.alerting.email import EmailAlertChannel
+from safeai.alerting.opsgenie import OpsgenieAlertChannel
+from safeai.alerting.pagerduty import PagerDutyAlertChannel
 
 __all__ = [
     "AlertChannel",
+    "EmailAlertChannel",
     "FileChannel",
-    "WebhookChannel",
+    "OpsgenieAlertChannel",
+    "PagerDutyAlertChannel",
     "SlackChannel",
+    "WebhookChannel",
     "dispatch_alert",
 ]

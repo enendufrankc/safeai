@@ -1,19 +1,37 @@
+# Memory schema — defines typed fields that agents can store in SafeAI's
+# retention-aware memory. Expired entries are automatically purged.
+#
+# Top-level fields:
+#   name               — Unique schema identifier.
+#   scope              — "session" (per-session) or "global" (shared across sessions).
+#   max_entries         — Maximum number of entries before writes are rejected.
+#   default_retention   — Fallback TTL for fields without explicit retention.
+#                         Format: 10s, 30m, 24h, 7d, 1y.
+#
+# Per-field options:
+#   name       — Field key used in memory_write(key, value).
+#   type       — Supported types: string, integer, number, boolean, list, object.
+#   tag        — Data classification tag applied when this field is read/written.
+#   retention  — How long the value is kept. Overrides default_retention.
+#   encrypted  — If true, value is encrypted at rest (requires secret backend).
+#   required   — If true, field must be present in every write batch.
 version: v1alpha1
+
 memory:
   name: default-session-memory
-  scope: session
-  max_entries: 100
-  default_retention: 24h
+  scope: session                       # Memory is isolated per session.
+  max_entries: 100                     # Reject writes after 100 entries.
+  default_retention: 24h              # Entries expire after 24 hours by default.
   fields:
     - name: user_preference
-      type: string
-      tag: internal
-      retention: 30d
+      type: string                     # Accepts any string value.
+      tag: internal                    # Tagged as internal data.
+      retention: 30d                   # Keep for 30 days.
       encrypted: false
       required: false
     - name: ticket_id
       type: string
-      tag: confidential
-      retention: 7d
+      tag: confidential                # Tagged as confidential — policy rules apply.
+      retention: 7d                    # Keep for 7 days.
       encrypted: false
       required: false

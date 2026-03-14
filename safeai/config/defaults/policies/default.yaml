@@ -1,8 +1,30 @@
+# SafeAI policy rules — evaluated top-down by priority (lowest number = highest priority).
+# First matching rule wins. If nothing matches, the request is blocked (default-deny).
+#
+# Fields per rule:
+#   name       — Unique human-readable identifier.
+#   boundary   — Where the rule applies: input, action, output, or a list like [input, output].
+#   priority   — Evaluation order. Lower numbers are checked first (10 before 1000).
+#   condition  — Optional. Match criteria. Omit to match everything at this boundary.
+#     data_tags  — Tags detected in the payload. Hierarchical: "secret" matches "secret.credential".
+#     agent_id   — List of agent IDs this rule applies to.
+#     tool_name  — List of tool names this rule applies to.
+#   action     — What to do: allow, block, redact, or require_approval.
+#   reason     — Explanation logged in the audit trail.
+#
+# Available data tags (built-in detectors):
+#   secret, secret.credential, secret.token, secret.api_key
+#   personal, personal.pii, personal.phi, personal.financial
+#   dangerous.command
+#
+# You can add custom tags via plugins (see plugins/example.py).
 version: v1alpha1
+
 policies:
+  # ── High-priority security rules ──────────────────────────────────
   - name: block-secrets-everywhere
-    boundary: [input, action, output]
-    priority: 10
+    boundary: [input, action, output]   # Apply at every boundary.
+    priority: 10                        # Checked first.
     condition:
       data_tags: [secret.credential, secret.token, secret]
     action: block
@@ -12,13 +34,16 @@ policies:
     boundary: output
     priority: 20
     condition:
+      # "personal" matches all sub-tags: personal.pii, personal.phi, etc.
       data_tags: [personal, personal.pii, personal.phi, personal.financial]
     action: redact
     reason: Personal data must not appear in outbound responses.
 
+  # ── Default allow rules (catch-all) ───────────────────────────────
+  # These have high priority numbers so they only match when nothing above matched.
   - name: allow-input-by-default
     boundary: input
-    priority: 1000
+    priority: 1000                      # Lowest priority — last resort.
     action: allow
     reason: Allow when no restrictive policy matched.
 

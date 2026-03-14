@@ -1,46 +1,76 @@
+# SafeAI configuration file.
+# Docs: https://github.com/your-org/safeai/blob/main/docs/configuration.md
 version: v1alpha1
+
+# ── File paths ──────────────────────────────────────────────────────
+# Glob patterns pointing to YAML files for each subsystem.
 paths:
+  # Policy rules that control allow/block/redact decisions.
   policy_files:
     - policies/default.yaml
+  # Tool contracts declaring what each tool accepts, emits, and stores.
   contract_files:
     - contracts/*.yaml
+  # Memory schemas defining typed, retention-aware agent memory fields.
   memory_schema_files:
     - schemas/*.yaml
+  # Agent identity files (agent_id, tools, clearance tags).
   identity_files:
     - agents/*.yaml
+
+# ── Audit logging ───────────────────────────────────────────────────
+# Every policy decision is logged here as a JSON-lines file.
 audit:
   file_path: logs/audit.log
+
+# ── Approval workflow ───────────────────────────────────────────────
+# Human-in-the-loop approval gate for high-risk actions.
 approvals:
   file_path: logs/approvals.log
+  # How long an approval request stays valid. Format: 10s, 30m, 2h, 1d.
   default_ttl: 30m
+
+# ── Memory runtime ──────────────────────────────────────────────────
 memory_runtime:
+  # Automatically remove expired memory entries on read/write.
   auto_purge_expired: true
+
+# ── Plugins ─────────────────────────────────────────────────────────
+# Plugins can add custom detectors, framework adapters, and policy templates.
 plugins:
   enabled: true
   plugin_files:
     - plugins/*.py
+
+# ── Dashboard & multi-tenancy ───────────────────────────────────────
+# HTTP dashboard for audit browsing, approvals, and alerts.
 dashboard:
   enabled: true
+  # Role-based access control. Roles: admin, approver, auditor, viewer.
   rbac_enabled: true
+  # HTTP headers used to identify the calling user and tenant.
   user_header: x-safeai-user
   tenant_header: x-safeai-tenant
+  # Tenant-scoped policy sets file.
   tenant_policy_file: tenants/policy-sets.yaml
+  # Alert rules and log output paths.
   alert_rules_file: alerts/default.yaml
   alert_log_file: logs/alerts.log
+  # Pre-configured dashboard users. Add your team members here.
   users:
     - user_id: security-admin
-      role: admin
+      role: admin          # Full access to all tenants and settings.
       tenants:
-        - "*"
+        - "*"              # Wildcard = access to every tenant.
     - user_id: security-approver
-      role: approver
+      role: approver       # Can approve/deny requests for assigned tenants.
       tenants:
         - default
     - user_id: security-auditor
-      role: auditor
+      role: auditor        # Read-only access to audit logs and events.
       tenants:
         - default
     - user_id: security-viewer
-      role: viewer
+      role: viewer         # Read-only access to dashboard summaries.
       tenants:
         - default

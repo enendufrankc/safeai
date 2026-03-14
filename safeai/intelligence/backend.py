@@ -108,8 +108,17 @@ class OpenAICompatibleBackend:
                     err_msg = detail.get("error", {}).get("message", "") or resp.text
                 except Exception:
                     err_msg = resp.text
+                status = resp.status_code
+                hints = {
+                    401: "Fix: Verify your API key is set and valid for this provider.",
+                    403: "Fix: Your API key lacks permission for this model or endpoint.",
+                    404: f"Fix: Check that model '{self._model}' exists on this endpoint.",
+                    429: "Fix: Rate limit hit. Reduce request frequency or upgrade your plan.",
+                }
+                hint = hints.get(status, "Fix: Check service health and provider documentation.")
                 raise RuntimeError(
-                    f"HTTP {resp.status_code} from {self._base_url}: {err_msg}"
+                    f"AI backend error (HTTP {status}) from {self._base_url}: {err_msg}\n"
+                    f"{hint}"
                 )
         data = resp.json()
         choices = data.get("choices", [])

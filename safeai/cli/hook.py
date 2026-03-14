@@ -185,8 +185,26 @@ def hook_command(config: str, event: str | None, agent_id: str | None, profile: 
     # Load SafeAI
     try:
         safeai = SafeAI.from_config(config)
+    except FileNotFoundError:
+        click.echo(
+            f"ERROR: Config file not found: {config}\n"
+            f"Fix: Run 'safeai init' to create default config, or use --config /path/to/safeai.yaml",
+            err=True,
+        )
+        sys.exit(2)
+    except ValueError as exc:
+        click.echo(
+            f"ERROR: Config validation failed: {exc}\n"
+            f"Fix: Check YAML syntax in {config}",
+            err=True,
+        )
+        sys.exit(2)
     except Exception as exc:
-        click.echo(f"ERROR: Failed to load SafeAI config: {exc}", err=True)
+        click.echo(
+            f"ERROR: Failed to load SafeAI config: {exc}\n"
+            f"Fix: Run 'safeai init' to regenerate config or check {config} for errors",
+            err=True,
+        )
         sys.exit(2)
 
     # Dispatch

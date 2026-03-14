@@ -1,107 +1,49 @@
-<p align="center">
-  <img src="https://raw.githubusercontent.com/enendufrankc/safeai/main/docs/assets/banner.png" alt="SafeAI Banner" width="100%" />
-</p>
+<!-- prettier-ignore -->
+<div align="center">
 
-<h3 align="center">SECURE. INTELLIGENT. TRUSTED.</h3>
+<img src="https://raw.githubusercontent.com/enendufrankc/safeai/main/docs/assets/banner.png" alt="SafeAI Banner" width="100%" />
 
-<p align="center">
-  <a href="https://github.com/enendufrankc/safeai/actions/workflows/quality.yml"><img src="https://img.shields.io/github/actions/workflow/status/enendufrankc/safeai/quality.yml?label=build&style=flat-square" alt="Build"></a>
-  <a href="https://github.com/enendufrankc/safeai/releases"><img src="https://img.shields.io/badge/release-v0.8.2-blue?style=flat-square" alt="Release"></a>
-  <a href="https://pypi.org/project/safeai-sdk/"><img src="https://img.shields.io/pypi/v/safeai-sdk?style=flat-square&label=pypi" alt="PyPI"></a>
-  <a href="https://opensource.org/licenses/Apache-2.0"><img src="https://img.shields.io/badge/license-Apache--2.0-green?style=flat-square" alt="License"></a>
-  <a href="https://github.com/enendufrankc/safeai/stargazers"><img src="https://img.shields.io/github/stars/enendufrankc/safeai?style=flat-square" alt="Stars"></a>
-</p>
+# SafeAI
 
-<p align="center">
-  <b>The runtime security layer for AI agents.</b><br>
-  Block secrets. Redact PII. Enforce policies. Control tool calls. Require approvals.<br>
-  Works with any model stack, framework, and deployment style.
-</p>
+*Runtime security layer for AI agents*
 
----
+[![Build Status](https://img.shields.io/github/actions/workflow/status/enendufrankc/safeai/quality.yml?style=flat-square&label=Build)](https://github.com/enendufrankc/safeai/actions)
+[![PyPI](https://img.shields.io/pypi/v/safeai-sdk?style=flat-square)](https://pypi.org/project/safeai-sdk/)
+![Python](https://img.shields.io/badge/Python->=3.10-3776ab?style=flat-square&logo=python&logoColor=white)
+[![Documentation](https://img.shields.io/badge/Documentation-00a3ee?style=flat-square)](https://enendufrankc.github.io/safeai/)
+[![License](https://img.shields.io/badge/License-Apache--2.0-green?style=flat-square)](LICENSE)
 
-## Table of Contents
+[Overview](#overview) · [Quick Start](#quick-start) · [Features](#features) · [Integrations](#integrations) · [Documentation](#documentation)
 
-- [What SafeAI Is](#what-safeai-is)
-- [Capability Overview](#capability-overview)
-- [Install](#install)
-- [Quick Start (SDK)](#quick-start-sdk)
-- [Scaffold a Full Config Project](#scaffold-a-full-config-project)
-- [Run as a Proxy API](#run-as-a-proxy-api)
-- [CLI Commands](#cli-commands)
-- [Framework and Agent Integrations](#framework-and-agent-integrations)
-- [Plugins and Policy Templates](#plugins-and-policy-templates)
-- [Dashboard and Enterprise Operations](#dashboard-and-enterprise-operations)
-- [Documentation Map](#documentation-map)
-- [Contributing, Security, and Governance](#contributing-security-and-governance)
-- [Local Development](#local-development)
-- [License](#license)
+</div>
 
-## What SafeAI Is
+Block secrets. Redact PII. Enforce policies. Control tool calls. Require approvals. Works with any model stack, framework, and deployment style.
 
-SafeAI enforces policy at three runtime boundaries:
+## Overview
 
-- `input`: before user or agent data reaches a model.
-- `action`: before and after tool execution, and during agent-to-agent messaging.
-- `output`: before model output is returned or forwarded.
-
-That model keeps policy decisions close to execution, where incidents actually happen.
+SafeAI enforces security policies at three runtime boundaries, keeping decisions close to execution where incidents actually happen:
 
 ```
-                    +----------------------------------+
- User / Agent  ---> |  INPUT BOUNDARY   (scan_input)  | ---> AI Provider
-                    |  ACTION BOUNDARY  (intercept)   |      (OpenAI, Gemini,
- AI Provider   <--- |  OUTPUT BOUNDARY  (guard_output)| <---  Claude, etc.)
-                    +----------------------------------+
-                              SafeAI Runtime
+                    ┌──────────────────────────────────┐
+ User / Agent  ───▶ │  INPUT BOUNDARY   (scan_input)   │ ───▶ AI Provider
+                    │  ACTION BOUNDARY  (intercept)    │      (OpenAI, Gemini,
+ AI Provider   ◀─── │  OUTPUT BOUNDARY  (guard_output) │ ◀───  Claude, etc.)
+                    └──────────────────────────────────┘
+                               SafeAI Runtime
 ```
 
-Current status: Phases 1–7 complete, with the current release at `v0.8.2`.
+- **Input** — scans prompts and payloads before they reach the model
+- **Action** — intercepts tool calls and agent-to-agent messages
+- **Output** — guards model responses before they are returned
 
-## What SafeAI Is Not
+Every decision is logged to an immutable audit trail.
 
-SafeAI focuses on runtime policy enforcement. It does **not**:
+> [!NOTE]
+> SafeAI focuses on runtime policy enforcement. It does not replace model safety training, provide content moderation, or act as a network firewall. See the full [documentation](https://enendufrankc.github.io/safeai/) for details.
 
-- **Replace model safety training** — SafeAI enforces policy at runtime boundaries, not during model training or fine-tuning.
-- **Provide content moderation** — It detects secrets and PII, not toxicity, hate speech, or content quality.
-- **Act as a firewall or WAF** — It operates inside your application, not at the network perimeter.
-- **Make compliance decisions for you** — It provides tools and templates, but you are responsible for your own compliance posture.
-- **Guarantee zero false positives** — Detection is pattern-based. Tune policies for your use case.
+## Quick Start
 
-If your need falls outside these boundaries, consider [opening a discussion](https://github.com/enendufrankc/safeai/discussions) to see if the community has suggestions.
-
-## Capability Overview
-
-SafeAI is intentionally broad. This is the complete capability set currently implemented:
-
-| Area | Capabilities |
-|---|---|
-| Detection and classification | Built-in detectors for secrets and personal data (`email`, `phone`, `ssn`, `credit_card`, `api_key`) with hierarchical tags |
-| Policy engine | Priority-based first-match rules, YAML policies, schema validation, hot reload, fallback output templates |
-| Input and output controls | Prompt scanning (`scan_input`), response guarding (`guard_output`), redaction/block/allow enforcement |
-| Structured and file scanning | Nested payload scanning (`scan_structured_input`) and file scanning (`scan_file_input`) for JSON and text |
-| Tool boundary enforcement | Request contract checks, response filtering, undeclared tool denial, per-field stripping |
-| Agent identity | Agent registry, tool binding, clearance-tag enforcement |
-| Agent messaging | Source/destination-aware, policy-gated agent-to-agent message interception |
-| Approvals | `require_approval` runtime gate with persistent queue and explicit approve/deny flow |
-| Secrets access | Capability-token TTL/scope/session binding, secret manager abstraction, Env/Vault/AWS backends |
-| Memory security | Schema-enforced memory controller, encrypted handle storage, retention and purge workflow |
-| Auditability | Append-only JSON logs, rich query filters (boundary/action/agent/tool/tag/session/time/metadata), context hashes and event IDs |
-| Proxy runtime | Sidecar and gateway modes, upstream forwarding, health endpoint, policy reload endpoint |
-| Integrations | LangChain, CrewAI, AutoGen, Claude ADK, Google ADK, coding-agent hooks, MCP server |
-| Extensibility | Plugin loader for detectors/adapters/templates, built-in policy template catalog (`finance`, `healthcare`, `support`) |
-| Skills system | Installable skill packages for policies, plugins, and deployment scripts. Pre-built skills for GDPR, HIPAA, PCI-DSS, prompt injection, secret detection, and deployment automation |
-| Operations UI | Web dashboard (`/dashboard`) for incidents, approvals, compliance summaries, tenant/RBAC controls, alerts |
-| Alerting and observability | Alert channels (file, webhook, Slack), agent timeline, session trace, Prometheus-style metrics (`/v1/metrics`) |
-| Intelligence layer | 5 AI advisory agents: auto-config, policy recommender, incident explainer, compliance mapper, integration generator. BYOM (Bring Your Own Model), metadata-only, human-approved staging |
-
-## Install
-
-```bash
-uv pip install safeai-sdk
-```
-
-Or with pip:
+### Install
 
 ```bash
 pip install safeai-sdk
@@ -110,180 +52,128 @@ pip install safeai-sdk
 Optional extras:
 
 ```bash
-uv pip install "safeai-sdk[vault]"   # HashiCorp Vault backend
-uv pip install "safeai-sdk[aws]"     # AWS Secrets Manager backend
-uv pip install "safeai-sdk[mcp]"     # MCP server support
-uv pip install "safeai-sdk[all]"     # Vault + AWS + MCP
-uv pip install "safeai-sdk[dev]"     # local development tooling
+pip install "safeai-sdk[vault]"   # HashiCorp Vault backend
+pip install "safeai-sdk[aws]"     # AWS Secrets Manager backend
+pip install "safeai-sdk[mcp]"     # MCP server support
+pip install "safeai-sdk[all]"     # Everything
 ```
 
-## Quick Start (SDK)
-
-For fast adoption with no config files:
+### Use the SDK
 
 ```python
 from safeai import SafeAI
 
 ai = SafeAI.quickstart()
-```
 
-Then enforce both ends of the model call:
-
-```python
-# Input boundary
+# Input boundary — detect and block secrets
 scan = ai.scan_input("Summarize this: token=sk-ABCDEF1234567890ABCDEF")
-print(scan.decision.action, scan.decision.reason)
+print(scan.decision.action)  # "block"
 
-# Output boundary
-guard = ai.guard_output("Contact alice@example.com")
-print(guard.safe_output)
+# Output boundary — redact PII from responses
+guard = ai.guard_output("Contact alice@example.com for details.")
+print(guard.safe_output)     # "Contact [REDACTED] for details."
 ```
 
-Structured payload example:
+### Scaffold a project
 
-```python
-payload = {"user": {"email": "alice@example.com"}, "note": "hello world"}
-result = ai.scan_structured_input(payload, agent_id="default-agent")
-print(result.decision.action)
-print(result.filtered)
-```
-
-## Scaffold a Full Config Project
-
-When you need full policy and runtime control:
+For full policy and runtime control, scaffold a config directory:
 
 ```bash
 safeai init --path .
 ```
 
-This scaffolds:
-
-- `safeai.yaml`
-- `policies/default.yaml`
-- `contracts/example.yaml`
-- `schemas/memory.yaml`
-- `agents/default.yaml`
-- `plugins/example.py`
-- `tenants/policy-sets.yaml`
-- `alerts/default.yaml`
-
-Use config mode via:
+This generates `safeai.yaml`, default policies, contracts, agent identities, plugins, and alert rules. Then load from config:
 
 ```python
-from safeai import SafeAI
-
 ai = SafeAI.from_config("safeai.yaml")
 ```
 
-## Run as a Proxy API
-
-Start the proxy:
+### Run as a proxy
 
 ```bash
 safeai serve --mode sidecar --host 127.0.0.1 --port 8910 --config safeai.yaml
 ```
 
-Health check:
-
 ```bash
+# Health check
 curl http://127.0.0.1:8910/v1/health
-```
 
-Hello world scan:
-
-```bash
+# Scan input
 curl -s -X POST http://127.0.0.1:8910/v1/scan/input \
   -H "content-type: application/json" \
   -d '{"text":"hello world","agent_id":"default-agent"}'
 ```
 
-Core HTTP endpoints:
+## Features
 
-- `GET /v1/health`
-- `GET /v1/metrics`
-- `POST /v1/scan/input`
-- `POST /v1/scan/structured`
-- `POST /v1/scan/file`
-- `POST /v1/guard/output`
-- `POST /v1/intercept/tool`
-- `POST /v1/intercept/agent-message`
-- `POST /v1/memory/write`
-- `POST /v1/memory/read`
-- `POST /v1/memory/resolve-handle`
-- `POST /v1/memory/purge-expired`
-- `POST /v1/audit/query`
-- `POST /v1/policies/reload`
-- `GET /v1/plugins`
-- `GET /v1/policies/templates`
-- `GET /v1/policies/templates/{template_name}`
-- `POST /v1/proxy/forward`
-- `GET /v1/intelligence/status`
-- `POST /v1/intelligence/explain`
-- `POST /v1/intelligence/recommend`
-- `POST /v1/intelligence/compliance`
-- `GET /dashboard`
+| Area | What it does |
+|---|---|
+| **Detection** | Built-in detectors for secrets and PII (`email`, `phone`, `ssn`, `credit_card`, `api_key`) with hierarchical tags |
+| **Policy engine** | Priority-based first-match YAML rules with schema validation and hot reload |
+| **Input / Output controls** | Prompt scanning, response guarding, redaction, blocking, and allow-listing |
+| **Tool contracts** | Request validation, response filtering, undeclared tool denial, per-field stripping |
+| **Agent identity** | Agent registry with tool bindings and clearance-tag enforcement |
+| **Approvals** | Human-in-the-loop `require_approval` gate with persistent queue and approve/deny flow |
+| **Secrets management** | Capability-token scoping with TTL/session binding; Env, Vault, and AWS backends |
+| **Memory security** | Schema-enforced encrypted storage with retention and auto-purge |
+| **Audit trail** | Append-only JSON logs with rich filters (boundary, agent, tool, session, time) |
+| **Proxy runtime** | Sidecar and gateway modes with upstream forwarding and policy reload |
+| **Skills system** | Installable packages for GDPR, HIPAA, PCI-DSS, prompt injection, and more |
+| **Dashboard** | Web UI for incidents, approvals, compliance summaries, and tenant/RBAC controls |
+| **Alerting** | File, webhook, and Slack channels with Prometheus-style metrics at `/v1/metrics` |
+| **Intelligence layer** | AI advisory agents for auto-config, policy recommendations, incident explanation, and compliance mapping |
 
-## CLI Commands
+<details>
+<summary><strong>Detailed request flow</strong></summary>
 
-Daily commands you will actually use:
-
-```bash
-safeai init --path .
-safeai validate --config safeai.yaml
-safeai scan --boundary input --input "hello world"
-safeai logs --tail 20 --json-output
-safeai serve --mode sidecar --port 8910
-
-safeai approvals list --status pending
-safeai approvals approve <request_id> --approver security-lead
-safeai approvals deny <request_id> --approver security-lead --note "policy mismatch"
-
-safeai templates list
-safeai templates show --name healthcare --format yaml
-
-safeai setup claude-code --config safeai.yaml --path .
-safeai setup cursor --config safeai.yaml --path .
-safeai setup generic --config safeai.yaml
-
-safeai hook --config safeai.yaml
-safeai mcp --config safeai.yaml
-
-safeai intelligence auto-config --path . --output-dir .safeai-generated
-safeai intelligence recommend --since 7d
-safeai intelligence explain <event_id>
-safeai intelligence compliance --framework hipaa
-safeai intelligence integrate --target langchain --path .
-
-safeai alerts add --channel slack --url https://hooks.slack.com/...
-safeai alerts list
-safeai alerts test --channel slack
-
-safeai observe agents
-safeai observe sessions
-
-safeai skills list
-safeai skills search secret
-safeai skills add prompt-injection-shield
-safeai skills remove prompt-injection-shield
+```
+  ┌─────────────┐
+  │  Your App   │
+  │  or Agent   │
+  └──────┬──────┘
+         │
+         ▼
+  ┌──────────────────────────────────────────────────────────┐
+  │                    INPUT BOUNDARY                        │
+  │  scan_input() / scan_structured_input() / scan_file()   │
+  │                                                          │
+  │  Detectors ──▶ Policy Engine ──▶ Decision                │
+  │  + Contracts · Identities · Approvals · Secrets          │
+  └──────────────────────────┬───────────────────────────────┘
+                             │
+                             ▼
+  ┌──────────────────────────────────────────────────────────┐
+  │                   ACTION BOUNDARY                        │
+  │  intercept_tool_request() / intercept_agent_message()    │
+  │  + Capability tokens (scoped permissions per tool call)  │
+  └──────────────────────────┬───────────────────────────────┘
+                             │
+                             ▼
+                      [ LLM / Tool ]
+                             │
+                             ▼
+  ┌──────────────────────────────────────────────────────────┐
+  │                   OUTPUT BOUNDARY                        │
+  │  guard_output() / intercept_tool_response()              │
+  │  + Fallback templates (safe replacement text)            │
+  └──────────────────────────┬───────────────────────────────┘
+                             │
+                             ▼
+                       Audit Trail
 ```
 
-## Framework and Agent Integrations
+</details>
 
-Built-in adapters:
+## Integrations
 
-- LangChain
-- CrewAI
-- AutoGen
-- Claude ADK
-- Google ADK
+SafeAI provides built-in adapters for popular AI frameworks and coding agents:
 
-Coding-agent integration:
-
-- universal hook adapter (`safeai hook`)
-- installer commands for Claude Code and Cursor (`safeai setup ...`)
-- MCP server (`safeai mcp`) for MCP-compatible clients
-
-Quick adapter example:
+| Type | Supported |
+|---|---|
+| **Frameworks** | LangChain, CrewAI, AutoGen, Claude ADK, Google ADK |
+| **Coding agents** | Claude Code, Cursor (via `safeai setup`) |
+| **IDE / MCP** | Any MCP-compatible client (via `safeai mcp`) |
+| **Proxy** | Sidecar and gateway modes for any HTTP-based stack |
 
 ```python
 from safeai import SafeAI
@@ -293,144 +183,64 @@ ai = SafeAI.from_config("safeai.yaml")
 safe_tool = wrap_langchain_tool(ai, my_tool, agent_id="default-agent")
 ```
 
-## Plugins and Policy Templates
+## CLI Reference
 
-Phase 6 added extensibility as first-class behavior.
+```bash
+safeai init --path .                          # Scaffold config and policies
+safeai validate --config safeai.yaml          # Validate configuration
+safeai scan --boundary input --input "text"   # Scan from the command line
+safeai serve --mode sidecar --port 8910       # Start the proxy server
+safeai setup claude-code --config safeai.yaml # Install into Claude Code
+safeai setup cursor --config safeai.yaml      # Install into Cursor
+safeai mcp --config safeai.yaml               # Start MCP server
+safeai hook --config safeai.yaml              # Universal hook adapter
 
-Plugin model:
+safeai approvals list --status pending        # Manage approvals
+safeai templates list                         # Browse policy templates
+safeai intelligence auto-config --path .      # AI-powered auto-configuration
+safeai skills add prompt-injection-shield     # Install a skill package
+safeai observe agents                         # Agent observability
+safeai alerts add --channel slack --url ...   # Configure alerting
+```
 
-- load plugin modules from `plugins/*.py` (configurable in `safeai.yaml`)
-- extend detector patterns
-- register adapters
-- contribute policy templates
+> [!TIP]
+> Run `safeai --help` or see the full [CLI reference](https://enendufrankc.github.io/safeai/cli/) for all commands and options.
 
-Template catalog:
+## Plugins
 
-- built-in packs: `finance`, `healthcare`, `support`
-- list with `safeai templates list`
-- inspect with `safeai templates show --name <template>`
-- proxy discovery endpoints via `/v1/policies/templates*`
-
-Minimal plugin shape:
+Extend SafeAI with custom detectors, adapters, and policy templates by dropping modules into `plugins/`:
 
 ```python
 def safeai_detectors():
-    return [
-        (r"my-custom-pattern", "custom.tag", "custom_detector"),
-    ]
-
-def safeai_adapters():
-    return {
-        "my-adapter": lambda safeai: object(),
-    }
+    return [(r"my-pattern", "custom.tag", "my_detector")]
 
 def safeai_policy_templates():
-    return [
-        {
-            "name": "my-template",
-            "template": {"version": "v1alpha1", "policies": []},
-        }
-    ]
+    return [{"name": "my-template", "template": {"version": "v1alpha1", "policies": []}}]
 ```
 
-## Dashboard and Enterprise Operations
+Built-in template packs: `finance`, `healthcare`, `support`.
 
-SafeAI includes a dashboard surface for security operations:
+## Documentation
 
-- incidents and policy events
-- approval queue workflow
-- compliance report summaries
-- tenant-scoped policy sets
-- RBAC checks
-- alert rule evaluation and alert logs
-
-Run the proxy and open `/dashboard` in your browser.
-
-## Documentation Map
-
-Start here:
-
-- Docs home: [`docs/index.md`](docs/index.md)
-- Install: [`docs/getting-started/installation.md`](docs/getting-started/installation.md)
-- Quickstart: [`docs/getting-started/quickstart.md`](docs/getting-started/quickstart.md)
-- Configuration: [`docs/getting-started/configuration.md`](docs/getting-started/configuration.md)
-
-Guides:
-
-- Policy engine: [`docs/guides/policy-engine.md`](docs/guides/policy-engine.md)
-- Tool contracts: [`docs/guides/tool-contracts.md`](docs/guides/tool-contracts.md)
-- Agent identity: [`docs/guides/agent-identity.md`](docs/guides/agent-identity.md)
-- Structured scanning: [`docs/guides/structured-scanning.md`](docs/guides/structured-scanning.md)
-- Capability tokens: [`docs/guides/capability-tokens.md`](docs/guides/capability-tokens.md)
-- Audit logging: [`docs/guides/audit-logging.md`](docs/guides/audit-logging.md)
-
-Integrations:
-
-- Integrations overview: [`docs/integrations/index.md`](docs/integrations/index.md)
-- LangChain: [`docs/integrations/langchain.md`](docs/integrations/langchain.md)
-- CrewAI: [`docs/integrations/crewai.md`](docs/integrations/crewai.md)
-- AutoGen: [`docs/integrations/autogen.md`](docs/integrations/autogen.md)
-- Claude ADK: [`docs/integrations/claude-adk.md`](docs/integrations/claude-adk.md)
-- Google ADK: [`docs/integrations/google-adk.md`](docs/integrations/google-adk.md)
-- Coding agents: [`docs/integrations/coding-agents.md`](docs/integrations/coding-agents.md)
-- Proxy/sidecar: [`docs/integrations/proxy-sidecar.md`](docs/integrations/proxy-sidecar.md)
-- Plugins: [`docs/integrations/plugins.md`](docs/integrations/plugins.md)
-
-Reference:
-
-- CLI reference: [`docs/cli/index.md`](docs/cli/index.md)
-- API reference: [`docs/reference/safeai.md`](docs/reference/safeai.md)
-- Changelog: [`docs/changelog.md`](docs/changelog.md)
-
-Project and planning:
-
-- Architecture: [`docs/project/architecture.md`](docs/project/architecture.md)
-- Roadmap: [`docs/project/roadmap.md`](docs/project/roadmap.md)
-- Security: [`docs/project/security.md`](docs/project/security.md)
-- Governance: [`docs/project/governance.md`](docs/project/governance.md)
-- Compatibility: [`docs/project/compatibility.md`](docs/project/compatibility.md)
-- Intelligence layer: [`docs/guides/intelligence.md`](docs/guides/intelligence.md)
-- Delivery tracker: [`docs/project/roadmap.md`](docs/project/roadmap.md)
-
-Notebooks:
-
-- Notebook index: [`docs/notebooks/index.md`](docs/notebooks/index.md)
-- Raw notebooks: [`notebook/`](notebook/)
-
-## Contributing, Security, and Governance
-
-Core project policies:
-
-- Contributing guide: [`CONTRIBUTING.md`](CONTRIBUTING.md)
-- Security policy: [`SECURITY.md`](SECURITY.md)
-- Governance model: [`GOVERNANCE.md`](GOVERNANCE.md)
-- Maintainer policy: [`MAINTAINERS.md`](MAINTAINERS.md)
-- Code of conduct: [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md)
-- Compatibility and semver contract: [`COMPATIBILITY.md`](COMPATIBILITY.md)
-- Roadmap: [`ROADMAP.md`](ROADMAP.md)
+| Resource | Link |
+|---|---|
+| Getting started | [Installation](https://enendufrankc.github.io/safeai/getting-started/installation/) · [Quickstart](https://enendufrankc.github.io/safeai/getting-started/quickstart/) · [Configuration](https://enendufrankc.github.io/safeai/getting-started/configuration/) |
+| Guides | [Policy Engine](https://enendufrankc.github.io/safeai/guides/policy-engine/) · [Tool Contracts](https://enendufrankc.github.io/safeai/guides/tool-contracts/) · [Agent Identity](https://enendufrankc.github.io/safeai/guides/agent-identity/) · [Audit Logging](https://enendufrankc.github.io/safeai/guides/audit-logging/) |
+| Integrations | [LangChain](https://enendufrankc.github.io/safeai/integrations/langchain/) · [CrewAI](https://enendufrankc.github.io/safeai/integrations/crewai/) · [AutoGen](https://enendufrankc.github.io/safeai/integrations/autogen/) · [Coding Agents](https://enendufrankc.github.io/safeai/integrations/coding-agents/) |
+| Reference | [CLI](https://enendufrankc.github.io/safeai/cli/) · [API](https://enendufrankc.github.io/safeai/reference/safeai/) · [Architecture](https://enendufrankc.github.io/safeai/project/architecture/) |
 
 ## Local Development
 
 ```bash
 git clone https://github.com/enendufrankc/safeai.git
 cd safeai
-uv sync --extra dev --extra all
-```
-
-Or with pip:
-
-```bash
 pip install -e ".[dev,all]"
 ```
 
-Quality gates used in CI:
+Run the quality gates:
 
 ```bash
-uv run ruff check safeai tests
-uv run mypy safeai
-uv run python -m pytest tests/ -v
+ruff check safeai tests        # Lint
+mypy safeai                    # Type check
+python -m pytest tests/ -v     # Test
 ```
-
-## License
-
-SafeAI is licensed under [Apache 2.0](https://opensource.org/licenses/Apache-2.0).

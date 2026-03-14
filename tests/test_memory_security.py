@@ -68,7 +68,9 @@ class MemorySecurityTests(unittest.TestCase):
     def test_encrypted_memory_field_returns_handle_and_resolves_for_owner(self) -> None:
         memory = MemoryController.from_documents(_memory_docs(tag="internal", encrypted=True))
         self.assertTrue(memory.write("secret_value", "abc123", agent_id="agent-1"))
-        handle = memory.read("secret_value", agent_id="agent-1")
+        result = memory.read("secret_value", agent_id="agent-1")
+        self.assertTrue(result.found)
+        handle = result.value
         self.assertIsInstance(handle, str)
         self.assertTrue(str(handle).startswith("hdl_"))
         self.assertEqual(memory.resolve_handle(str(handle), agent_id="agent-1"), "abc123")
@@ -78,7 +80,8 @@ class MemorySecurityTests(unittest.TestCase):
     def test_expired_encrypted_entries_are_removed_from_handle_store(self) -> None:
         memory = MemoryController.from_documents(_memory_docs(tag="internal", encrypted=True, retention="1s"))
         self.assertTrue(memory.write("secret_value", "abc123", agent_id="agent-1"))
-        handle = str(memory.read("secret_value", agent_id="agent-1"))
+        result = memory.read("secret_value", agent_id="agent-1")
+        handle = str(result.value)
 
         entry = memory._data["agent-1"]["secret_value"]  # noqa: SLF001 - intentional test visibility.
         memory._data["agent-1"]["secret_value"] = entry.__class__(

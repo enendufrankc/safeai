@@ -1,11 +1,25 @@
+# Alert rules — trigger notifications when audit events match a pattern.
+#
+# Fields:
+#   rule_id    — Unique identifier for this alert rule.
+#   name       — Human-readable description shown in notifications.
+#   filters    — Match criteria against audit events.
+#     actions    — Policy actions to watch: block, redact, require_approval.
+#     agents     — (optional) Agent IDs to watch.
+#     boundaries — (optional) Boundaries to watch: input, action, output.
+#   threshold  — Number of matching events required to fire the alert.
+#   window     — Time window for threshold counting. Format: 5m, 1h, 1d.
+#   channels   — Where to send alerts. Available: file, webhook, slack.
+#                 Configure webhook/slack URLs in safeai.yaml under dashboard.alerts.
 version: v1alpha1
+
 alert_rules:
   - rule_id: high-block-rate
     name: High blocked decision volume
     filters:
       actions:
-        - block
-    threshold: 5
-    window: 15m
+        - block                        # Fire when "block" decisions accumulate.
+    threshold: 5                       # Alert after 5 blocked events…
+    window: 15m                        # …within a 15-minute window.
     channels:
-      - file
+      - file                           # Write alert to alert log file.

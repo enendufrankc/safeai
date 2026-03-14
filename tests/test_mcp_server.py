@@ -33,7 +33,7 @@ class HandleToolTests(unittest.TestCase):
 
     def _build_sdk(self, work: Path) -> SafeAI:
         runner = CliRunner()
-        result = runner.invoke(init_command, ["--path", str(work)])
+        result = runner.invoke(init_command, ["--path", str(work), "--full"])
         assert result.exit_code == 0, result.output
         return SafeAI.from_config(work / "safeai.yaml")
 
@@ -110,7 +110,7 @@ class McpImportTests(unittest.TestCase):
 
     def _build_sdk(self, work: Path) -> SafeAI:
         runner = CliRunner()
-        result = runner.invoke(init_command, ["--path", str(work)])
+        result = runner.invoke(init_command, ["--path", str(work), "--full"])
         assert result.exit_code == 0, result.output
         return SafeAI.from_config(work / "safeai.yaml")
 

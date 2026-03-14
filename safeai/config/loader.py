@@ -36,7 +36,13 @@ def load_yaml_file(path: Path) -> dict[str, Any]:
     with path.open("r", encoding="utf-8") as fh:
         loaded = yaml.safe_load(fh) or {}
     if not isinstance(loaded, dict):
-        raise ValueError(f"Expected object at top-level in {path}")
+        actual_type = type(loaded).__name__
+        raise ValueError(
+            f"Config file {path} has invalid top-level structure.\n"
+            f"Expected: YAML mapping (key: value pairs)\n"
+            f"Found: {actual_type}\n"
+            f"Fix: Ensure your YAML file starts with key-value pairs, not a list or scalar."
+        )
     return loaded
 
 
@@ -319,7 +325,10 @@ def _format_json_path(path_parts: Iterable[Any]) -> str:
 def _schema_validator(schema_name: str, version: str) -> Draft202012Validator:
     schema_path = _schema_path(schema_name, version)
     if not schema_path.exists():
-        raise FileNotFoundError(f"Schema file not found for '{schema_name}' version '{version}': {schema_path}")
+        raise FileNotFoundError(
+            f"Schema file '{schema_name}.schema.json' (v{version}) not found at: {schema_path}\n"
+            f"Fix: Ensure SafeAI is properly installed. Try: pip install -U safeai-sdk"
+        )
 
     with schema_path.open("r", encoding="utf-8") as fh:
         schema = json.load(fh)

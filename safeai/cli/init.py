@@ -13,7 +13,12 @@ import yaml  # type: ignore[import-untyped]
 
 from safeai.cli import ui
 
-DEFAULT_FILES = {
+MINIMAL_FILES = {
+    Path("safeai.yaml"): Path("config/defaults/safeai-minimal.yaml"),
+    Path("policies/default.yaml"): Path("config/defaults/policies/default.yaml"),
+}
+
+FULL_FILES = {
     Path("safeai.yaml"): Path("config/defaults/safeai.yaml"),
     Path("policies/default.yaml"): Path("config/defaults/policies/default.yaml"),
     Path("contracts/example.yaml"): Path("config/defaults/contracts/example.yaml"),
@@ -23,6 +28,9 @@ DEFAULT_FILES = {
     Path("tenants/policy-sets.yaml"): Path("config/defaults/tenants/policy-sets.yaml"),
     Path("alerts/default.yaml"): Path("config/defaults/alerts/default.yaml"),
 }
+
+# Backward-compatible alias used by _scaffold_files when no mode is specified.
+DEFAULT_FILES = FULL_FILES
 
 PROVIDERS: dict[str, dict[str, str | None]] = {
     "Ollama (local, free — no API key needed)": {
@@ -109,12 +117,13 @@ def _get_version() -> str:
 
 
 def _scaffold_files(
-    base: Path, package_root: Path
+    base: Path, package_root: Path, file_map: dict[Path, Path] | None = None
 ) -> tuple[list[Path], list[Path]]:
     """Copy default config files into the project directory."""
+    files = file_map if file_map is not None else DEFAULT_FILES
     created: list[Path] = []
     skipped: list[Path] = []
-    for rel_target, rel_source in DEFAULT_FILES.items():
+    for rel_target, rel_source in files.items():
         source = package_root / rel_source
         target = base / rel_target
         target.parent.mkdir(parents=True, exist_ok=True)
@@ -203,7 +212,14 @@ def _prompt_intelligence_config() -> dict | None:
 @click.command(name="init")
 @click.option("--path", "target_path", default=".", show_default=True, help="Project directory.")
 @click.option("--non-interactive", is_flag=True, help="Skip interactive prompts.")
-def init_command(target_path: str, non_interactive: bool) -> None:
+@click.option(
+    "--minimal/--full",
+    "minimal",
+    default=True,
+    show_default=True,
+    help="Minimal scaffolds 2 files (config + policy). Full scaffolds all 8.",
+)
+def init_command(target_path: str, non_interactive: bool, minimal: bool) -> None:
     """Scaffold default SafeAI config files and configure intelligence."""
     base = Path(target_path).expanduser().resolve()
     package_root = Path(__file__).resolve().parents[1]
@@ -212,11 +228,13 @@ def init_command(target_path: str, non_interactive: bool) -> None:
     # ── Banner ──────────────────────────────────────────────────────
     ui.banner(version)
     ui.step_done("Project path", str(base))
+    ui.step_done("Mode", "minimal" if minimal else "full")
     ui.bar()
 
     # ── Scaffold files ──────────────────────────────────────────────
     ui.step_active("Scaffolding config files...")
-    created, skipped = _scaffold_files(base, package_root)
+    file_map = MINIMAL_FILES if minimal else FULL_FILES
+    created, skipped = _scaffold_files(base, package_root, file_map=file_map)
 
     for path in created:
         ui.file_result("created", str(path))
@@ -224,6 +242,11 @@ def init_command(target_path: str, non_interactive: bool) -> None:
         ui.file_result("skipped", str(path))
     if not skipped:
         ui.file_result("skipped", "(none)")
+
+    if minimal:
+        ui.bar()
+        ui.bar("Tip: Run 'safeai init --full' for enterprise features", style="dim")
+        ui.bar("     (contracts, memory schemas, agents, plugins, tenants, alerts).", style="dim")
 
     # ── Intelligence setup ──────────────────────────────────────────
     intel_config = None

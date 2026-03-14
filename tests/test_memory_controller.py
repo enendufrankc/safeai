@@ -34,7 +34,9 @@ class MemoryControllerTests(unittest.TestCase):
     def test_write_and_read_allowed_field(self) -> None:
         memory = MemoryController.from_documents(_memory_docs())
         self.assertTrue(memory.write("nickname", "frank", agent_id="agent-1"))
-        self.assertEqual(memory.read("nickname", agent_id="agent-1"), "frank")
+        result = memory.read("nickname", agent_id="agent-1")
+        self.assertTrue(result.found)
+        self.assertEqual(result.value, "frank")
 
     def test_write_rejects_unknown_fields(self) -> None:
         memory = MemoryController.from_documents(_memory_docs())
@@ -43,7 +45,8 @@ class MemoryControllerTests(unittest.TestCase):
     def test_write_rejects_type_mismatch(self) -> None:
         memory = MemoryController.from_documents(_memory_docs())
         self.assertFalse(memory.write("age", "thirty", agent_id="agent-1"))
-        self.assertIsNone(memory.read("age", agent_id="agent-1"))
+        result = memory.read("age", agent_id="agent-1")
+        self.assertFalse(result.found)
 
     def test_max_entries_is_enforced(self) -> None:
         memory = MemoryController.from_documents(
@@ -93,7 +96,8 @@ class MemoryControllerTests(unittest.TestCase):
             encrypted=entry.encrypted,
         )
         self.assertEqual(memory.purge_expired(), 1)
-        self.assertIsNone(memory.read("nickname", agent_id="agent-1"))
+        result = memory.read("nickname", agent_id="agent-1")
+        self.assertFalse(result.found)
 
     def test_safeai_from_config_loads_memory_schema(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:

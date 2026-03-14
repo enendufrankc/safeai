@@ -27,7 +27,7 @@ class _FakeHTTPXResponse:
 
 class ProxyApiTests(unittest.TestCase):
     def _build_client(self, work: Path, *, mode: str = "sidecar", encrypted_memory: bool = False) -> TestClient:
-        init_result = CliRunner().invoke(init_command, ["--path", str(work)])
+        init_result = CliRunner().invoke(init_command, ["--path", str(work), "--full"])
         self.assertEqual(init_result.exit_code, 0, msg=init_result.output)
 
         memory_path = work / "schemas" / "memory.yaml"

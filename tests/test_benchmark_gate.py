@@ -21,7 +21,7 @@ class BenchmarkGateTests(unittest.TestCase):
 
             from safeai.cli.init import init_command
 
-            init_result = CliRunner().invoke(init_command, ["--path", str(work)])
+            init_result = CliRunner().invoke(init_command, ["--path", str(work), "--full"])
             self.assertEqual(init_result.exit_code, 0, msg=init_result.output)
 
             sdk = SafeAI.from_config(work / "safeai.yaml")
@@ -46,7 +46,7 @@ class BenchmarkGateTests(unittest.TestCase):
 
             from safeai.cli.init import init_command
 
-            init_result = CliRunner().invoke(init_command, ["--path", str(work)])
+            init_result = CliRunner().invoke(init_command, ["--path", str(work), "--full"])
             self.assertEqual(init_result.exit_code, 0, msg=init_result.output)
 
             sdk = SafeAI.from_config(work / "safeai.yaml")

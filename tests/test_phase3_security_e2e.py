@@ -21,7 +21,7 @@ class Phase3SecurityE2ETests(unittest.TestCase):
     def test_approvals_secrets_and_handles_end_to_end(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             work = Path(tmp_dir)
-            init_result = CliRunner().invoke(init_command, ["--path", str(work)])
+            init_result = CliRunner().invoke(init_command, ["--path", str(work), "--full"])
             self.assertEqual(init_result.exit_code, 0, msg=init_result.output)
 
             policy_path = work / "policies" / "default.yaml"

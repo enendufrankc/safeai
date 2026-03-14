@@ -149,7 +149,10 @@ class MetadataSanitizer:
     def extract_codebase_structure(self, project_path: str | Path) -> CodebaseStructure:
         root = Path(project_path).resolve()
         if not root.exists() or not root.is_dir():
-            raise FileNotFoundError(f"Project path not found: {root}")
+            raise FileNotFoundError(
+                f"Project path not found: {root}\n"
+                f"Fix: Provide an absolute path to an existing directory with source files."
+            )
         file_paths: list[str] = []
         all_imports: list[str] = []
         all_classes: list[str] = []

@@ -20,7 +20,7 @@ class EndToEndFlowTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp_dir:
             work = Path(tmp_dir)
             runner = CliRunner()
-            init_result = runner.invoke(init_command, ["--path", str(work)])
+            init_result = runner.invoke(init_command, ["--path", str(work), "--full"])
             self.assertEqual(init_result.exit_code, 0, msg=init_result.output)
 
             sdk = SafeAI.from_config(work / "safeai.yaml")

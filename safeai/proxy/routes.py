@@ -746,7 +746,7 @@ def intelligence_compliance(
     }
 
 
-@router.post("/v1/route/completion")
+@router.post("/v1/route/completion", response_model=None)
 async def route_completion(request: Request) -> dict[str, Any] | JSONResponse:
     """Route an LLM completion request to the best available provider."""
     body = await request.json()

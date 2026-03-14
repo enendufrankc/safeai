@@ -17,7 +17,7 @@ from safeai.middleware.langchain import SafeAIBlockedError
 
 class GoogleADKAdapterTests(unittest.TestCase):
     def _build_sdk(self, work: Path) -> SafeAI:
-        init_result = CliRunner().invoke(init_command, ["--path", str(work)])
+        init_result = CliRunner().invoke(init_command, ["--path", str(work), "--full"])
         self.assertEqual(init_result.exit_code, 0, msg=init_result.output)
         return SafeAI.from_config(work / "safeai.yaml")
 
