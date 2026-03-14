@@ -333,8 +333,9 @@ def _download_npm(pkg: str, tmp: Path) -> Path:
 def _download_github(spec: str, tmp: Path, name: str) -> Path:
     parts = spec.split("/")
     if len(parts) >= 3:
-        user, repo_and_ref, *subparts = parts[0], parts[1], parts[2:]
-        subpath = "/".join(subparts) if subparts else None
+        user, repo_and_ref = parts[0], parts[1]
+        subparts = parts[2:]
+        subpath: str | None = "/".join(subparts) if subparts else None
     else:
         user, repo_and_ref = parts[0], parts[1]
         subpath = None
@@ -393,14 +394,16 @@ def _install_files(skill_dir: Path, manifest: dict, name: str, root: Path) -> li
                 shutil.copytree(entry, dest, dirs_exist_ok=True)
                 installed.append(f"{SKILLS_DIR}/{name}")
             elif entry.name in DEST_MAP and DEST_MAP[entry.name] is not None:
-                dest_dir = root / DEST_MAP[entry.name]
+                dest_name = DEST_MAP[entry.name]
+                assert dest_name is not None
+                dest_dir = root / dest_name
                 dest_dir.mkdir(parents=True, exist_ok=True)
                 for src_file in _list_files(entry):
                     rel = src_file.relative_to(entry)
                     dest_file = dest_dir / rel
                     dest_file.parent.mkdir(parents=True, exist_ok=True)
                     shutil.copy2(src_file, dest_file)
-                    installed.append(str(DEST_MAP[entry.name] / rel))
+                    installed.append(str(Path(dest_name) / rel))
         elif entry.name == "plugin.py":
             dest_dir = root / "plugins"
             dest_dir.mkdir(parents=True, exist_ok=True)
