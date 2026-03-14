@@ -1,31 +1,63 @@
-@import url("https://fonts.googleapis.com/css2?family=Fira+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap");
 
+/* ---------------------------------------------------------------------------
+   Design tokens — LangChain-inspired dark palette
+   --------------------------------------------------------------------------- */
 :root {
   color-scheme: dark;
-  --safeai-bg: #000000;
-  --safeai-surface: #0a0a0a;
-  --safeai-surface-2: #121212;
-  --safeai-surface-3: #171717;
-  --safeai-border: rgba(255, 255, 255, 0.1);
-  --safeai-border-strong: rgba(255, 255, 255, 0.18);
-  --safeai-text: #ededed;
-  --safeai-text-muted: #a0a0a0;
-  --safeai-text-faint: #7d7d7d;
-  --safeai-accent: #ffb200;
-  --safeai-accent-soft: rgba(255, 178, 0, 0.18);
-  --safeai-success: #00ca52;
-  --safeai-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+
+  /* Backgrounds */
+  --safeai-bg: #0a0a14;
+  --safeai-surface: #0f0f1a;
+  --safeai-surface-2: #14142a;
+  --safeai-surface-3: #1a1a30;
+
+  /* Borders */
+  --safeai-border: rgb(79, 93, 115);
+  --safeai-border-strong: rgb(100, 116, 139);
+
+  /* Typography */
+  --safeai-text: #ffffff;
+  --safeai-text-muted: rgb(159, 159, 160);
+  --safeai-text-faint: rgb(113, 113, 114);
+
+  /* Accent */
+  --safeai-accent: rgb(195, 231, 150);
+  --safeai-accent-soft: rgba(195, 231, 150, 0.18);
+  --safeai-success: rgb(195, 231, 150);
+
+  /* Effects */
+  --safeai-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
   --safeai-focus-ring: 0 0 0 2px var(--safeai-bg), 0 0 0 4px var(--safeai-accent);
-  --safeai-transition-speed: 0.18s;
+  --safeai-transition-speed: 0.2s;
+
+  /* Inline code */
+  --safeai-code-bg: rgba(255, 255, 255, 0.125);
+  --safeai-code-fg: rgb(195, 231, 150);
+
+  /* Admonition palettes */
+  --safeai-admon-note-bg: rgba(124, 58, 237, 0.15);
+  --safeai-admon-note-border: rgba(124, 58, 237, 0.45);
+  --safeai-admon-tip-bg: rgb(46, 57, 0);
+  --safeai-admon-tip-border: rgb(120, 160, 40);
+  --safeai-admon-warning-bg: rgba(245, 158, 11, 0.12);
+  --safeai-admon-warning-border: rgba(245, 158, 11, 0.5);
+  --safeai-admon-danger-bg: rgba(239, 68, 68, 0.12);
+  --safeai-admon-danger-border: rgba(239, 68, 68, 0.5);
+
+  /* Sidebar nav active */
+  --safeai-nav-active-bg: rgb(30, 30, 46);
+
+  /* Material overrides */
   --md-default-bg-color: var(--safeai-bg);
   --md-default-fg-color: var(--safeai-text);
   --md-default-fg-color--light: var(--safeai-text-muted);
   --md-default-fg-color--lighter: var(--safeai-text-faint);
-  --md-default-fg-color--lightest: rgba(255, 255, 255, 0.08);
+  --md-default-fg-color--lightest: rgba(255, 255, 255, 0.06);
   --md-primary-fg-color: var(--safeai-bg);
   --md-primary-bg-color: var(--safeai-text);
   --md-accent-fg-color: var(--safeai-accent);
-  --md-typeset-a-color: var(--safeai-text);
+  --md-typeset-a-color: var(--safeai-accent);
   --md-code-bg-color: var(--safeai-surface);
   --md-code-fg-color: var(--safeai-text);
   --md-footer-bg-color: var(--safeai-bg);
@@ -38,30 +70,30 @@
   --md-default-fg-color: var(--safeai-text);
   --md-default-fg-color--light: var(--safeai-text-muted);
   --md-default-fg-color--lighter: var(--safeai-text-faint);
-  --md-default-fg-color--lightest: rgba(255, 255, 255, 0.08);
+  --md-default-fg-color--lightest: rgba(255, 255, 255, 0.06);
   --md-primary-fg-color: var(--safeai-bg);
   --md-primary-bg-color: var(--safeai-text);
   --md-accent-fg-color: var(--safeai-accent);
-  --md-typeset-a-color: var(--safeai-text);
+  --md-typeset-a-color: var(--safeai-accent);
   --md-code-bg-color: var(--safeai-surface);
   --md-code-fg-color: var(--safeai-text);
   --md-footer-bg-color: var(--safeai-bg);
   --md-footer-fg-color: var(--safeai-text-muted);
 }
 
+/* ---------------------------------------------------------------------------
+   Base & scrolling
+   --------------------------------------------------------------------------- */
 html {
   scroll-behavior: smooth;
-  -webkit-tap-highlight-color: rgba(255, 178, 0, 0.15);
+  -webkit-tap-highlight-color: rgba(195, 231, 150, 0.15);
   touch-action: manipulation;
 }
 
 html,
 body,
 [data-md-color-scheme="slate"] {
-  background:
-    radial-gradient(circle at top left, rgba(255, 255, 255, 0.05), transparent 28%),
-    radial-gradient(circle at top right, rgba(255, 178, 0, 0.06), transparent 18%),
-    linear-gradient(180deg, #030303 0%, #000000 100%);
+  background: var(--safeai-bg);
 }
 
 ::selection {
@@ -70,8 +102,8 @@ body,
 }
 
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -79,8 +111,8 @@ body,
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.12);
-  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
@@ -89,14 +121,21 @@ body,
 
 @supports (scrollbar-color: auto) {
   * {
-    scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
+    scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
     scrollbar-width: thin;
   }
 }
 
+/* ---------------------------------------------------------------------------
+   Typography — Inter + JetBrains Mono
+   --------------------------------------------------------------------------- */
 body,
 .md-typeset {
-  font-family: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 1rem;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 code,
@@ -104,13 +143,17 @@ kbd,
 pre,
 .md-typeset code,
 .md-typeset pre,
-.md-header,
-.md-tabs,
-.md-nav,
 .section-kicker,
 .eyebrow,
 .hero-command code {
-  font-family: "Fira Mono", "SFMono-Regular", Consolas, monospace;
+  font-family: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
+}
+
+/* ---------------------------------------------------------------------------
+   Layout — spacious, 1472px max
+   --------------------------------------------------------------------------- */
+.md-grid {
+  max-width: 1472px;
 }
 
 .md-header,
@@ -124,11 +167,12 @@ pre,
 }
 
 .md-header {
-  backdrop-filter: blur(14px);
-  background: rgba(0, 0, 0, 0.82);
-  border-bottom: 1px solid var(--safeai-border);
+  backdrop-filter: blur(16px);
+  background: rgba(10, 10, 20, 0.85);
+  border-bottom: 1px solid rgba(79, 93, 115, 0.4);
 }
 
+/* Breakout logo pattern — keep oversized logo visible */
 .md-header__button.md-logo img {
   width: auto;
   height: 5rem;
@@ -151,12 +195,11 @@ pre,
 }
 
 .md-tabs {
-  border-bottom: 1px solid var(--safeai-border);
-  background: rgba(0, 0, 0, 0.72);
+  border-bottom: 1px solid rgba(79, 93, 115, 0.35);
+  background: rgba(10, 10, 20, 0.7);
 }
 
 .md-tabs__link,
-.md-nav__link,
 .md-header__topic,
 .md-search__input,
 .md-search-result__title {
@@ -164,8 +207,6 @@ pre,
 }
 
 .md-tabs__link--active,
-.md-nav__item .md-nav__link--active,
-.md-nav__link:hover,
 .md-tabs__link:hover,
 .md-search-result__title:hover {
   color: var(--safeai-text);
@@ -176,37 +217,108 @@ pre,
 }
 
 .md-content__inner {
-  padding-bottom: 3rem;
+  padding-bottom: 3.5rem;
 }
 
+/* ---------------------------------------------------------------------------
+   Sidebar navigation — ~267px, 14px, smooth transitions
+   --------------------------------------------------------------------------- */
+.md-sidebar {
+  width: 267px;
+}
+
+.md-sidebar--secondary {
+  width: 264px;
+}
+
+.md-nav__link {
+  font-size: 0.875rem;
+  color: var(--safeai-text-muted);
+  padding: 0.4rem 0.75rem;
+  border-radius: 8px;
+  transition:
+    color var(--safeai-transition-speed) ease,
+    background-color var(--safeai-transition-speed) ease;
+}
+
+.md-nav__link:hover {
+  color: var(--safeai-text);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.md-nav__item .md-nav__link--active {
+  color: var(--safeai-text);
+  background: var(--safeai-nav-active-bg);
+  font-weight: 500;
+}
+
+.md-nav--primary .md-nav__title,
+.md-nav--secondary .md-nav__title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--safeai-text-faint);
+}
+
+.md-nav__item .md-nav__link {
+  font-size: 0.875rem;
+  letter-spacing: 0.01em;
+}
+
+/* TOC (right sidebar) */
+.md-nav--secondary .md-nav__link {
+  font-size: 0.875rem;
+}
+
+/* ---------------------------------------------------------------------------
+   Headings — tight tracking, white
+   --------------------------------------------------------------------------- */
 .md-typeset h1,
 .md-typeset h2,
 .md-typeset h3,
 .md-typeset h4 {
-  letter-spacing: -0.03em;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   color: var(--safeai-text);
   text-wrap: balance;
 }
 
 .md-typeset h1 {
-  font-size: clamp(2.8rem, 7vw, 5.5rem);
-  line-height: 0.95;
-  margin: 0.25rem 0 0.75rem;
+  font-size: 1.875rem;
+  font-weight: 700;
+  letter-spacing: -0.75px;
+  line-height: 1.2;
+  margin: 0.5rem 0 1rem;
 }
 
 .md-typeset h2 {
-  font-size: clamp(1.8rem, 4vw, 2.9rem);
-  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: -0.5px;
+  line-height: 1.3;
+  margin: 2rem 0 0.75rem;
 }
 
 .md-typeset h3 {
-  font-size: 1.1rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: -0.25px;
 }
 
+.md-typeset h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: -0.15px;
+}
+
+/* ---------------------------------------------------------------------------
+   Body text — muted gray
+   --------------------------------------------------------------------------- */
 .md-typeset p,
 .md-typeset li,
 .md-typeset td {
   color: var(--safeai-text-muted);
+  line-height: 1.65;
 }
 
 .md-typeset strong,
@@ -216,12 +328,28 @@ pre,
 }
 
 .md-typeset hr {
-  border-bottom: 1px solid var(--safeai-border);
+  border-bottom: 1px solid rgba(79, 93, 115, 0.35);
 }
 
+/* ---------------------------------------------------------------------------
+   Links
+   --------------------------------------------------------------------------- */
+.md-typeset a {
+  color: var(--safeai-accent);
+  text-decoration: none;
+  transition: color var(--safeai-transition-speed) ease;
+}
+
+.md-typeset a:hover {
+  color: #d4f0a6;
+}
+
+/* ---------------------------------------------------------------------------
+   Hero section
+   --------------------------------------------------------------------------- */
 .md-typeset .hero {
   text-align: center;
-  padding: 2rem 0 1.5rem;
+  padding: 3rem 0 2rem;
   max-width: 980px;
   margin: 0 auto;
 }
@@ -231,12 +359,10 @@ pre,
   width: min(100%, 46rem);
   justify-content: center;
   margin-bottom: 1.5rem;
-  padding: 1.4rem 1.2rem;
+  padding: 1.5rem 1.4rem;
   border: 1px solid var(--safeai-border);
-  border-radius: 14px;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01)),
-    var(--safeai-surface);
+  border-radius: 16px;
+  background: var(--safeai-surface);
   box-shadow: var(--safeai-shadow);
   overflow-x: auto;
 }
@@ -254,15 +380,17 @@ pre,
   margin: 0;
   color: var(--safeai-accent);
   text-transform: uppercase;
-  font-size: 0.85rem;
-  letter-spacing: 0.12em;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  font-family: "JetBrains Mono", monospace;
 }
 
 .md-typeset .hero .tagline {
   max-width: 48rem;
   margin: 0 auto 1.5rem;
-  font-size: clamp(1.05rem, 2.2vw, 1.55rem);
-  line-height: 1.4;
+  font-size: clamp(1.05rem, 2.2vw, 1.45rem);
+  line-height: 1.5;
   color: var(--safeai-text-muted);
 }
 
@@ -270,19 +398,22 @@ pre,
   display: inline-flex;
   max-width: 100%;
   margin: 0 auto;
-  padding: 0.95rem 1.1rem;
+  padding: 1rem 1.2rem;
   border: 1px solid var(--safeai-border);
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.04);
+  border-radius: 16px;
+  background: var(--safeai-surface);
   overflow-x: auto;
 }
 
 .md-typeset .hero-command code {
-  color: var(--safeai-text);
-  font-size: 0.88rem;
+  color: var(--safeai-accent);
+  font-size: 0.875rem;
   white-space: nowrap;
 }
 
+/* ---------------------------------------------------------------------------
+   Badges
+   --------------------------------------------------------------------------- */
 .md-typeset .badges {
   text-align: center;
   margin: 0 auto 2.5rem;
@@ -292,6 +423,9 @@ pre,
   margin: 0.2rem 0.25rem;
 }
 
+/* ---------------------------------------------------------------------------
+   Section headers
+   --------------------------------------------------------------------------- */
 .md-typeset .section-header {
   margin: 3.5rem 0 1.5rem;
   text-align: left;
@@ -300,22 +434,23 @@ pre,
 .md-typeset .section-kicker {
   margin: 0 0 0.4rem;
   color: var(--safeai-text-faint);
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.14em;
 }
 
+/* ---------------------------------------------------------------------------
+   Code blocks — rounded-2xl (16px), border rgb(79,93,115)
+   --------------------------------------------------------------------------- */
 .md-typeset .quickstart-block,
 .md-typeset .compat-table,
 .md-typeset pre,
 .md-typeset table:not([class]) {
   border: 1px solid var(--safeai-border);
-  border-radius: 14px;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0.01)),
-    var(--safeai-surface);
-  box-shadow: var(--safeai-shadow);
+  border-radius: 16px;
+  background: var(--safeai-surface);
+  box-shadow: none;
 }
 
 .md-typeset .quickstart-block {
@@ -328,13 +463,36 @@ pre,
 }
 
 .md-typeset pre {
-  padding: 1rem 1.1rem;
+  padding: 1.1rem 1.25rem;
 }
 
+.md-typeset pre > code {
+  font-size: 0.8125rem;
+  line-height: 1.7;
+}
+
+/* Inline code — green on dark */
 .md-typeset code {
+  background: var(--safeai-code-bg);
+  color: var(--safeai-code-fg);
+  font-size: 0.765rem;
+  padding: 2px 8px;
   border-radius: 6px;
+  font-weight: 400;
 }
 
+/* Reset inline-code styles inside code blocks */
+.md-typeset pre code {
+  background: transparent;
+  color: inherit;
+  padding: 0;
+  font-size: inherit;
+  border-radius: 0;
+}
+
+/* ---------------------------------------------------------------------------
+   CTA buttons
+   --------------------------------------------------------------------------- */
 .md-typeset .cta {
   display: flex;
   flex-wrap: wrap;
@@ -346,13 +504,16 @@ pre,
 .md-typeset .cta a.md-button {
   margin: 0;
   min-height: 2.7rem;
-  padding: 0.7rem 1rem;
-  border-radius: 10px;
+  padding: 0.7rem 1.2rem;
+  border-radius: 12px;
   border: 1px solid var(--safeai-border);
-  background: rgba(255, 255, 255, 0.03);
+  background: transparent;
   color: var(--safeai-text);
   font-weight: 500;
   text-transform: none;
+  transition:
+    border-color var(--safeai-transition-speed) ease,
+    background var(--safeai-transition-speed) ease;
 }
 
 .md-typeset .cta a.md-button:hover {
@@ -361,54 +522,60 @@ pre,
 }
 
 .md-typeset .md-button--primary {
-  background: var(--safeai-text);
-  border-color: var(--safeai-text);
-  color: #000000;
+  background: var(--safeai-text) !important;
+  border-color: var(--safeai-text) !important;
+  color: var(--safeai-bg) !important;
+  font-weight: 600;
 }
 
 .md-typeset .md-button--primary:hover {
-  background: #ffffff;
-  border-color: #ffffff;
+  background: #e8e8e8 !important;
+  border-color: #e8e8e8 !important;
 }
 
+/* ---------------------------------------------------------------------------
+   Feature grid & cards — transparent bg, subtle border, 16px radius
+   --------------------------------------------------------------------------- */
 .md-typeset .feature-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 0.9rem;
+  gap: 1rem;
   margin: 1.6rem 0 0;
 }
 
 .md-typeset .feature-card {
   min-height: 100%;
-  padding: 1.05rem 1.1rem;
+  padding: 1.25rem 1.25rem;
   border: 1px solid var(--safeai-border);
-  border-radius: 12px;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0.01)),
-    var(--safeai-surface-2);
-  transition: transform var(--safeai-transition-speed) ease, opacity var(--safeai-transition-speed) ease;
+  border-radius: 16px;
+  background: transparent;
+  transition:
+    transform var(--safeai-transition-speed) ease,
+    border-color var(--safeai-transition-speed) ease,
+    background var(--safeai-transition-speed) ease;
 }
 
 .md-typeset .feature-card:hover {
   transform: translateY(-2px);
-  opacity: 0.95;
   border-color: var(--safeai-border-strong);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.015)),
-    var(--safeai-surface-3);
+  background: rgba(255, 255, 255, 0.03);
 }
 
 .md-typeset .feature-card h3 {
   margin: 0 0 0.5rem;
   font-size: 1rem;
+  font-weight: 600;
 }
 
 .md-typeset .feature-card p {
   margin: 0;
-  font-size: 0.92rem;
-  line-height: 1.55;
+  font-size: 0.9rem;
+  line-height: 1.6;
 }
 
+/* ---------------------------------------------------------------------------
+   Tables
+   --------------------------------------------------------------------------- */
 .md-typeset .compat-table {
   padding: 0.8rem;
 }
@@ -421,13 +588,14 @@ pre,
 
 .md-typeset table:not([class]) th,
 .md-typeset table:not([class]) td {
-  border-color: var(--safeai-border);
+  border-color: rgba(79, 93, 115, 0.35);
   background: transparent;
 }
 
 .md-typeset table:not([class]) th {
   color: var(--safeai-text);
-  font-size: 0.78rem;
+  font-size: 0.75rem;
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.1em;
 }
@@ -437,30 +605,37 @@ pre,
   font-variant-numeric: tabular-nums;
 }
 
+/* ---------------------------------------------------------------------------
+   Architecture link
+   --------------------------------------------------------------------------- */
 .md-typeset .architecture-link {
   display: inline-flex;
   margin-top: 0.25rem;
-  color: var(--safeai-text);
+  color: var(--safeai-accent);
   text-decoration: none;
 }
 
 .md-typeset .architecture-link:hover {
-  color: var(--safeai-accent);
+  color: #d4f0a6;
 }
 
 .md-typeset .md-typeset__table {
   display: block;
 }
 
+/* ---------------------------------------------------------------------------
+   Tabbed content
+   --------------------------------------------------------------------------- */
 .md-typeset .tabbed-set {
   border: 1px solid var(--safeai-border);
-  border-radius: 14px;
+  border-radius: 16px;
   background: var(--safeai-surface);
   overflow: hidden;
 }
 
 .md-typeset .tabbed-labels > label {
   color: var(--safeai-text-muted);
+  transition: color var(--safeai-transition-speed) ease;
 }
 
 .md-typeset .tabbed-labels > label:hover,
@@ -468,28 +643,82 @@ pre,
   color: var(--safeai-text);
 }
 
+/* ---------------------------------------------------------------------------
+   Admonitions — colored backgrounds per type, 16px radius
+   --------------------------------------------------------------------------- */
 .md-typeset .admonition,
 .md-typeset details {
   border: 1px solid var(--safeai-border);
-  border-radius: 12px;
+  border-radius: 16px;
   background: var(--safeai-surface);
+  overflow: hidden;
 }
 
 .md-typeset .admonition-title,
 .md-typeset summary {
-  font-family: "Fira Mono", "SFMono-Regular", Consolas, monospace;
+  font-family: "Inter", sans-serif;
+  font-weight: 600;
+  font-size: 0.875rem;
 }
 
-.md-nav--primary .md-nav__title,
-.md-nav--secondary .md-nav__title,
-.md-nav__item .md-nav__link {
-  font-size: 0.78rem;
-  letter-spacing: 0.02em;
+/* Note / info — purple */
+.md-typeset .admonition.note,
+.md-typeset .admonition.info,
+.md-typeset .admonition.abstract,
+.md-typeset details.note,
+.md-typeset details.info {
+  background: var(--safeai-admon-note-bg);
+  border-color: var(--safeai-admon-note-border);
 }
 
+/* Tip / success — green */
+.md-typeset .admonition.tip,
+.md-typeset .admonition.success,
+.md-typeset .admonition.check,
+.md-typeset .admonition.done,
+.md-typeset details.tip,
+.md-typeset details.success {
+  background: var(--safeai-admon-tip-bg);
+  border-color: var(--safeai-admon-tip-border);
+}
+
+/* Warning / caution — amber */
+.md-typeset .admonition.warning,
+.md-typeset .admonition.caution,
+.md-typeset .admonition.attention,
+.md-typeset details.warning,
+.md-typeset details.caution {
+  background: var(--safeai-admon-warning-bg);
+  border-color: var(--safeai-admon-warning-border);
+}
+
+/* Danger / failure / bug — red */
+.md-typeset .admonition.danger,
+.md-typeset .admonition.failure,
+.md-typeset .admonition.bug,
+.md-typeset .admonition.error,
+.md-typeset details.danger,
+.md-typeset details.failure {
+  background: var(--safeai-admon-danger-bg);
+  border-color: var(--safeai-admon-danger-border);
+}
+
+/* Example / question — subtle default */
+.md-typeset .admonition.example,
+.md-typeset .admonition.question,
+.md-typeset .admonition.quote,
+.md-typeset details.example,
+.md-typeset details.question {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: var(--safeai-border);
+}
+
+/* ---------------------------------------------------------------------------
+   Search
+   --------------------------------------------------------------------------- */
 .md-search__form {
   border: 1px solid var(--safeai-border);
-  border-radius: 10px;
+  border-radius: 12px;
   background: rgba(255, 255, 255, 0.04);
 }
 
@@ -498,14 +727,25 @@ pre,
   color: var(--safeai-text-muted);
 }
 
+/* ---------------------------------------------------------------------------
+   Back-to-top
+   --------------------------------------------------------------------------- */
 .md-top {
   background: var(--safeai-surface-2);
   border: 1px solid var(--safeai-border);
+  border-radius: 12px;
 }
 
+/* ---------------------------------------------------------------------------
+   Responsive
+   --------------------------------------------------------------------------- */
 @media screen and (max-width: 76.2344em) {
   .md-typeset .hero {
-    padding-top: 1.3rem;
+    padding-top: 1.5rem;
+  }
+
+  .md-sidebar {
+    width: 242px;
   }
 }
 
@@ -533,7 +773,9 @@ pre,
   }
 }
 
-/* Focus states — visible keyboard focus on all interactive elements */
+/* ---------------------------------------------------------------------------
+   Focus states — visible keyboard focus on all interactive elements
+   --------------------------------------------------------------------------- */
 :focus-visible {
   outline: none;
   box-shadow: var(--safeai-focus-ring);
@@ -571,11 +813,9 @@ pre,
   box-shadow: 0 0 0 1px var(--safeai-accent);
 }
 
-/* Hover & interactive states — increased contrast */
-.md-typeset a:hover {
-  color: var(--safeai-accent);
-}
-
+/* ---------------------------------------------------------------------------
+   Hover & interactive states
+   --------------------------------------------------------------------------- */
 .md-header__button:hover {
   opacity: 0.85;
 }
@@ -588,7 +828,9 @@ pre,
   transform: scale(0.99);
 }
 
-/* Prefers reduced motion — disable all transitions and transforms */
+/* ---------------------------------------------------------------------------
+   Prefers reduced motion
+   --------------------------------------------------------------------------- */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -612,7 +854,9 @@ pre,
   }
 }
 
-/* Safe areas for notched devices */
+/* ---------------------------------------------------------------------------
+   Safe areas for notched devices
+   --------------------------------------------------------------------------- */
 @supports (padding: env(safe-area-inset-bottom)) {
   .md-header {
     padding-left: env(safe-area-inset-left);
@@ -631,12 +875,13 @@ pre,
   }
 }
 
-/* Modal / dialog scroll containment */
+/* ---------------------------------------------------------------------------
+   Miscellaneous
+   --------------------------------------------------------------------------- */
 .md-search__overlay {
   overscroll-behavior: contain;
 }
 
-/* Smooth anchor scroll offset for sticky header */
 [id] {
   scroll-margin-top: 4rem;
 }

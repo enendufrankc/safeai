@@ -148,6 +148,31 @@ Policy-gated agent-to-agent communication across trust boundaries.
 Block `rm -rf /`, `DROP TABLE`, fork bombs, pipe-to-shell, and force pushes.
 </div>
 
+<div class="feature-card" markdown>
+### :material-text-search: Content Moderation
+80+ detector patterns for toxicity, prompt injection, jailbreaks, and topic restrictions — all local, no external APIs.
+</div>
+
+<div class="feature-card" markdown>
+### :material-currency-usd: Cost Governance
+Track token usage, enforce budgets with hard blocks and alerts, and extract costs from OpenAI, Anthropic, and Google responses.
+</div>
+
+<div class="feature-card" markdown>
+### :material-swap-horizontal: Multi-Provider Routing
+4 routing strategies (priority, cost, latency, round-robin) with circuit-breaker failover across providers.
+</div>
+
+<div class="feature-card" markdown>
+### :material-puzzle: Skills System
+Install pre-built security packages — GDPR, HIPAA, PCI-DSS, prompt injection shields — from the skills registry.
+</div>
+
+<div class="feature-card" markdown>
+### :material-bell-ring: Alerting &amp; Observability
+File, webhook, Slack, email, PagerDuty, and Opsgenie channels with Prometheus metrics and real-time WebSocket streaming.
+</div>
+
 </div>
 
 ---
@@ -287,6 +312,16 @@ The project now covers the full agent security stack:
     Covers: secret detection, PII protection, tool contracts, dangerous command blocking, structured payload scanning, audit logging, and proxy/sidecar deployment — all without modifying OpenClaw's source code.
 
     **[Read the full use case :material-arrow-right:](examples/openclaw.md)**
+
+!!! example "SDK Quick Start Examples"
+    Progressive examples covering input scanning, output guarding, structured payloads, file scanning, memory operations, API tiers, typed results, and content moderation — all aligned with real E2E test scenarios.
+
+    **[Try the SDK examples :material-arrow-right:](examples/sdk-quickstart.md)**
+
+!!! example "Proxy &amp; API Deployment"
+    Deploy SafeAI as an HTTP proxy with full REST API coverage — health checks, scanning endpoints, approval workflows, dashboard, WebSocket streaming, and OpenAPI documentation.
+
+    **[Deploy the proxy :material-arrow-right:](examples/proxy-deployment.md)**
 
 ---
 

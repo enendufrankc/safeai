@@ -15,8 +15,8 @@ theme:
     primary: black
     accent: deep orange
   font:
-    text: IBM Plex Sans
-    code: Fira Mono
+    text: Inter
+    code: JetBrains Mono
   icon:
     repo: fontawesome/brands/github
   features:
@@ -110,9 +110,12 @@ nav:
   - Examples:
     - "Securing OpenClaw": examples/openclaw.md
     - "Securing Coding Agents": examples/coding-agents.md
+    - "SDK Quick Start": examples/sdk-quickstart.md
+    - "Proxy & API Deployment": examples/proxy-deployment.md
   - Guides:
     - Secret Detection: guides/secret-detection.md
     - PII Protection: guides/pii-protection.md
+    - Content Moderation: guides/content-moderation.md
     - Policy Engine: guides/policy-engine.md
     - Tool Contracts: guides/tool-contracts.md
     - Agent Identity: guides/agent-identity.md
@@ -122,8 +125,15 @@ nav:
     - Audit Logging: guides/audit-logging.md
     - Structured Scanning: guides/structured-scanning.md
     - Agent Messaging: guides/agent-messaging.md
+    - Content Moderation: guides/content-moderation.md
     - Dangerous Commands: guides/dangerous-commands.md
+    - Cost Governance: guides/cost-governance.md
+    - Multi-Provider Routing: guides/multi-provider-routing.md
+    - Skills System: guides/skills-system.md
+    - Alerting & Observability: guides/alerting-observability.md
     - Intelligence Layer: guides/intelligence.md
+    - Enterprise Features: guides/enterprise-features.md
+    - Creating Plugins: guides/creating-plugins.md
     - Troubleshooting: guides/troubleshooting.md
   - Integrations:
     - Overview: integrations/index.md
