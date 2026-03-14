@@ -130,9 +130,13 @@ pre,
 }
 
 .md-header__button.md-logo img {
-  width: 10rem;
-  height: 10rem;
+  width: auto;
+  height: 2.4rem;
   object-fit: contain;
+}
+
+.md-header__button.md-logo {
+  padding: 0.2rem 0;
 }
 
 .md-tabs {
