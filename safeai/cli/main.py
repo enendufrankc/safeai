@@ -41,3 +41,6 @@ cli.add_command(intelligence_group)
 cli.add_command(alerts_group)
 cli.add_command(observe_group)
 cli.add_command(skills_group)
+
+if __name__ == "__main__":
+    cli()
