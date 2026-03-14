@@ -30,3 +30,12 @@ skills-lock.json
 # Root-level schemas are duplicates of safeai/schemas/
 schemas/v1alpha1/
 schemas/memory.yaml
+
+# Generated config files (run `safeai init` to create them)
+safeai.yaml
+agents/
+alerts/
+contracts/
+plugins/
+policies/
+tenants/
