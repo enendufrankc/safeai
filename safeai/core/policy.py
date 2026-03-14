@@ -22,6 +22,7 @@ class PolicyContext:
     agent_id: str = "unknown"
     tool_name: str | None = None
     action_type: str | None = None
+    tenant_id: str = "default"
 
 
 @dataclass(frozen=True)
@@ -30,6 +31,7 @@ class PolicyDecision:
     policy_name: str | None
     reason: str
     fallback_template: str | None = None
+    routing_constraint: list[str] | None = None
 
 
 @dataclass(frozen=True)
@@ -41,6 +43,8 @@ class PolicyRule:
     condition: dict[str, Any]
     priority: int = 100
     fallback_template: str | None = None
+    tenant_id: str | None = None
+    allowed_providers: list[str] | None = None
 
 
 class PolicyEngine:
@@ -62,12 +66,15 @@ class PolicyEngine:
             rules = tuple(self._rules)
 
         for rule in rules:
+            if rule.tenant_id is not None and rule.tenant_id != context.tenant_id:
+                continue
             if self._matches(rule, context):
                 validated = PolicyDecisionModel(
                     action=rule.action,
                     policy_name=rule.name,
                     reason=rule.reason,
                     fallback_template=rule.fallback_template,
+                    routing_constraint=rule.allowed_providers,
                 )
                 return PolicyDecision(**validated.model_dump())
         validated = PolicyDecisionModel(
@@ -168,6 +175,7 @@ def normalize_rules(raw_items: list[dict[str, Any]]) -> list[PolicyRule]:
                 condition=dict(validated.condition),
                 priority=validated.priority,
                 fallback_template=_normalize_optional_text(validated.fallback_template),
+                allowed_providers=validated.allowed_providers,
             )
         )
     return sorted(rules, key=lambda item: item.priority)

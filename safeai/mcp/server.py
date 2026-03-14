@@ -120,6 +120,52 @@ def create_mcp_server(safeai: SafeAI) -> Any:
                     "required": ["tool_name"],
                 },
             ),
+            Tool(
+                name="reload_policies",
+                description="Reload SafeAI policies from configured files",
+                inputSchema={"type": "object", "properties": {}},
+            ),
+            Tool(
+                name="approve_request",
+                description="Approve a pending approval request",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "request_id": {"type": "string", "description": "ID of the request to approve"},
+                        "approver_id": {"type": "string", "default": "mcp-client"},
+                        "note": {"type": "string"},
+                    },
+                    "required": ["request_id"],
+                },
+            ),
+            Tool(
+                name="deny_request",
+                description="Deny a pending approval request",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "request_id": {"type": "string", "description": "ID of the request to deny"},
+                        "reason": {"type": "string", "description": "Reason for denial"},
+                        "approver_id": {"type": "string", "default": "mcp-client"},
+                    },
+                    "required": ["request_id"],
+                },
+            ),
+            Tool(
+                name="list_plugins",
+                description="List all loaded SafeAI plugins",
+                inputSchema={"type": "object", "properties": {}},
+            ),
+            Tool(
+                name="check_budget",
+                description="Check current cost tracking budget status",
+                inputSchema={"type": "object", "properties": {}},
+            ),
+            Tool(
+                name="health_check",
+                description="Return SafeAI health and status information",
+                inputSchema={"type": "object", "properties": {}},
+            ),
         ]
 
     @server.call_tool()
@@ -165,6 +211,60 @@ def _handle_tool(safeai: SafeAI, name: str, arguments: dict) -> dict:
             session_id=arguments.get("session_id"),
         )
         return _serializable(result)
+
+    if name == "reload_policies":
+        try:
+            changed = safeai.reload_policies()
+            return {"success": True, "changed": changed}
+        except Exception as exc:
+            return {"success": False, "error": str(exc)}
+
+    if name == "approve_request":
+        try:
+            ok = safeai.advanced.approve_request(
+                arguments["request_id"],
+                approver_id=arguments.get("approver_id", "mcp-client"),
+                note=arguments.get("note"),
+            )
+            return {"success": ok, "request_id": arguments["request_id"]}
+        except Exception as exc:
+            return {"success": False, "error": str(exc)}
+
+    if name == "deny_request":
+        try:
+            ok = safeai.advanced.deny_request(
+                arguments["request_id"],
+                approver_id=arguments.get("approver_id", "mcp-client"),
+                note=arguments.get("reason"),
+            )
+            return {"success": ok, "request_id": arguments["request_id"]}
+        except Exception as exc:
+            return {"success": False, "error": str(exc)}
+
+    if name == "list_plugins":
+        return {"plugins": safeai.list_plugins()}
+
+    if name == "check_budget":
+        try:
+            tracker = getattr(safeai, "_cost_tracker", None) or getattr(safeai, "cost_tracker", None)
+            if tracker is None:
+                return {"enabled": False, "message": "cost tracking not enabled"}
+            summary = tracker.summary()
+            return {"enabled": True, "budget": _serializable(summary)}
+        except Exception as exc:
+            return {"enabled": False, "error": str(exc)}
+
+    if name == "health_check":
+        import time as _time
+
+        policies_count = len(safeai.policy_engine._rules)
+        plugins_count = len(safeai.list_plugins())
+        return {
+            "status": "healthy",
+            "policies_loaded": policies_count,
+            "plugins_loaded": plugins_count,
+            "timestamp": _time.strftime("%Y-%m-%dT%H:%M:%SZ", _time.gmtime()),
+        }
 
     return {"error": f"Unknown tool: {name}"}
 
