@@ -32,6 +32,7 @@ class PolicyRuleModel(BaseModel):
     condition: dict[str, Any] = Field(default_factory=dict)
     priority: int = Field(default=100, ge=0)
     fallback_template: str | None = None
+    allowed_providers: list[str] | None = None
 
     @model_validator(mode="before")
     @classmethod
@@ -54,6 +55,7 @@ class PolicyDecisionModel(BaseModel):
     policy_name: str | None = None
     reason: str = Field(min_length=1)
     fallback_template: str | None = None
+    routing_constraint: list[str] | None = None
 
 
 class ToolIOContractModel(BaseModel):

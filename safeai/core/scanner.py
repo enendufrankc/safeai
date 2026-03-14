@@ -19,6 +19,30 @@ class ScanResult:
     decision: PolicyDecision
 
 
+@dataclass(frozen=True)
+class FileScanResult:
+    """Result of scanning a file through SafeAI's input boundary."""
+
+    mode: str
+    file_path: str
+    size_bytes: int
+    decision: dict[str, str | None]
+    detections: list[dict[str, str | int | None]]
+    filtered: str | dict | list | None
+
+    def __getitem__(self, key: str):
+        """Allow dict-style access for backward compatibility."""
+        return getattr(self, key)
+
+    def get(self, key: str, default=None):
+        """Allow dict-style .get() for backward compatibility."""
+        return getattr(self, key, default)
+
+    def keys(self):
+        """Allow dict-style .keys() for backward compatibility."""
+        return self.__dataclass_fields__.keys()
+
+
 class InputScanner:
     """Classifies and enforces input policy before model access."""
 

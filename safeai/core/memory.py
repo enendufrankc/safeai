@@ -5,6 +5,7 @@
 from __future__ import annotations
 
 import json
+import logging
 import re
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
@@ -16,6 +17,32 @@ from cryptography.fernet import Fernet
 
 from safeai.config.loader import load_memory_documents
 from safeai.core.models import MemoryFieldModel, MemorySchemaDocumentModel, MemorySchemaModel
+
+logger = logging.getLogger(__name__)
+
+
+class MemoryValidationError(Exception):
+    """Raised when a memory write fails validation in strict mode."""
+
+
+@dataclass(frozen=True)
+class MemoryWriteResult:
+    """Result of a memory write operation."""
+
+    success: bool
+    reason: str | None = None
+
+    def __bool__(self) -> bool:
+        return self.success
+
+
+@dataclass(frozen=True)
+class MemoryReadResult:
+    """Result of a memory read operation."""
+
+    value: Any = None
+    found: bool = False
+    reason: str | None = None
 
 
 @dataclass(frozen=True)
@@ -82,16 +109,28 @@ class MemoryController:
     def allowed_fields(self) -> set[str]:
         return {field.name for field in self.schema.fields}
 
-    def write(self, key: str, value: Any, agent_id: str) -> bool:
+    def write(self, key: str, value: Any, agent_id: str, *, strict: bool = False) -> MemoryWriteResult:
         field_spec = self._field(key)
         if field_spec is None:
-            return False
+            reason = f"Field '{key}' is not defined in memory schema. Allowed fields: {sorted(self.allowed_fields)}"
+            logger.warning("memory_write rejected: %s", reason)
+            if strict:
+                raise MemoryValidationError(reason)
+            return MemoryWriteResult(success=False, reason=reason)
         if not _matches_declared_type(value, field_spec.type):
-            return False
+            reason = f"Type mismatch for field '{key}': expected {field_spec.type}, got {type(value).__name__}"
+            logger.warning("memory_write rejected: %s", reason)
+            if strict:
+                raise MemoryValidationError(reason)
+            return MemoryWriteResult(success=False, reason=reason)
 
         bucket = self._data.setdefault(agent_id, {})
         if key not in bucket and len(bucket) >= self.schema.max_entries:
-            return False
+            reason = f"Memory at capacity ({self.schema.max_entries} entries) for agent '{agent_id}'. Cannot add new key '{key}'."
+            logger.warning("memory_write rejected: %s", reason)
+            if strict:
+                raise MemoryValidationError(reason)
+            return MemoryWriteResult(success=False, reason=reason)
 
         expiry = _compute_expiry(field_spec.retention or self.schema.default_retention)
         existing = bucket.get(key)
@@ -114,19 +153,19 @@ class MemoryController:
             tag=field_spec.tag,
             encrypted=field_spec.encrypted,
         )
-        return True
+        return MemoryWriteResult(success=True)
 
-    def read(self, key: str, agent_id: str) -> Any:
+    def read(self, key: str, agent_id: str) -> MemoryReadResult:
         bucket = self._data.get(agent_id)
         if not bucket:
-            return None
+            return MemoryReadResult(found=False, reason=f"No memory bucket for agent '{agent_id}'")
         entry = bucket.get(key)
         if not entry:
-            return None
+            return MemoryReadResult(found=False, reason=f"Key '{key}' not found for agent '{agent_id}'")
         if entry.expires_at <= datetime.now(timezone.utc):
             self._drop_entry(bucket=bucket, key=key, entry=entry)
-            return None
-        return entry.value
+            return MemoryReadResult(found=False, reason=f"Key '{key}' expired and was purged")
+        return MemoryReadResult(value=entry.value, found=True)
 
     def purge(self, agent_id: str | None = None) -> int:
         if agent_id is None:
