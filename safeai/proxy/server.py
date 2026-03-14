@@ -23,7 +23,7 @@ from safeai.dashboard.routes import router as dashboard_router
 from safeai.dashboard.service import DashboardService
 from safeai.proxy.metrics import ProxyMetrics
 from safeai.proxy.routes import router
-from safeai.proxy.ws import register_websocket_routes
+from safeai.proxy.ws import register_websocket_routes, websocket_endpoint
 
 
 @dataclass(frozen=True)
@@ -51,7 +51,13 @@ def create_app(
     sdk = SafeAI.from_config(resolved_config)
     dashboard = DashboardService(sdk=sdk, config_path=resolved_config, config=cfg.dashboard)
 
-    app = FastAPI(title="SafeAI Proxy", version=_VERSION)
+    app = FastAPI(
+        title="SafeAI Proxy",
+        description="Zero-trust security proxy for AI agents. Provides policy-based input/output scanning, tool interception, memory management, audit logging, and real-time observability.",
+        version=_VERSION,
+        docs_url="/docs",
+        redoc_url="/redoc",
+    )
     app.state.runtime = ProxyRuntime(
         safeai=sdk,
         mode=resolved_mode_literal,
@@ -62,6 +68,7 @@ def create_app(
     app.include_router(router)
     app.include_router(dashboard_router)
     register_websocket_routes(app)
+    app.add_api_websocket_route("/v1/ws/events", websocket_endpoint)
 
     if cfg.alerting.enabled:
         _wire_alerting(sdk=sdk, dashboard=dashboard, alerting_config=cfg.alerting)
