@@ -11,6 +11,27 @@ Extend via plugins or add custom patterns to your policy files.
 """
 
 TOXICITY_PATTERNS: list[tuple[str, str, str]] = [
+    # --- toxic.insult ----------------------------------------------------
+    (
+        "insult",
+        "toxic.insult",
+        r"\b(?:stupid|idiot|idiots|idiotic|moron|morons|moronic)\b",
+    ),
+    (
+        "insult",
+        "toxic.insult",
+        r"\b(?:imbecile|imbeciles|cretin|cretins|dimwit|dimwits)\b",
+    ),
+    (
+        "insult",
+        "toxic.insult",
+        r"\b(?:loser|losers|pathetic|worthless|useless)\s+(?:person|people|human|fool|idiot)?\b",
+    ),
+    (
+        "insult",
+        "toxic.insult",
+        r"\b(?:go\s+to\s+hell|shut\s+up|piss\s+off|screw\s+you|drop\s+dead)\b",
+    ),
     # --- toxic.profanity -------------------------------------------------
     (
         "profanity",
@@ -66,7 +87,7 @@ TOXICITY_PATTERNS: list[tuple[str, str, str]] = [
     (
         "threat",
         "toxic.threat",
-        r"\b(?:i[''\u2019]?(?:ll|m\s+going\s+to|will))\s+(?:kill|hurt|destroy|attack|end)\s+(?:you|him|her|them)\b",
+        r"\b(?:i['\u2018\u2019]?ll|i(?:\s+am|\s*'m)?\s+going\s+to|i\s+will)\s+(?:kill|hurt|destroy|attack|end)\s+(?:you|him|her|them)\b",
     ),
     (
         "threat",

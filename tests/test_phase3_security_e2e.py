@@ -98,7 +98,8 @@ class Phase3SecurityE2ETests(unittest.TestCase):
                 self.assertEqual(second.decision.action, "allow")
 
                 self.assertTrue(sdk.memory_write("api_token", "smtp-super-secret", agent_id="default-agent"))
-                handle = sdk.memory_read("api_token", agent_id="default-agent")
+                read_result = sdk.memory_read("api_token", agent_id="default-agent")
+                handle = read_result.value
                 self.assertTrue(str(handle).startswith("hdl_"))
                 self.assertNotEqual(handle, "smtp-super-secret")
 

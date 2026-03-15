@@ -671,7 +671,7 @@ curl -s http://127.0.0.1:8910/v1/intelligence/status | python -m json.tool
 
 ## Phase 9: Content Moderation Detectors
 
-SafeAI now ships with 80 detector patterns across 8 categories. These can be tested entirely locally.
+SafeAI now ships with 84 detector patterns across 8 categories. These can be tested entirely locally.
 
 ### 9.1 Toxicity detection
 
@@ -959,20 +959,20 @@ print(f"Secret backends: {len(backends)}")
 ```python
 ai = SafeAI.quickstart()
 
-# Write with typed result
-write_result = ai.memory_write("test-bucket", "key1", "hello")
+# Write with typed result — memory_write(key, value)
+write_result = ai.memory_write("key1", "hello")
 print(f"Write success: {write_result.success}, reason: {write_result.reason}")
 assert write_result.success is True
 assert bool(write_result) is True  # backward compat
 
-# Read with typed result
-read_result = ai.memory_read("test-bucket", "key1")
+# Read with typed result — memory_read(key)
+read_result = ai.memory_read("key1")
 print(f"Read found: {read_result.found}, value: {read_result.value}")
 assert read_result.found is True
 assert read_result.value == "hello"
 
 # Read missing key
-read_result = ai.memory_read("test-bucket", "nonexistent")
+read_result = ai.memory_read("nonexistent")
 assert read_result.found is False
 print(f"Missing key reason: {read_result.reason}")
 ```
@@ -1031,9 +1031,9 @@ Expected: lists loaded plugins with detector/adapter/template counts.
 from safeai.core.policy import PolicyEngine, PolicyContext, PolicyRule
 
 rules = [
-    PolicyRule(name="global-block-secrets", boundary="input", data_tags=["secret.credential"], action="block"),
-    PolicyRule(name="acme-allow-pii", boundary="input", data_tags=["personal.pii"], action="allow", tenant_id="acme"),
-    PolicyRule(name="default-redact-pii", boundary="input", data_tags=["personal.pii"], action="redact"),
+    PolicyRule(name="global-block-secrets", boundary=["input"], action="block", reason="secrets blocked", condition={"tags": ["secret.credential"]}),
+    PolicyRule(name="acme-allow-pii", boundary=["input"], action="allow", reason="acme pii allowed", condition={"tags": ["personal.pii"]}, priority=10, tenant_id="acme"),
+    PolicyRule(name="default-redact-pii", boundary=["input"], action="redact", reason="pii redacted", condition={"tags": ["personal.pii"]}, priority=20),
 ]
 
 engine = PolicyEngine(rules=rules)
@@ -1249,7 +1249,7 @@ You need both because `pytest` collects additional pytest-style tests that `unit
 You can say "I tested SafeAI like a normal user across all implemented features" only if:
 
 1. package installation works in a fresh environment
-2. project scaffolding works (both `--minimal` and `--full` modes)
+2. project scaffolding works (`safeai init` creates the full 8-file scaffold by default)
 3. SDK quickstart and config mode work
 4. CLI commands work (including `cost`, `plugins`)
 5. proxy and dashboard work (including `/docs`, `/redoc`)
@@ -1273,7 +1273,7 @@ If you also want to verify the repo itself, complete Phase 15.
 ## Known Gotchas
 
 - If `safeai --help` fails but `python -m safeai.cli.main --help` works, your shell is using the wrong CLI entrypoint.
-- `safeai init` now defaults to `--minimal` (2 files). Use `--full` for the complete 8-file scaffold.
+- `safeai init` creates the full 8-file scaffold by default (no `--minimal` or `--full` flags).
 - intelligence features require a configured backend
 - skills and marketplace features require network access
 - Vault and AWS features require real external services for live testing
@@ -1293,9 +1293,8 @@ python -m pip install --upgrade pip
 python -m pip install "safeai-sdk[all]"
 python -m safeai.cli.main --help
 python -m safeai.cli.main init --path /tmp/safeai-user-e2e --non-interactive
-python -m safeai.cli.main init --full --path /tmp/safeai-user-e2e-full --non-interactive
-python -m safeai.cli.main validate --config /tmp/safeai-user-e2e-full/safeai.yaml
-python -m safeai.cli.main plugins list --config /tmp/safeai-user-e2e-full/safeai.yaml
+python -m safeai.cli.main validate --config /tmp/safeai-user-e2e/safeai.yaml
+python -m safeai.cli.main plugins list --config /tmp/safeai-user-e2e/safeai.yaml
 python -m safeai.cli.main cost --help
 python -m safeai.cli.main serve --mode sidecar --host 127.0.0.1 --port 8910 --config /tmp/safeai-user-e2e-full/safeai.yaml
 ```

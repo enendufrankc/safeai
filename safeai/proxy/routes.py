@@ -377,30 +377,30 @@ def intercept_agent_message(payload: AgentMessagePayload, request: Request) -> d
 def memory_write(payload: MemoryWritePayload, request: Request) -> dict[str, Any]:
     started = time.perf_counter()
     runtime = request.app.state.runtime
-    allowed = runtime.safeai.memory_write(payload.key, payload.value, agent_id=payload.agent_id)
+    result = runtime.safeai.memory_write(payload.key, payload.value, agent_id=payload.agent_id)
     elapsed = time.perf_counter() - started
     runtime.metrics.observe_request(
         endpoint="/v1/memory/write",
         status_code=200,
         latency_seconds=elapsed,
-        decision_action="allow" if allowed else "deny",
+        decision_action="allow" if result.success else "deny",
     )
-    return {"allowed": allowed}
+    return {"allowed": result.success, "reason": result.reason}
 
 
 @router.post("/v1/memory/read")
 def memory_read(payload: MemoryReadPayload, request: Request) -> dict[str, Any]:
     started = time.perf_counter()
     runtime = request.app.state.runtime
-    value = runtime.safeai.memory_read(payload.key, agent_id=payload.agent_id)
+    result = runtime.safeai.memory_read(payload.key, agent_id=payload.agent_id)
     elapsed = time.perf_counter() - started
     runtime.metrics.observe_request(
         endpoint="/v1/memory/read",
         status_code=200,
         latency_seconds=elapsed,
-        decision_action="allow" if value is not None else "deny",
+        decision_action="allow" if result.found else "deny",
     )
-    return {"value": value}
+    return {"value": result.value, "found": result.found, "reason": result.reason}
 
 
 @router.post("/v1/memory/resolve-handle")

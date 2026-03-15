@@ -154,7 +154,7 @@ class MemoryControllerTests(unittest.TestCase):
             sdk = SafeAI.from_config(work / "safeai.yaml")
             self.assertIsNotNone(sdk.memory)
             self.assertTrue(sdk.memory_write("nickname", "frank", agent_id="agent-1"))
-            self.assertEqual(sdk.memory_read("nickname", agent_id="agent-1"), "frank")
+            self.assertEqual(sdk.memory_read("nickname", agent_id="agent-1").value, "frank")
 
 
 if __name__ == "__main__":

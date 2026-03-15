@@ -34,7 +34,7 @@ class EndToEndFlowTests(unittest.TestCase):
             self.assertIn("[REDACTED]", output.safe_output)
 
             self.assertTrue(sdk.memory_write("user_preference", "en-US", agent_id="agent-1"))
-            self.assertEqual(sdk.memory_read("user_preference", agent_id="agent-1"), "en-US")
+            self.assertEqual(sdk.memory_read("user_preference", agent_id="agent-1").value, "en-US")
 
             events = sdk.query_audit(limit=10)
             self.assertGreaterEqual(len(events), 2)

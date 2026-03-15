@@ -104,7 +104,8 @@ class MemorySecurityTests(unittest.TestCase):
                 memory_controller=MemoryController.from_documents(_memory_docs(tag="secret", encrypted=True)),
             )
             self.assertTrue(sdk.memory_write("secret_value", "super-secret", agent_id="agent-1"))
-            handle = sdk.memory_read("secret_value", agent_id="agent-1")
+            read_result = sdk.memory_read("secret_value", agent_id="agent-1")
+            handle = read_result.value
             self.assertTrue(str(handle).startswith("hdl_"))
             self.assertIsNone(sdk.resolve_memory_handle(str(handle), agent_id="agent-1"))
 
@@ -125,7 +126,8 @@ class MemorySecurityTests(unittest.TestCase):
                 tag=entry.tag,
                 encrypted=entry.encrypted,
             )
-            self.assertIsNone(sdk.memory_read("secret_value", agent_id="agent-1"))
+            read_result = sdk.memory_read("secret_value", agent_id="agent-1")
+            self.assertFalse(read_result.found)
             events = sdk.query_audit(boundary="memory", phase="retention_purge", limit=10)
             self.assertGreaterEqual(len(events), 1)
             self.assertGreaterEqual(int(events[0]["metadata"]["purged_count"]), 1)

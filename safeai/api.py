@@ -39,7 +39,7 @@ from safeai.core.interceptor import (
     ResponseInterceptResult,
     ToolCall,
 )
-from safeai.core.memory import MemoryController
+from safeai.core.memory import MemoryController, MemoryReadResult, MemoryWriteResult
 from safeai.core.policy import PolicyContext, PolicyEngine, normalize_rules
 from safeai.core.scanner import FileScanResult, InputScanner, ScanResult
 from safeai.core.structured import StructuredScanner, StructuredScanResult
@@ -425,7 +425,9 @@ class SafeAI:
         """Always reload policies from configured files."""
         return self.policy_engine.reload()
 
-    def memory_write(self, key: str, value: Any, *, agent_id: str = "unknown", strict: bool = False) -> bool:
+    def memory_write(
+        self, key: str, value: Any, *, agent_id: str = "unknown", strict: bool = False
+    ) -> MemoryWriteResult:
         """Write a value to schema-enforced agent memory.
 
         Args:
@@ -435,15 +437,15 @@ class SafeAI:
             strict: If True, raise MemoryValidationError on failure instead of returning False.
 
         Returns:
-            True if the write succeeded, False otherwise.
+            A :class:`MemoryWriteResult` with ``success`` and ``reason`` fields.
+            Supports ``bool()`` conversion for backward compatibility.
         """
         if not self.memory:
-            return False
+            return MemoryWriteResult(success=False, reason="no memory configured")
         self._auto_purge_memory(trigger="memory_write", agent_id=agent_id)
-        result = self.memory.write(key=key, value=value, agent_id=agent_id, strict=strict)
-        return bool(result)
+        return self.memory.write(key=key, value=value, agent_id=agent_id, strict=strict)
 
-    def memory_read(self, key: str, *, agent_id: str = "unknown") -> Any:
+    def memory_read(self, key: str, *, agent_id: str = "unknown") -> MemoryReadResult:
         """Read a value from agent memory.
 
         Args:
@@ -451,13 +453,12 @@ class SafeAI:
             agent_id: Agent performing the read.
 
         Returns:
-            The stored value, or None if not found / expired / no memory configured.
+            A :class:`MemoryReadResult` with ``found``, ``value``, and ``reason`` fields.
         """
         if not self.memory:
-            return None
+            return MemoryReadResult(found=False, reason="no memory configured")
         self._auto_purge_memory(trigger="memory_read", agent_id=agent_id)
-        result = self.memory.read(key=key, agent_id=agent_id)
-        return result.value if result.found else None
+        return self.memory.read(key=key, agent_id=agent_id)
 
     def memory_purge_expired(self) -> int:
         """Manually purge all expired entries from agent memory.

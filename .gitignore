@@ -37,4 +37,5 @@ alerts/
 contracts/
 plugins/
 policies/
-tenants/
+tenants/zimage test/
+DASHBOARD_DATA_MODEL.md
