@@ -32,10 +32,6 @@ def validate_command(config_path: str) -> None:
 
     if not policies:
         raise click.ClickException("No policies found. Check paths.policy_files.")
-    if not memories:
-        raise click.ClickException("No memory schemas found. Check paths.memory_schema_files.")
-    if not contracts:
-        raise click.ClickException("No tool contracts found. Check paths.contract_files.")
     if cfg.paths.identity_files and not identities:
         raise click.ClickException("No agent identity files found. Check paths.identity_files.")
 

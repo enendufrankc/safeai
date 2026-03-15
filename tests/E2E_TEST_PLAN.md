@@ -171,10 +171,11 @@ python -m safeai.cli.main init --path /tmp/safeai-user-e2e --non-interactive
 python -m safeai.cli.main validate --config /tmp/safeai-user-e2e/safeai.yaml
 ```
 
-Expected files (minimal — only 2):
+Expected files (minimal — 3):
 
 - `/tmp/safeai-user-e2e/safeai.yaml`
 - `/tmp/safeai-user-e2e/policies/default.yaml`
+- `/tmp/safeai-user-e2e/schemas/memory.yaml`
 
 Verify the YAML files have inline comments:
 
@@ -956,20 +957,25 @@ print(f"Secret backends: {len(backends)}")
 
 ### 12.2 Typed memory results
 
+Memory requires a config with a memory schema. Use `from_config` with the full scaffold:
+
 ```python
-ai = SafeAI.quickstart()
+from pathlib import Path
+from safeai import SafeAI
+
+ai = SafeAI.from_config(Path("/tmp/safeai-user-e2e-full/safeai.yaml"))
 
 # Write with typed result — memory_write(key, value)
-write_result = ai.memory_write("key1", "hello")
+write_result = ai.memory_write("user_preference", "en-US")
 print(f"Write success: {write_result.success}, reason: {write_result.reason}")
 assert write_result.success is True
 assert bool(write_result) is True  # backward compat
 
 # Read with typed result — memory_read(key)
-read_result = ai.memory_read("key1")
+read_result = ai.memory_read("user_preference")
 print(f"Read found: {read_result.found}, value: {read_result.value}")
 assert read_result.found is True
-assert read_result.value == "hello"
+assert read_result.value == "en-US"
 
 # Read missing key
 read_result = ai.memory_read("nonexistent")

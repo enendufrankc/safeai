@@ -16,6 +16,7 @@ from safeai.cli import ui
 MINIMAL_FILES = {
     Path("safeai.yaml"): Path("config/defaults/safeai-minimal.yaml"),
     Path("policies/default.yaml"): Path("config/defaults/policies/default.yaml"),
+    Path("schemas/memory.yaml"): Path("config/defaults/schemas/memory.yaml"),
 }
 
 FULL_FILES = {
@@ -246,7 +247,7 @@ def init_command(target_path: str, non_interactive: bool, minimal: bool) -> None
     if minimal:
         ui.bar()
         ui.bar("Tip: Run 'safeai init --full' for enterprise features", style="dim")
-        ui.bar("     (contracts, memory schemas, agents, plugins, tenants, alerts).", style="dim")
+        ui.bar("     (contracts, agents, plugins, tenants, alerts).", style="dim")
 
     # ── Intelligence setup ──────────────────────────────────────────
     intel_config = None

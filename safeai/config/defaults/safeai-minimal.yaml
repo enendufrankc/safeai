@@ -1,6 +1,6 @@
 # SafeAI minimal configuration.
-# This is the simplest setup — just policy paths and audit logging.
-# Run 'safeai init --full' to add contracts, memory, agents, plugins, and more.
+# This is the simplest setup — policy paths, memory schema, and audit logging.
+# Run 'safeai init --full' to add contracts, agents, plugins, and more.
 version: v1alpha1
 
 # ── File paths ──────────────────────────────────────────────────────
@@ -8,6 +8,9 @@ paths:
   # Policy rules that control allow/block/redact decisions.
   policy_files:
     - policies/default.yaml
+  # Memory schemas defining typed, retention-aware agent memory fields.
+  memory_schema_files:
+    - schemas/*.yaml
 
 # ── Audit logging ───────────────────────────────────────────────────
 # Every policy decision is logged here as a JSON-lines file.

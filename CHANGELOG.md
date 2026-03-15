@@ -4,6 +4,21 @@
 
 ### Added
 
+### Changed
+
+## 0.9.1 - 2026-03-15
+
+### Fixed
+
+- Minimal `safeai init` now scaffolds `schemas/memory.yaml` so `safeai validate` succeeds out of the box.
+- `safeai validate` no longer hard-fails when optional resources (contracts, identities) are absent in minimal mode.
+- Add `uvicorn[standard]` to the `[all]` extras so WebSocket support (`/v1/ws/events`) works without a separate install.
+- E2E test plan Phase 12.2 now uses `from_config()` with the full scaffold for memory tests (quickstart has no memory).
+
+## 0.9.0
+
+### Added
+
 - Skills system with 8 pre-built skill packages: `safeai`, `safeai-deploy`, `langchain-adapter`, `prompt-injection-shield`, `secrets-detector`, `finance-policies`, `gdpr-policies`, `healthcare-policies`.
 - Skills CLI (`safeai skills add|remove|list|search`) and Node.js installer (`npx safeai add <skill>`).
 - Skills registry (`skills-registry.json`) and lock file support.
